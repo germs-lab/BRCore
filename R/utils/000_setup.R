@@ -1,6 +1,7 @@
 # Package and Environment setup
-if (!require("pacman"))
-    install.packages("pacman")
+suppressWarnings({
+  if (!require(pacman)) install.packages("pacman")
+})
 
 pacman::p_load(
     conflicted,
