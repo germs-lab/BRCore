@@ -24,7 +24,11 @@ Writes a fasta file with the selected sequences.
 This function loads a fasta file, selects a subset on sequences based on the sequence's names and writes a new fsata file.
 }
 \examples{
-subset.fasta(file = "http://greengenes.lbl.gov/Data/JD_Tutorial/UnAligSeq24606.txt", subset = c("24.6jsd1.Tut", "24.6jsd2.Tut ", "24.6jsd3.Tut "), out = "out.fasta")
+subset_fasta(
+file = "http://greengenes.lbl.gov/Data/JD_Tutorial/UnAligSeq24606.txt", 
+subset = c("24.6jsd1.Tut", "24.6jsd2.Tut ", "24.6jsd3.Tut "), 
+out = "out.fasta"
+)
 }
 \author{
 Guillem Salazar \href{mailto:salazar@icm.csic.es}{salazar@icm.csic.es}
