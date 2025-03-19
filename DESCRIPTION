@@ -3,8 +3,8 @@ Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: c(
     person("Bolívar", "Aponte Rolón", , "bolaponte@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2544-4551")),
-    person("Brandon", "Kristy", role = c("aut", "cre")),
-    person("Gian", "Benucci", role = c("aut", "cre")),
+    person("Brandon", "Kristy", role = c("aut")),
+    person("Gian", "Benucci", role = c("aut")),
     person("Adina", "Howe", role = "ctb"),
     person("Jaejin", "Lee", role = "ctb"),
     person("Phillip", "de Lorimier", role = "ctb")
