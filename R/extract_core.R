@@ -35,10 +35,14 @@
 #'   - `sample_metadata`: The sample metadata used for analysis.
 #'   - `taxonomy_table`: The taxonomy table used for analysis.
 #'
+#' @import phyloseq
+#' @import dplyr
+#' @import tidyr 
+#' @import vegan
+#' @import tibble
+#' 
 #' @examples
 #' # Load the esophagus dataset
-#' data(esophagus, package = "phyloseq")
-#'
 #' data(esophagus, package = "phyloseq")
 #' 
 #' #' Get the taxa names from the esophagus dataset
@@ -95,11 +99,6 @@
 #'
 #' # View the results
 #' print(core_result)
-#' @import phyloseq
-#' @import dplyr
-#' @import tidyr 
-#' @import vegan
-#' @import tibble
 #' @export
 
 

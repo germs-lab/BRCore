@@ -60,8 +60,6 @@ NOTE: This technique requires en even sampling depth to perform, which requires 
 # Load the esophagus dataset
 data(esophagus, package = "phyloseq")
 
-data(esophagus, package = "phyloseq")
-
 #' Get the taxa names from the esophagus dataset
 taxa_names <- taxa_names(esophagus)
 
