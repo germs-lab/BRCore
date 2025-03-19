@@ -1,6 +1,35 @@
-# Model fitting
+#' Fit a Neutral Model to Microbial Community Data
+#'
+#' This function fits a neutral model to microbial community data, identifying taxa that are above or below the fitted model predictions. It provides insights into potential taxa that may be deterministically selected by the host or environment. The function supports both non-linear least squares (NLS) and maximum likelihood estimation (MLE) for model fitting.
+#'
+#' @param spp A community data matrix (samples as rows, taxa as columns).
+#' @param pool An optional community data matrix representing the source pool. If `NULL`, the average relative abundance of each taxon across `spp` is used.
+#' @param stats A logical value indicating whether to return model statistics (`TRUE`) or detailed predictions for each taxon (`FALSE`). Default is `TRUE`.
+#' @param taxon An optional data frame containing taxonomic information for each taxon. If provided, the output will include taxonomic details.
+#'
+#' @return If `stats = TRUE`, a data frame containing model statistics such as AIC, BIC, R-squared, and RMSE. If `stats = FALSE`, a data frame with detailed predictions for each taxon, including observed and predicted frequencies, confidence intervals, and taxonomic information (if provided).
+#'
+#' @importFrom stats confint pbeta pbinom ppois dnorm AIC BIC
+#' @importFrom stats4 mle
+#' @importFrom minpack.lm nlsLM
+#' @importFrom Hmisc binconf
+#' @export
+#'
+#' @examples
+#' # Load example data
+#' data(esophagus, package = "phyloseq")
+#'
+#' # Extract OTU table
+#' otu_table <- otu_table(esophagus)
+#'
+#' # Fit the neutral model
+#' model_stats <- sncm.fit(otu_table, stats = TRUE)
+#' print(model_stats)
+#'
+#' # Get detailed predictions for each taxon
+#' taxon_predictions <- sncm.fit(otu_table, stats = FALSE)
+#' head(taxon_predictions)
 
-# NEUTRAL MODEL FUNCTION: This function fits the extracted core OTU table from ExtractCore to a neutral model, identifying taxa that are above or below the fitted model predictions. This provides insights into potential taxa that may be deterministically selected by the plant host.
 sncm.fit <- function(spp,
                      pool = NULL,
                      stats = TRUE,
