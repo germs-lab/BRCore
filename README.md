@@ -4,6 +4,8 @@
 # BRCore
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome
