@@ -39,8 +39,51 @@
 #' # Load the esophagus dataset
 #' data(esophagus, package = "phyloseq")
 #'
-#' # Add mock taxonomy and sample metadata
-#' esophagus_with_tax <- prepare_esophagus_data(esophagus)
+#' data(esophagus, package = "phyloseq")
+#' 
+#' #' Get the taxa names from the esophagus dataset
+#' taxa_names <- taxa_names(esophagus)
+#' 
+#' # Define realistic taxonomy levels
+#' kingdoms <- c("Bacteria", "Archaea")
+#' phyla <- c("Firmicutes", "Bacteroidetes", "Proteobacteria", "Actinobacteria", "Euryarchaeota")
+#' classes <- c("Clostridia", "Bacteroidia", "Gammaproteobacteria", "Actinobacteria", "Methanobacteria")
+#' orders <- c("Clostridiales", "Bacteroidales", "Enterobacterales", "Bifidobacteriales", "Methanobacteriales")
+#' families <- c("Lachnospiraceae", "Bacteroidaceae", "Enterobacteriaceae", "Bifidobacteriaceae", "Methanobacteriaceae")
+#' genera <- c("Blautia", "Bacteroides", "Escherichia", "Bifidobacterium", "Methanobrevibacter")
+#' species <- c("Blautia producta", "Bacteroides fragilis", "Escherichia coli", "Bifidobacterium longum", "Methanobrevibacter smithii")
+#' 
+#' # Create a mock taxonomy table
+#' mock_taxonomy_table <- matrix(
+#'   c(
+#'     sample(kingdoms, length(taxa_names), replace = TRUE),
+#'     sample(phyla, length(taxa_names), replace = TRUE),
+#'     sample(classes, length(taxa_names), replace = TRUE),
+#'     sample(orders, length(taxa_names), replace = TRUE),
+#'     sample(families, length(taxa_names), replace = TRUE),
+#'     sample(genera, length(taxa_names), replace = TRUE),
+#'     sample(species, length(taxa_names), replace = TRUE)
+#'   ),
+#'   nrow = length(taxa_names),
+#'   ncol = 7,
+#'   dimnames = list(
+#'     taxa_names,
+#'     c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+#'   )
+#' )
+#' 
+#' # Convert to a taxonomy table object
+#' tax_table <- tax_table(mock_taxonomy_table)
+#' 
+#' # Add sample metadata to the esophagus dataset
+#' sample_data <- data.frame(
+#'   Sample = sample_names(esophagus),
+#'   Group = sample(c("A", "B"), nsamples(esophagus), replace = TRUE), #' Random groups
+#'   row.names = sample_names(esophagus)
+#' )
+#' 
+#' # Add the taxonomy table to the esophagus dataset
+#' esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data)) 
 #'
 #' # Extract core taxa using the "increase" method
 #' core_result <- extract_core(
