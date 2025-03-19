@@ -52,8 +52,6 @@ sample_data <- data.frame(
 
 # Add the taxonomy table to the esophagus dataset
 esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data))
-
-
 # Test suite
 test_that("extract_core() works with esophagus_with_tax dataset", {
   # Load expected

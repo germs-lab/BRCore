@@ -1,24 +1,16 @@
-library(phyloseq)
-library(vegan)
-library(tidyverse)
-library(waldo)
-library(testthat)
-list.files(here::here("R/functions/"), full.names = TRUE) |>
-  lapply(source)
-
-# Load the esophagus dataset
-data(esophagus, package = "phyloseq")
-
-# Add sample metadata to the esophagus dataset (required for calculate_nmds)
-sample_data <- data.frame(
-  Sample = sample_names(esophagus),
-  Group = sample(c("A", "B"), nsamples(esophagus), replace = TRUE), # Random groups
-  row.names = sample_names(esophagus)
-)
-esophagus_with_metadata <- merge_phyloseq(esophagus, sample_data(sample_data))
-
 # Test suite
 test_that("calculate_nmds() works with esophagus dataset", {
+  # Load the esophagus dataset
+  data(esophagus, package = "phyloseq")
+  
+  # Add sample metadata to the esophagus dataset (required for calculate_nmds)
+  sample_data <- data.frame(
+    Sample = sample_names(esophagus),
+    Group = sample(c("A", "B"), nsamples(esophagus), replace = TRUE), # Random groups
+    row.names = sample_names(esophagus)
+  )
+  esophagus_with_metadata <- merge_phyloseq(esophagus, sample_data(sample_data))
+  
   # Load expected results
   load(here::here("tests/testthat/expected_nmds.rda"))
 
