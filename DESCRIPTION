@@ -20,6 +20,7 @@ Imports:
     cli,
     conflicted,
     dplyr,
+    ggplot2,
     Hmisc,
     magrittr,
     minpack.lm,
@@ -28,6 +29,7 @@ Imports:
     stats4,
     styler,
     tibble,
+    tidyr,
     vegan
 Suggests: 
     here,
