@@ -23,11 +23,11 @@ The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](
 
 ## Installation
 
-To install the package, use the following command in R:
+Install the development version of `BRCore` from GitHub with:
 
 ```{r}
-install.packages("devtools")  # If you don't have devtools installed
-devtools::install_github("germs-lab/BRCore")
+# install.packages("pak")
+pak::pak("germs-lab/BRCore")
 ```
 
 ## Step 1: Load Required Libraries and Data
