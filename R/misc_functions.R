@@ -109,7 +109,7 @@ subset_fasta <- function(file = NULL,
 #' @return A plot showing stress values for NMDS with dimensions ranging from 1 to 10. Each dimension
 #'   is represented by 10 replicate stress values.
 #'
-#' @importFrom vegan metaMDS
+#' @import vegan
 #' @importFrom parallel mclapply detectCores
 #' @importFrom graphics plot points
 #' @export

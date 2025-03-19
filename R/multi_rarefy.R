@@ -9,7 +9,7 @@
 #' @return A data frame with samples as rows and taxa as columns. The values represent the average abundance across all iterations.
 #'
 #' @importFrom phyloseq otu_table
-#' @importFrom vegan rrarefy
+#' @import vegan
 #' @import dplyr
 #' @import tibble
 #' @export
