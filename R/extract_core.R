@@ -52,7 +52,11 @@
 #'
 #' # View the results
 #' print(core_result)
-#'
+#' @import phyloseq
+#' @import dplyr
+#' @import tidyr 
+#' @import vegan
+#' @import tibble
 #' @export
 
 

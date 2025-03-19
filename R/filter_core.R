@@ -13,6 +13,8 @@
 #'     \item \code{physeq_high_occ}: Phyloseq object with high occurrence ASVs.
 #'     \item \code{physeq_low_occ}: Phyloseq object with low occurrence ASVs.
 #'   }
+#' @import phyloseq
+#' @import dplyr
 #' @export
 filter_core <- function(physeq, threshold = 0.6, as = "rows") {
   # Validate inputs
@@ -68,7 +70,7 @@ filter_core <- function(physeq, threshold = 0.6, as = "rows") {
   low_occurrence_asvs <- names(asv_sample_counts[asv_sample_counts < total_samples * threshold])
 
   # Print ASV counts
-  cli::cli_alert_info("ASVs found in ≥{threshold * 100}% samples: {length(high_occurrence_asvs)}")
+  cli::cli_alert_info("ASVs found in >={threshold * 100}% samples: {length(high_occurrence_asvs)}")
   cli::cli_alert_info("ASVs found in <{threshold * 100}% samples: {length(low_occurrence_asvs)}")
 
   # Filter phyloseq objects for each category

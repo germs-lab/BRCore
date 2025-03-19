@@ -23,7 +23,11 @@ calculate_nmds(
 
 \item{k}{Number of dimensions for NMDS. Default is 2.}
 
+\item{maxit}{Maximum number of iterations for NMDS. Default is 999.}
+
 \item{trymax}{Maximum number of random starts for NMDS. Default is 100.}
+
+\item{previous.best}{A previous NMDS result to use as a starting point.}
 }
 \value{
 A list containing:

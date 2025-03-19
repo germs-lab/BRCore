@@ -16,16 +16,21 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
+    Biostrings,
     cli,
     conflicted,
     dplyr,
     Hmisc,
+    magrittr,
     minpack.lm,
     phyloseq,
+    rlang,
     stats4,
     styler,
+    tibble,
     vegan
 Suggests: 
     here,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidyverse
 Config/testthat/edition: 3

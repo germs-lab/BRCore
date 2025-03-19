@@ -73,5 +73,4 @@ core_result <- extract_core(
 
 # View the results
 print(core_result)
-
 }
