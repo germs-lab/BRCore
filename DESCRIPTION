@@ -1,8 +1,14 @@
 Package: BRCore
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Authors@R: c(
+    person("Bolívar", "Aponte Rolón", , "bolaponte@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2544-4551")),
+    person("Brandon", "Kristy", role = c("aut", "cre")),
+    person("Gian", "Benucci", role = c("aut", "cre")),
+    person("Adina", "Howe", role = "ctb"),
+    person("Jaejin", "Lee", role = "ctb"),
+    person("Phillip", "de Lorimier", role = "ctb")
+  )
 Description: What the package does (one paragraph).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
