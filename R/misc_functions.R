@@ -1,9 +1,36 @@
-# Miscellaneous functions for Inter-BRC Core Microbiome Analysis
-# By Bolívar Aponte Rolón
+#' Extract ASV/OTU Matrix from phyloseq or Matrix Object
+#'
+#' This function extracts an ASV/OTU matrix from a `phyloseq` or `matrix` object. 
+#' It ensures the matrix is in the correct format (samples as rows and ASVs as columns) 
+#' and filters samples based on a specified vector and row sums.
+#'
+#' @param physeq A `phyloseq` or `matrix` object containing ASV/OTU data. 
+#'   If a `phyloseq` object is provided, the OTU table is extracted. 
+#'   If a `matrix` is provided, it is used directly.
+#' @param .vec A character string or vector specifying the columns to select from the matrix. 
+#'   This is passed to `dplyr::select(contains(.vec))` to filter the matrix.
+#' @param keep_rows_sums A numeric value specifying the minimum row sum required to keep a sample. 
+#'   Rows (samples) with sums less than or equal to this value are removed. Default is `0`.
+#' @param taxa_are_rows A logical value specifying whether the taxa are rows in the matrix. Default is `TRUE`.
+#' @return A matrix with samples as rows and ASVs/OTUs as columns. Only samples matching 
+#'   the `.vec` criteria and with row sums greater than `keep_rows_sums` are retained.
+#'
+#' @importFrom phyloseq otu_table
+#' @importFrom dplyr select contains
+#' @importFrom cli cli_abort cli_alert_info cli_alert_success
+#' @export
+#'
+#' @examples
+#' # Load phyloseq object
+#' data(GlobalPatterns, package = "phyloseq")
+#'
+#' # Extract matrix for samples containing "Feces" in their names
+#' fec_matrix <- extract_matrix(GlobalPatterns, .vec = "Feces", keep_rows_sums = 10)
+#'
+#' # View the extracted matrix
+#' head(fec_matrix)
 
-# extract_matrix(): extract/subset a ASV/OTU matrix based on a vector of strings and a rowSums() condition.
-
-extract_matrix <- function(physeq, .vec, keep_rows_sums = 0) {
+extract_matrix <- function(physeq, .vec, keep_rows_sums = 0, taxa_are_rows = TRUE) {
   # Error handling
   if (!inherits(physeq, c("phyloseq", "matrix"))) {
     cli::cli_abort(
@@ -13,7 +40,7 @@ extract_matrix <- function(physeq, .vec, keep_rows_sums = 0) {
 
   if (inherits(physeq, "phyloseq")) {
     cli::cli_alert_info("Detected a 'phyloseq' object. Input object is valid!")
-    physeq <- otu_table(physeq)
+    physeq <- otu_table(physeq, taxa_are_rows = taxa_are_rows)
   } else {
     cli::cli_alert_info("Detected a 'matrix' object. Proceeding with the input matrix.")
   }
@@ -38,7 +65,6 @@ extract_matrix <- function(physeq, .vec, keep_rows_sums = 0) {
 }
 
 
-
 # Borrowed subset.fasta from https://github.com/GuillemSalazar/FastaUtils/blob/master/R/FastaUtils_functions.R
 
 #' Select a subset of sequences from a fasta file
@@ -49,6 +75,7 @@ extract_matrix <- function(physeq, .vec, keep_rows_sums = 0) {
 #' @param out Path to output file. If absent, the '.mod' is added to the input file's name (path is thus conserved).
 #' @keywords FastaUtils
 #' @return Writes a fasta file with the selected sequences.
+#' @importFrom Biostrings readDNAStringSet writeXStringSet
 #' @export
 #' @author Guillem Salazar <salazar@@icm.csic.es>
 #' @examples
@@ -60,7 +87,7 @@ extract_matrix <- function(physeq, .vec, keep_rows_sums = 0) {
 subset_fasta <- function(file = NULL,
                          subset = NULL,
                          out = paste(file, ".subset", sep = "")) {
-  library(Biostrings)
+  
   sequences <- readDNAStringSet(file)
   if (all(as.character(subset) %in% names(sequences)) == FALSE)
     stop("There are names in 'subset' not present in the fasta file")
@@ -69,7 +96,31 @@ subset_fasta <- function(file = NULL,
 }
 
 
-# Parallelized function for choosing dimensions for NMDS
+#' Parallelized NMDS Dimension Screening
+#'
+#' This function calculates and visualizes stress values for Non-Metric Multidimensional Scaling (NMDS)
+#' across different numbers of dimensions (1 to 10). The stress calculation is parallelized to improve
+#' performance, and the results are plotted to help choose the optimal number of dimensions.
+#'
+#' @param x A community data matrix (samples as rows, species as columns) or a distance matrix.
+#' @param ncores An integer specifying the number of CPU cores to use for parallel processing.
+#'   Defaults to `parallel::detectCores() - 1` (one less than the total number of available cores).
+#'
+#' @return A plot showing stress values for NMDS with dimensions ranging from 1 to 10. Each dimension
+#'   is represented by 10 replicate stress values.
+#'
+#' @importFrom vegan metaMDS
+#' @importFrom parallel mclapply detectCores
+#' @importFrom graphics plot points
+#' @export
+#'
+#' @examples
+#' # Load example data
+#' data(varespec, package = "vegan")
+#'
+#' # Run NMDS dimension screening
+#' nmds_screen_parallel(varespec, ncores = 2)
+
 nmds_screen_parallel <- function(x, ncores = parallel::detectCores() - 1) {
   # Function to calculate stress for a given number of dimensions
   calculate_stress <- function(k) {
@@ -93,7 +144,37 @@ nmds_screen_parallel <- function(x, ncores = parallel::detectCores() - 1) {
   }
 }
 
-# Standard NMDS plots
+#' Standard NMDS Plot with ggplot2
+#'
+#' This function creates a standardized Non-Metric Multidimensional Scaling (NMDS) plot using `ggplot2`.
+#' It includes points, ellipses, and reference lines for visualizing NMDS results. The function allows
+#' customization of color, shape, and handling of missing values.
+#'
+#' @param .data A data frame containing NMDS coordinates (NMDS1 and NMDS2) and additional metadata.
+#' @param .color A column in `.data` to use for coloring points and ellipses. This should be a categorical variable.
+#' @param .shape A column in `.data` to use for shaping points. This is optional and can be `NULL`.
+#' @param .drop_na A column in `.data` used to filter out rows with missing values. Rows with `NA` in this column will be removed.
+#'
+#' @return A `ggplot` object representing the NMDS plot with points, ellipses, and reference lines.
+#'
+#' @import ggplot2
+#' @import dplyr
+#' @import tidyr
+#' @import rlang
+#' @export
+#'
+#' @examples
+#' # Load example data
+#' data(dune, package = "vegan")
+#' data(dune.env, package = "vegan")
+#'
+#' # Run NMDS
+#' nmds_result <- metaMDS(dune, k = 2)
+#' nmds_scores <- scores(nmds_result, display = "sites")
+#' nmds_data <- cbind(nmds_scores, dune.env)
+#'
+#' # Create NMDS plot
+#' gg_nmds(nmds_data, .color = Management, .drop_na = Management)
 gg_nmds <- function(.data, .color, .shape = NULL, .drop_na) {
   .color <- enquo(.color)
   .drop_na <- enquo(.drop_na)
