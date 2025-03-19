@@ -43,6 +43,7 @@
 #' 
 #' @examples
 #' # Load the esophagus dataset
+#' library(phyloseq)
 #' data(esophagus, package = "phyloseq")
 #' 
 #' #' Get the taxa names from the esophagus dataset
@@ -50,12 +51,36 @@
 #' 
 #' # Define realistic taxonomy levels
 #' kingdoms <- c("Bacteria", "Archaea")
-#' phyla <- c("Firmicutes", "Bacteroidetes", "Proteobacteria", "Actinobacteria", "Euryarchaeota")
-#' classes <- c("Clostridia", "Bacteroidia", "Gammaproteobacteria", "Actinobacteria", "Methanobacteria")
-#' orders <- c("Clostridiales", "Bacteroidales", "Enterobacterales", "Bifidobacteriales", "Methanobacteriales")
-#' families <- c("Lachnospiraceae", "Bacteroidaceae", "Enterobacteriaceae", "Bifidobacteriaceae", "Methanobacteriaceae")
-#' genera <- c("Blautia", "Bacteroides", "Escherichia", "Bifidobacterium", "Methanobrevibacter")
-#' species <- c("Blautia producta", "Bacteroides fragilis", "Escherichia coli", "Bifidobacterium longum", "Methanobrevibacter smithii")
+#' phyla <- c("Firmicutes", 
+#' "Bacteroidetes", 
+#' "Proteobacteria", 
+#' "Actinobacteria", 
+#' "Euryarchaeota")
+#' classes <- c("Clostridia", 
+#' "Bacteroidia", 
+#' "Gammaproteobacteria", 
+#' "Actinobacteria", 
+#' "Methanobacteria")
+#' orders <- c("Clostridiales", 
+#' "Bacteroidales", 
+#' "Enterobacterales", 
+#' "Bifidobacteriales", 
+#' "Methanobacteriales")
+#' families <- c("Lachnospiraceae", 
+#' "Bacteroidaceae", 
+#' "Enterobacteriaceae", 
+#' "Bifidobacteriaceae", 
+#' "Methanobacteriaceae")
+#' genera <- c("Blautia", 
+#' "Bacteroides", 
+#' "Escherichia", 
+#' "Bifidobacterium", 
+#' "Methanobrevibacter")
+#' species <- c("Blautia producta", 
+#' "Bacteroides fragilis", 
+#' "Escherichia coli", 
+#' "Bifidobacterium longum", 
+#' "Methanobrevibacter smithii")
 #' 
 #' # Create a mock taxonomy table
 #' mock_taxonomy_table <- matrix(
