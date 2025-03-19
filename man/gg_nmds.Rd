@@ -25,8 +25,8 @@ customization of color, shape, and handling of missing values.
 }
 \examples{
 # Load example data
+library(vegan)
 data(dune, package = "vegan")
-data(dune.env, package = "vegan")
 
 # Run NMDS
 nmds_result <- metaMDS(dune, k = 2)
