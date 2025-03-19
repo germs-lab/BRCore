@@ -11,6 +11,9 @@ filter_core(physeq, threshold = 0.6, as = "rows")
 
 \item{threshold}{A numeric value between 0 and 1 specifying the occurrence threshold.
 Default is 0.6 (60\% of samples).}
+
+\item{as}{The matrix dimension that is desired for taxa. Must be
+"rows" for rows and "columns" or "cols" for columns.}
 }
 \value{
 A named list containing:

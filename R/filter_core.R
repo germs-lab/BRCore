@@ -6,7 +6,7 @@
 #' @param physeq A phyloseq object.
 #' @param threshold A numeric value between 0 and 1 specifying the occurrence threshold.
 #'   Default is 0.6 (60% of samples).
-#' @as as The matrix dimension that is desired for taxa. Must be
+#' @param as The matrix dimension that is desired for taxa. Must be
 #'   "rows" for rows and "columns" or "cols" for columns.
 #' @return A named list containing:
 #'   \itemize{

@@ -64,7 +64,7 @@ data(esophagus, package = "phyloseq")
 esophagus_with_tax <- prepare_esophagus_data(esophagus)
 
 # Extract core taxa using the "increase" method
-core_result <- ExtractCore(
+core_result <- extract_core(
   physeq = esophagus_with_tax,
   Var = "Group",
   method = "increase",
