@@ -23,6 +23,7 @@ performance, and the results are plotted to help choose the optimal number of di
 }
 \examples{
 # Load example data
+library(vegan)
 data(varespec, package = "vegan")
 
 # Run NMDS dimension screening

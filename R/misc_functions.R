@@ -116,6 +116,7 @@ subset_fasta <- function(file = NULL,
 #'
 #' @examples
 #' # Load example data
+#' library(vegan)
 #' data(varespec, package = "vegan")
 #'
 #' # Run NMDS dimension screening
