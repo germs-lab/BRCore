@@ -186,7 +186,7 @@ obs1 <- obs1 %>%
 
 
 obs1 %>%
-<<<<<<< Updated upstream
+
   ggplot(aes(x = log10(otu_rel), y = otu_occ)) +
   scale_fill_npg(
     name = "Core Membership: Model Predictions",
@@ -260,7 +260,7 @@ obs1 %>%
     legend.title = element_text(size = 14),
     plot.margin = unit(c(.5, 1, .5, .5), "cm")
   )
-=======
+
     ggplot(aes(x = log10(otu_rel), y = otu_occ)) +
     scale_fill_npg(
         name = "Core Membership: Model Predictions",
@@ -333,4 +333,4 @@ obs1 %>%
         legend.title = element_text(size = 14),
         plot.margin = unit(c(.5, 1, .5, .5), "cm")
     )
->>>>>>> Stashed changes
+
