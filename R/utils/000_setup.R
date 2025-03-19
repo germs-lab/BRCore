@@ -8,17 +8,7 @@ pacman::p_load(
     styler,
     phyloseq,
     vegan,
-    tidyverse,
-    ggsci,
-    ggpubr,
-    hillR,
-    microViz,
-    magrittr,
-    lazyeval,
-    minpack.lm,
-    Hmisc,
-    stats4,
-    metagMisc
+    tidyverse
 )
 
 # Scripts

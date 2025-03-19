@@ -55,12 +55,12 @@ esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_da
 
 
 # Test suite
-test_that("ExtractCore() works with esophagus_with_tax dataset", {
+test_that("extract_core() works with esophagus_with_tax dataset", {
   # Load expected
   load(here::here("tests/testthat/expected_extract_core.rda"))
 
   # Run the function
-  test_core <- ExtractCore(
+  test_core <- extract_core(
     esophagus_with_tax,
     Var = "site",
     method = "increase",

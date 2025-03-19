@@ -1,23 +1,62 @@
-# The functions below use abundance-occupancy distributions fitted to a neutral model
-# described by Shade and Stopnisek, 2019. Core microbial taxa are selected based on their
-# contributions to overall microbial beta-diversity. In the described function, a core microbial taxa
-# must contribute at least ~2% of variation to Bray-Curtis dissimilarity to be considered a 'core' microbial taxa
-# -- but this value can be manipulated within the function.
+#' Extract Core Microbial Taxa
+#'
+#' Identifies core microbial taxa based on abundance-occupancy distributions and their contributions
+#' to Bray-Curtis dissimilarity. Core taxa are selected using either the "increase" or "elbow" method.
+#'
+#' The functions below use abundance-occupancy distributions fitted to a neutral model
+#' described by Shade and Stopnisek, 2019. Core microbial taxa are selected based on their
+#' contributions to overall microbial beta-diversity. In the described function, a core microbial taxa
+#' must contribute at least ~2% of variation to Bray-Curtis dissimilarity to be considered a 'core' microbial taxa but this value can be manipulated within the function.
 
-# Core microbial taxa whose abundance and occupancy are above the fitted neutral model's confidence intervals
-# indicates greater occupancy across samples given abundance, suggesting deterministic selection by the plant.
-# Alternatively, core microbial taxa that are below the fitted neutral model indicates greater abundance given
-# lower occupancy; these taxa may be  dispersal limited.
+#' Core microbial taxa whose abundance and occupancy are above the fitted neutral model's confidence intervals
+#' indicates greater occupancy across samples given abundance, suggesting deterministic selection by the plant.
+#' Alternatively, core microbial taxa that are below the fitted neutral model indicates greater abundance given
+#' lower occupancy; these taxa may be  dispersal limited.
 
-# More info on the functions can be found in Shade and Stopnisek, 2019. Original functions were developed in VanWallendael et al 2021.
-# Code was adapted and updated by Nicco Benucci (GLBRC, Bonito Lab) and Brandon Kristy (GLBRC, Evans Lab).
-# Error handling, helper functions and refactoring by Bolívar Aponte Rolón (CABBI, GERMS Lab) and Brandon Kristy. -2025-03-06
+#' More info on the functions can be found in Shade and Stopnisek, 2019. Original functions were developed in VanWallendael et al 2021.
+#' Code was adapted and updated by Nicco Benucci (GLBRC, Bonito Lab) and Brandon Kristy (GLBRC, Evans Lab).
+#' Error handling, helper functions and refactoring by Bolívar Aponte Rolón (CABBI, GERMS Lab) and Brandon Kristy. -2025-03-06
+#' NOTE: This technique requires en even sampling depth to perform, which requires rarefaction.
 
-# EXTRACT CORE FUNCTION: This function extracts a core microbial community based on abundnace occupancy
-# distributions and each taxa's contributions to BC-dissimilarity.
-# The threshold defined for this analysis is 2% (1.02 in the below function).
+#'
+#' @param physeq A `phyloseq` object containing an OTU table, taxonomy table, and sample metadata.
+#' @param Var A character string specifying the column name in the sample metadata to group samples.
+#' @param method A character string specifying the method for selecting core taxa.
+#' @param increase_value A numeric value specifying the threshold for core taxa selection.
+#' @param Group A character string specifying the column name in the sample metadata to subset the data.
+#' @param Level A character vector specifying the level(s) within the `Group` column to subset the data.
+#'
+#' @return A list containing the following elements:
+#'   - `core_otus`: A vector of core OTU IDs.
+#'   - `bray_curtis_ranked`: A data frame of Bray-Curtis dissimilarity rankings.
+#'   - `otu_rankings`: A data frame of OTU rankings based on occupancy and abundance.
+#'   - `occupancy_abundance`: A data frame of occupancy and abundance values.
+#'   - `otu_table`: The OTU table used for analysis.
+#'   - `sample_metadata`: The sample metadata used for analysis.
+#'   - `taxonomy_table`: The taxonomy table used for analysis.
+#'
+#' @examples
+#' # Load the esophagus dataset
+#' data(esophagus, package = "phyloseq")
+#'
+#' # Add mock taxonomy and sample metadata
+#' esophagus_with_tax <- prepare_esophagus_data(esophagus)
+#'
+#' # Extract core taxa using the "increase" method
+#' core_result <- ExtractCore(
+#'   physeq = esophagus_with_tax,
+#'   Var = "Group",
+#'   method = "increase",
+#'   increase_value = 2
+#' )
+#'
+#' # View the results
+#' print(core_result)
+#'
+#' @export
 
-ExtractCore <- function(physeq, Var, method, increase_value = NULL, Group = NULL, Level = NULL) {
+
+extract_core <- function(physeq, Var, method, increase_value = NULL, Group = NULL, Level = NULL) {
         set.seed(37920)
         
         # Error handling: type check
@@ -349,6 +388,3 @@ ExtractCore <- function(physeq, Var, method, increase_value = NULL, Group = NULL
   return(return_list)
 }
         
-## NOTE: This technique requires en even sampling depth to perform, which requires rarefaction.
-# I tested this function /wo rarefaction (using the mean sampling depth instead),
-# and there were no differences in core community composition or identification.

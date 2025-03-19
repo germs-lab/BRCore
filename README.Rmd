@@ -14,23 +14,113 @@ knitr::opts_chunk$set(
 # BRCore
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of functions to process and analyze the data.
+The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of tools to process and analyze microbial data from Bioenergy Research Centers.
 
-<!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
+## Installation
 
-<!-- ```{r cars} -->
-<!-- summary(cars) -->
-<!-- ``` -->
+To install the package, use the following command in R:
 
-<!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. -->
+```{r}
+install.packages("devtools")  # If you don't have devtools installed
+devtools::install_github("germs-lab/BRCore")
+```
 
-<!-- You can also embed plots, for example: -->
+## Step 1: Load Required Libraries and Data
 
-<!-- ```{r pressure, echo = FALSE} -->
-<!-- plot(pressure) -->
-<!-- ``` -->
+```{r}
+library(phyloseq)
+library(BRCore)
 
-<!-- In that case, don't forget to commit and push the resulting figure files, so they display on GitHub. -->
+# Load the esophagus dataset
+data(esophagus, package = "phyloseq")
+```
+
+## Step 2: Create Mock Taxonomy Table
+
+```{r}
+# Get the taxa names from the esophagus dataset
+taxa_names <- taxa_names(esophagus)
+
+# Define realistic taxonomy levels
+kingdoms <- c("Bacteria", "Archaea")
+phyla <- c("Firmicutes", "Bacteroidetes", "Proteobacteria", "Actinobacteria", "Euryarchaeota")
+classes <- c("Clostridia", "Bacteroidia", "Gammaproteobacteria", "Actinobacteria", "Methanobacteria")
+orders <- c("Clostridiales", "Bacteroidales", "Enterobacterales", "Bifidobacteriales", "Methanobacteriales")
+families <- c("Lachnospiraceae", "Bacteroidaceae", "Enterobacteriaceae", "Bifidobacteriaceae", "Methanobacteriaceae")
+genera <- c("Blautia", "Bacteroides", "Escherichia", "Bifidobacterium", "Methanobrevibacter")
+species <- c("Blautia producta", "Bacteroides fragilis", "Escherichia coli", "Bifidobacterium longum", "Methanobrevibacter smithii")
+
+# Create a mock taxonomy table
+mock_taxonomy_table <- matrix(
+  c(
+    sample(kingdoms, length(taxa_names), replace = TRUE),
+    sample(phyla, length(taxa_names), replace = TRUE),
+    sample(classes, length(taxa_names), replace = TRUE),
+    sample(orders, length(taxa_names), replace = TRUE),
+    sample(families, length(taxa_names), replace = TRUE),
+    sample(genera, length(taxa_names), replace = TRUE),
+    sample(species, length(taxa_names), replace = TRUE)
+  ),
+  nrow = length(taxa_names),
+  ncol = 7,
+  dimnames = list(
+    taxa_names,
+    c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")
+  )
+)
+
+# Convert to a taxonomy table object
+tax_table <- tax_table(mock_taxonomy_table)
+```
+
+## Step 3: Add Sample Metadata
+
+```{r}
+# Add sample metadata to the esophagus dataset
+sample_data <- data.frame(
+  Sample = sample_names(esophagus),
+  Group = sample(c("A", "B"), nsamples(esophagus), replace = TRUE), # Random groups
+  row.names = sample_names(esophagus)
+)
+
+# Add the taxonomy table and sample metadata to the esophagus dataset
+esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data))
+```
+
+## Step 4: Run extract_core()
+
+```{r}
+# Extract core microbial taxa
+core_result <- extract_core(
+  physeq = esophagus_with_tax,
+  Var = "Group",  # Variable in sample metadata to group by
+  method = "increase",  # Method for core taxa selection
+  increase_value = 2  # Threshold for core taxa inclusion (2% contribution to Bray-Curtis dissimilarity)
+)
+
+# View the results
+print(core_result)
+```
+
+## Output
+
+The `extract_core()` function returns a list containing the following elements:
+
+-   **core_otus**: A vector of core OTUs identified based on the specified threshold.
+
+-   **bray_curtis_ranked**: A data frame of Bray-Curtis dissimilarity rankings.
+
+-   **otu_rankings**: A data frame of OTU rankings based on occupancy and abundance.
+
+-   **occupancy_abundance**: A data frame of occupancy and abundance values for each OTU.
+
+-   **otu_table**: The OTU table used for analysis.
+
+-   **sample_metadata**: The sample metadata used for analysis.
+
+-   **taxonomy_table**: The taxonomy table used for analysis.
