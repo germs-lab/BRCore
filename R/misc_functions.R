@@ -172,7 +172,7 @@ nmds_screen_parallel <- function(x, ncores = parallel::detectCores() - 1) {
 #' # Run NMDS
 #' nmds_result <- metaMDS(dune, k = 2)
 #' nmds_scores <- scores(nmds_result, display = "sites")
-#' nmds_data <- cbind(nmds_scores, dune.env)
+#' nmds_data <- cbind(nmds_scores, dune)
 #'
 #' # Create NMDS plot
 #' gg_nmds(nmds_data, .color = Management, .drop_na = Management)
