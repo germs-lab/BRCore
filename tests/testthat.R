@@ -8,7 +8,7 @@
 
 library(testthat)
 library(here)
+library(phyloseq)
 library(BRCore)
 
-test_dir(here::here('tests/testthat/'), stop_on_failure = TRUE)
 test_check("BRCore")

@@ -9,7 +9,7 @@
 #'
 #' @return If `stats = TRUE`, a data frame containing model statistics such as AIC, BIC, R-squared, and RMSE. If `stats = FALSE`, a data frame with detailed predictions for each taxon, including observed and predicted frequencies, confidence intervals, and taxonomic information (if provided).
 #'
-#' @importFrom stats confint pbeta pbinom ppois dnorm AIC BIC
+#' @importFrom stats confint pbeta pbinom ppois dnorm AIC BIC coef
 #' @importFrom stats4 mle
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
