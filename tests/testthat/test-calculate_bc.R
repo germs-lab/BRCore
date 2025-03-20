@@ -1,7 +1,3 @@
-library(testthat)
-list.files(here::here("R/functions/"), full.names = TRUE) |>
-  lapply(source)
-
 # Unit Tests
 test_that("calculate_bc() correctly computes Bray-Curtis between samples", {
   # Test 1: 1 OTU x 2 samples

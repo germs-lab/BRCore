@@ -40,9 +40,9 @@ test_phyloseq_rare <-
     prune_samples(sample_sums(x = .) > 0, x = .)
 
 
-# Extract the 'spatial' core microbiome across all sites. The 'Var' in the ExtractCore is 'site'.
+# Extract the 'spatial' core microbiome across all sites. The 'Var' in the extract_core is 'site'.
 
-spatial_core <- ExtractCore(
+spatial_core <- extract_core(
     test_small_phyloseq,
     Var = "site",
     method = "increase",
