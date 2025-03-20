@@ -14,21 +14,6 @@
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
 #' @export
-#'
-#' @examples
-#' # Load example data
-#' data(esophagus, package = "phyloseq")
-#'
-#' # Extract OTU table
-#' otu_table <- otu_table(esophagus)
-#'
-#' # Fit the neutral model
-#' model_stats <- sncm.fit(otu_table, stats = TRUE)
-#' print(model_stats)
-#'
-#' # Get detailed predictions for each taxon
-#' taxon_predictions <- sncm.fit(otu_table, stats = FALSE)
-#' head(taxon_predictions)
 
 sncm.fit <- function(spp,
                      pool = NULL,

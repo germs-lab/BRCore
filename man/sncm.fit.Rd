@@ -21,18 +21,3 @@ If \code{stats = TRUE}, a data frame containing model statistics such as AIC, BI
 \description{
 This function fits a neutral model to microbial community data, identifying taxa that are above or below the fitted model predictions. It provides insights into potential taxa that may be deterministically selected by the host or environment. The function supports both non-linear least squares (NLS) and maximum likelihood estimation (MLE) for model fitting.
 }
-\examples{
-# Load example data
-data(esophagus, package = "phyloseq")
-
-# Extract OTU table
-otu_table <- otu_table(esophagus)
-
-# Fit the neutral model
-model_stats <- sncm.fit(otu_table, stats = TRUE)
-print(model_stats)
-
-# Get detailed predictions for each taxon
-taxon_predictions <- sncm.fit(otu_table, stats = FALSE)
-head(taxon_predictions)
-}

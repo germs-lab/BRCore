@@ -15,7 +15,7 @@
 #' @return A matrix with samples as rows and ASVs/OTUs as columns. Only samples matching 
 #'   the `.vec` criteria and with row sums greater than `keep_rows_sums` are retained.
 #'
-#' @importFrom phyloseq otu_table
+#' @import phyloseq
 #' @importFrom dplyr select contains
 #' @importFrom cli cli_abort cli_alert_info cli_alert_success
 #' @export
@@ -78,12 +78,7 @@ extract_matrix <- function(physeq, .vec, keep_rows_sums = 0, taxa_are_rows = TRU
 #' @importFrom Biostrings readDNAStringSet writeXStringSet
 #' @export
 #' @author Guillem Salazar <salazar@@icm.csic.es>
-#' @examples
-#' subset_fasta(
-#' file = "http://greengenes.lbl.gov/Data/JD_Tutorial/UnAligSeq24606.txt", 
-#' subset = c("24.6jsd1.Tut", "24.6jsd2.Tut ", "24.6jsd3.Tut "), 
-#' out = "out.fasta"
-#' )
+
 subset_fasta <- function(file = NULL,
                          subset = NULL,
                          out = paste(file, ".subset", sep = "")) {

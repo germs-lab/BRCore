@@ -12,7 +12,7 @@ test_that("calculate_nmds() works with esophagus dataset", {
   esophagus_with_metadata <- phyloseq::merge_phyloseq(esophagus, sample_data(sample_data))
   
   # Load expected results
-  load(here::here("tests/testthat/expected_nmds.rda"))
+  load(here::here("testthat/expected_nmds.rda"))
 
   # Extract the OTU table from the esophagus dataset
   esophagus_asv_matrix <- as.matrix(otu_table(esophagus_with_metadata))
