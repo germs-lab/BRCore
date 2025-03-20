@@ -56,7 +56,7 @@ jobs:
       - name: Setup R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache: "false"
+          cache: false
           cache-version: 2 
           extra-packages: any::rmarkdown, local::., renv=?ignore
 
