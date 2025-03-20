@@ -8,13 +8,18 @@
 #' @param physeq A phyloseq object containing sample metadata.
 #' @param ncores Number of cores for parallel processing. Default is `parallel::detectCores()`.
 #' @param k Number of dimensions for NMDS. Default is 2.
+#' @param maxit Maximum number of iterations for NMDS. Default is 999.
 #' @param trymax Maximum number of random starts for NMDS. Default is 100.
+#' @param previous.best A previous NMDS result to use as a starting point.
 #' @return A list containing:
 #'   \itemize{
 #'     \item \code{nmds_scores}: NMDS scores for samples.
 #'     \item \code{nmds_df}: NMDS scores merged with sample metadata.
 #'     \item \code{ordi}: NMDS ordination object.
 #'   }
+#' @import phyloseq
+#' @import dplyr
+#' @import vegan
 #' @export
 calculate_nmds <- function(asv_matrix,
                            physeq,

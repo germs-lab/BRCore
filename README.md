@@ -4,11 +4,13 @@
 # BRCore
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of BRCore is to aid the analysis of the [Inter BRC COree
-Microbiome project](https://github.com/germs-lab/interbrc-core-analysis)
-by providing a set of functions to process and analyze the data.
+The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome
+project](https://github.com/germs-lab/interbrc-core-analysis) by
+providing a set of functions to process and analyze the data.
 
 <!-- What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so: -->
 <!-- ```{r cars} -->
