@@ -33,7 +33,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - name: Checout repository
+      - name: Checkout PR branch
         uses: actions/checkout@v4
 
       - name: Setup Pandoc
