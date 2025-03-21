@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of tools to process and analyze microbial data from Bioenergy Research Centers.
+The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of tools to process and analyze microbial data from Bioenergy Research Centers. ***This is still an experimental package***.
 
 ## Installation
 

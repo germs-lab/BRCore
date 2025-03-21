@@ -56,9 +56,7 @@ jobs:
       - name: Setup R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          cache: false
-          cache-version: 2 
-          extra-packages: any::rmarkdown, local::., renv=?ignore
+          extra-packages: any::rmarkdown, local::.
 
       - name: Render RMarkdown files
         shell: bash
@@ -71,7 +69,7 @@ jobs:
             echo "No RMarkdown files changed."
           fi
 
-      - name: Commit Results
+      - name: Commit Results to PR branch
         shell: bash
         run: |
           if [ -n "$RMD_PATH" ]; then
