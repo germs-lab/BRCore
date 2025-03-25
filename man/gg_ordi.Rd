@@ -14,8 +14,6 @@ gg_ordi(.data, .color, ordi, .drop_na = NULL)
 \item{ordi}{A character string specifying the ordination method. Options are "NMDS" and "PcoA".}
 
 \item{.drop_na}{A column in \code{.data} used to filter out rows with missing values. Rows with \code{NA} in this column will be removed.}
-
-\item{.shape}{A column in \code{.data} to use for shaping points. This is optional and can be \code{NULL}.}
 }
 \value{
 A \code{ggplot} object representing the NMDS plot with points, ellipses, and reference lines.
@@ -39,5 +37,5 @@ dune$Management <- sample(c("A", "B"), nrow(dune), replace = TRUE)
 nmds_data <- cbind(nmds_scores, dune)
 
 # Create NMDS plot
-gg_ordi(nmds_data, .color = Management, .drop_na = Management)
+gg_ordi(nmds_data, .color = Management, ordi = "NMDS", .drop_na = Management)
 }

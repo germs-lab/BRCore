@@ -149,7 +149,6 @@ nmds_screen_parallel <- function(x, ncores = parallel::detectCores() - 1) {
 #' @param .data A data frame containing ordination coordinates and additional metadata.
 #' @param ordi A character string specifying the ordination method. Options are "NMDS" and "PcoA".
 #' @param .color A column in `.data` to use for coloring points and ellipses. This should be a categorical variable.
-#' @param .shape A column in `.data` to use for shaping points. This is optional and can be `NULL`.
 #' @param .drop_na A column in `.data` used to filter out rows with missing values. Rows with `NA` in this column will be removed.
 #'
 #' @return A `ggplot` object representing the NMDS plot with points, ellipses, and reference lines.
@@ -174,7 +173,7 @@ nmds_screen_parallel <- function(x, ncores = parallel::detectCores() - 1) {
 #' nmds_data <- cbind(nmds_scores, dune)
 #'
 #' # Create NMDS plot
-#' gg_ordi(nmds_data, .color = Management, .drop_na = Management)
+#' gg_ordi(nmds_data, .color = Management, ordi = "NMDS", .drop_na = Management)
 # Standard Ordination plot
 gg_ordi <- function(.data, .color, ordi, .drop_na = NULL) {
   # Input validation
