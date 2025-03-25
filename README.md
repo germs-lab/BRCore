@@ -27,17 +27,17 @@ pak::pak("germs-lab/BRCore")
 #> 
 #> → Will update 1 package.
 #> → The package (0 B) is cached.
-#> + BRCore 0.0.0.9000 → 0.0.0.9000 [bld][cmp] (GitHub: 51d757d)
+#> + BRCore 0.0.0.9000 → 0.0.0.9000 [bld][cmp] (GitHub: 1ad972a)
 #> ✔ All system requirements are already installed.
 #> 
 #> ℹ No downloads are needed, 1 pkg is cached
-#> ✔ Got BRCore 0.0.0.9000 (source) (740.97 kB)
+#> ✔ Got BRCore 0.0.0.9000 (source) (587.62 kB)
 #> ℹ Installing system requirements
 #> ℹ Executing `sudo sh -c apt-get -y update`
 #> Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [142 B]
-#> Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
 #> Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
 #> Hit:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease
+#> Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
 #> Hit:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease
 #> Hit:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease
 #> Hit:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease
@@ -53,13 +53,13 @@ pak::pak("germs-lab/BRCore")
 #> libxml2-dev is already the newest version (2.9.14+dfsg-1.3ubuntu3.2).
 #> pandoc is already the newest version (3.1.3+ds-2).
 #> libicu-dev is already the newest version (74.2-1ubuntu3.1).
-#> 0 upgraded, 0 newly installed, 0 to remove and 54 not upgraded.
+#> 0 upgraded, 0 newly installed, 0 to remove and 59 not upgraded.
 #> ℹ Packaging BRCore 0.0.0.9000
-#> ✔ Packaged BRCore 0.0.0.9000 (564ms)
+#> ✔ Packaged BRCore 0.0.0.9000 (573ms)
 #> ℹ Building BRCore 0.0.0.9000
-#> ✔ Built BRCore 0.0.0.9000 (8.8s)
-#> ✔ Installed BRCore 0.0.0.9000 (github::germs-lab/BRCore@51d757d) (1s)
-#> ✔ 1 pkg + 114 deps: kept 111, upd 1, dld 1 (NA B) [17.9s]
+#> ✔ Built BRCore 0.0.0.9000 (10.5s)
+#> ✔ Installed BRCore 0.0.0.9000 (github::germs-lab/BRCore@1ad972a) (1s)
+#> ✔ 1 pkg + 114 deps: kept 111, upd 1, dld 1 (NA B) [19.1s]
 ```
 
 ## Step 1: Load Required Libraries and Data
@@ -137,7 +137,7 @@ core_result <- extract_core(
 #> ✔ Input phyloseq object is valid!
 #> ℹ Calculating BC dissimilarity based on the 1st ranked OTU
 #> ✔ BC dissimilarity based on the 1st ranked OTU complete
-#> ℹ Calculating BC dissimilarity based on ranked OTUs, starting at 2025-03-21 15:54:35.26651
+#> ℹ Calculating BC dissimilarity based on ranked OTUs, starting at 2025-03-25 16:49:56.688574
 #> ✔ BC ranks done!
 #> Joining with `by = join_by(rank)`
 #> Joining with `by = join_by(rank, IncreaseBC)`
@@ -319,106 +319,106 @@ print(core_result)
 #> $sample_metadata
 #>   Sample Group SampleID
 #> B      B     A        B
-#> C      C     A        C
+#> C      C     B        C
 #> D      D     B        D
 #> 
 #> $taxonomy_table
 #>          Kingdom         Phylum               Class              Order
-#> 59_8_22  Archaea  Euryarchaeota     Methanobacteria  Bifidobacteriales
-#> 59_5_13 Bacteria  Euryarchaeota Gammaproteobacteria   Enterobacterales
-#> 59_8_12 Bacteria     Firmicutes          Clostridia   Enterobacterales
-#> 65_3_22 Bacteria  Bacteroidetes         Bacteroidia      Bacteroidales
-#> 65_5_1   Archaea     Firmicutes         Bacteroidia      Clostridiales
-#> 65_1_10  Archaea  Euryarchaeota     Methanobacteria      Clostridiales
-#> 65_7_12  Archaea Proteobacteria          Clostridia      Bacteroidales
-#> 59_6_1  Bacteria  Bacteroidetes          Clostridia Methanobacteriales
-#> 65_2_17  Archaea  Bacteroidetes      Actinobacteria  Bifidobacteriales
-#> 65_9_26 Bacteria  Euryarchaeota     Methanobacteria  Bifidobacteriales
-#> 65_5_18 Bacteria Proteobacteria         Bacteroidia   Enterobacterales
-#> 65_8_12 Bacteria     Firmicutes Gammaproteobacteria  Bifidobacteriales
-#> 65_9_1  Bacteria  Bacteroidetes      Actinobacteria  Bifidobacteriales
-#> 59_9_26  Archaea  Bacteroidetes          Clostridia Methanobacteriales
-#> 9_6_28  Bacteria Actinobacteria     Methanobacteria  Bifidobacteriales
-#> 65_7_4  Bacteria     Firmicutes     Methanobacteria   Enterobacterales
-#> 65_4_26  Archaea Actinobacteria         Bacteroidia Methanobacteriales
-#> 65_1_17  Archaea Proteobacteria     Methanobacteria   Enterobacterales
-#> 9_4_3   Bacteria     Firmicutes Gammaproteobacteria      Clostridiales
-#> 65_8_7   Archaea  Euryarchaeota      Actinobacteria      Clostridiales
-#> 59_4_5   Archaea Proteobacteria          Clostridia Methanobacteriales
-#> 59_5_2  Bacteria  Euryarchaeota     Methanobacteria Methanobacteriales
-#> 65_6_2   Archaea  Euryarchaeota Gammaproteobacteria   Enterobacterales
-#> 65_4_10  Archaea Actinobacteria      Actinobacteria      Bacteroidales
-#> 9_7_25  Bacteria     Firmicutes      Actinobacteria Methanobacteriales
-#> 9_4_5   Bacteria     Firmicutes      Actinobacteria   Enterobacterales
-#> 65_1_8  Bacteria Proteobacteria Gammaproteobacteria      Clostridiales
-#> 65_2_5  Bacteria     Firmicutes          Clostridia   Enterobacterales
-#> 59_7_6  Bacteria  Bacteroidetes      Actinobacteria      Bacteroidales
-#> 59_9_31  Archaea  Euryarchaeota      Actinobacteria   Enterobacterales
-#> 9_4_13  Bacteria Proteobacteria         Bacteroidia      Clostridiales
-#> 9_6_3    Archaea Actinobacteria         Bacteroidia      Clostridiales
-#> 59_9_18 Bacteria  Bacteroidetes         Bacteroidia  Bifidobacteriales
-#> 65_9_13  Archaea     Firmicutes         Bacteroidia      Clostridiales
-#> 65_3_18 Bacteria     Firmicutes     Methanobacteria   Enterobacterales
-#> 65_8_25  Archaea  Euryarchaeota Gammaproteobacteria  Bifidobacteriales
-#> 65_8_29  Archaea  Bacteroidetes         Bacteroidia   Enterobacterales
-#> 65_4_20  Archaea Actinobacteria     Methanobacteria  Bifidobacteriales
-#> 59_9_17 Bacteria Actinobacteria     Methanobacteria  Bifidobacteriales
-#> 9_4_6    Archaea  Bacteroidetes      Actinobacteria      Clostridiales
-#> 59_4_25 Bacteria Actinobacteria          Clostridia   Enterobacterales
-#> 59_3_21  Archaea  Bacteroidetes         Bacteroidia  Bifidobacteriales
-#> 59_4_16 Bacteria     Firmicutes     Methanobacteria   Enterobacterales
-#> 59_8_3   Archaea Proteobacteria Gammaproteobacteria Methanobacteriales
-#> 59_5_19 Bacteria  Euryarchaeota     Methanobacteria  Bifidobacteriales
-#> 65_9_9  Bacteria Proteobacteria     Methanobacteria      Clostridiales
-#> 59_2_6   Archaea  Bacteroidetes     Methanobacteria  Bifidobacteriales
+#> 59_8_22 Bacteria     Firmicutes          Clostridia  Bifidobacteriales
+#> 59_5_13  Archaea Proteobacteria     Methanobacteria      Bacteroidales
+#> 59_8_12  Archaea Actinobacteria         Bacteroidia      Clostridiales
+#> 65_3_22  Archaea Proteobacteria     Methanobacteria Methanobacteriales
+#> 65_5_1  Bacteria  Bacteroidetes          Clostridia      Clostridiales
+#> 65_1_10 Bacteria Proteobacteria Gammaproteobacteria      Bacteroidales
+#> 65_7_12 Bacteria Actinobacteria          Clostridia Methanobacteriales
+#> 59_6_1   Archaea  Bacteroidetes      Actinobacteria  Bifidobacteriales
+#> 65_2_17 Bacteria Actinobacteria     Methanobacteria      Clostridiales
+#> 65_9_26 Bacteria  Bacteroidetes     Methanobacteria   Enterobacterales
+#> 65_5_18 Bacteria Actinobacteria Gammaproteobacteria Methanobacteriales
+#> 65_8_12  Archaea Actinobacteria          Clostridia  Bifidobacteriales
+#> 65_9_1  Bacteria Actinobacteria Gammaproteobacteria      Clostridiales
+#> 59_9_26 Bacteria Proteobacteria         Bacteroidia Methanobacteriales
+#> 9_6_28   Archaea     Firmicutes Gammaproteobacteria      Clostridiales
+#> 65_7_4  Bacteria  Bacteroidetes         Bacteroidia  Bifidobacteriales
+#> 65_4_26  Archaea  Euryarchaeota          Clostridia Methanobacteriales
+#> 65_1_17  Archaea  Euryarchaeota          Clostridia      Bacteroidales
+#> 9_4_3    Archaea  Euryarchaeota          Clostridia      Clostridiales
+#> 65_8_7   Archaea  Bacteroidetes Gammaproteobacteria   Enterobacterales
+#> 59_4_5  Bacteria Proteobacteria Gammaproteobacteria  Bifidobacteriales
+#> 59_5_2   Archaea Actinobacteria      Actinobacteria  Bifidobacteriales
+#> 65_6_2  Bacteria Proteobacteria      Actinobacteria Methanobacteriales
+#> 65_4_10 Bacteria  Euryarchaeota         Bacteroidia   Enterobacterales
+#> 9_7_25  Bacteria  Bacteroidetes         Bacteroidia      Clostridiales
+#> 9_4_5   Bacteria     Firmicutes         Bacteroidia Methanobacteriales
+#> 65_1_8  Bacteria Actinobacteria          Clostridia   Enterobacterales
+#> 65_2_5  Bacteria  Euryarchaeota      Actinobacteria   Enterobacterales
+#> 59_7_6  Bacteria Proteobacteria Gammaproteobacteria  Bifidobacteriales
+#> 59_9_31 Bacteria  Bacteroidetes     Methanobacteria  Bifidobacteriales
+#> 9_4_13  Bacteria     Firmicutes     Methanobacteria  Bifidobacteriales
+#> 9_6_3    Archaea     Firmicutes          Clostridia   Enterobacterales
+#> 59_9_18 Bacteria  Euryarchaeota Gammaproteobacteria   Enterobacterales
+#> 65_9_13  Archaea Proteobacteria     Methanobacteria      Clostridiales
+#> 65_3_18  Archaea Proteobacteria     Methanobacteria      Bacteroidales
+#> 65_8_25 Bacteria Proteobacteria         Bacteroidia      Clostridiales
+#> 65_8_29  Archaea Actinobacteria      Actinobacteria   Enterobacterales
+#> 65_4_20  Archaea Proteobacteria Gammaproteobacteria      Clostridiales
+#> 59_9_17 Bacteria     Firmicutes      Actinobacteria  Bifidobacteriales
+#> 9_4_6    Archaea  Euryarchaeota      Actinobacteria      Clostridiales
+#> 59_4_25 Bacteria  Euryarchaeota     Methanobacteria  Bifidobacteriales
+#> 59_3_21  Archaea     Firmicutes         Bacteroidia  Bifidobacteriales
+#> 59_4_16 Bacteria  Euryarchaeota Gammaproteobacteria   Enterobacterales
+#> 59_8_3  Bacteria Actinobacteria     Methanobacteria      Clostridiales
+#> 59_5_19  Archaea     Firmicutes      Actinobacteria      Clostridiales
+#> 65_9_9   Archaea Actinobacteria      Actinobacteria  Bifidobacteriales
+#> 59_2_6  Bacteria Proteobacteria         Bacteroidia  Bifidobacteriales
 #>                      Family              Genus                    Species
-#> 59_8_22 Methanobacteriaceae Methanobrevibacter           Escherichia coli
-#> 59_5_13  Enterobacteriaceae        Escherichia Methanobrevibacter smithii
-#> 59_8_12     Lachnospiraceae Methanobrevibacter           Escherichia coli
-#> 65_3_22     Lachnospiraceae        Bacteroides       Bacteroides fragilis
-#> 65_5_1  Methanobacteriaceae    Bifidobacterium           Blautia producta
-#> 65_1_10     Lachnospiraceae        Escherichia       Bacteroides fragilis
-#> 65_7_12  Enterobacteriaceae Methanobrevibacter Methanobrevibacter smithii
-#> 59_6_1  Methanobacteriaceae Methanobrevibacter       Bacteroides fragilis
-#> 65_2_17     Lachnospiraceae        Escherichia           Escherichia coli
-#> 65_9_26 Methanobacteriaceae        Escherichia           Blautia producta
-#> 65_5_18  Bifidobacteriaceae            Blautia           Escherichia coli
-#> 65_8_12     Lachnospiraceae            Blautia     Bifidobacterium longum
-#> 65_9_1   Bifidobacteriaceae    Bifidobacterium       Bacteroides fragilis
-#> 59_9_26  Bifidobacteriaceae Methanobrevibacter Methanobrevibacter smithii
-#> 9_6_28   Bifidobacteriaceae Methanobrevibacter           Blautia producta
-#> 65_7_4   Enterobacteriaceae Methanobrevibacter       Bacteroides fragilis
-#> 65_4_26  Enterobacteriaceae Methanobrevibacter Methanobrevibacter smithii
-#> 65_1_17  Enterobacteriaceae        Bacteroides           Escherichia coli
-#> 9_4_3        Bacteroidaceae Methanobrevibacter           Escherichia coli
-#> 65_8_7       Bacteroidaceae        Bacteroides     Bifidobacterium longum
-#> 59_4_5  Methanobacteriaceae        Bacteroides       Bacteroides fragilis
-#> 59_5_2       Bacteroidaceae        Bacteroides Methanobrevibacter smithii
-#> 65_6_2       Bacteroidaceae            Blautia           Escherichia coli
-#> 65_4_10  Enterobacteriaceae    Bifidobacterium     Bifidobacterium longum
-#> 9_7_25   Enterobacteriaceae            Blautia           Escherichia coli
-#> 9_4_5        Bacteroidaceae        Bacteroides           Blautia producta
-#> 65_1_8   Enterobacteriaceae        Escherichia           Blautia producta
-#> 65_2_5   Enterobacteriaceae            Blautia           Blautia producta
-#> 59_7_6  Methanobacteriaceae        Escherichia     Bifidobacterium longum
-#> 59_9_31 Methanobacteriaceae            Blautia       Bacteroides fragilis
-#> 9_4_13   Bifidobacteriaceae    Bifidobacterium           Blautia producta
-#> 9_6_3       Lachnospiraceae        Bacteroides           Escherichia coli
-#> 59_9_18  Enterobacteriaceae Methanobrevibacter     Bifidobacterium longum
-#> 65_9_13 Methanobacteriaceae        Escherichia           Blautia producta
-#> 65_3_18      Bacteroidaceae        Escherichia           Escherichia coli
-#> 65_8_25  Enterobacteriaceae            Blautia           Blautia producta
-#> 65_8_29     Lachnospiraceae            Blautia       Bacteroides fragilis
-#> 65_4_20     Lachnospiraceae        Bacteroides       Bacteroides fragilis
-#> 59_9_17     Lachnospiraceae        Bacteroides       Bacteroides fragilis
-#> 9_4_6   Methanobacteriaceae            Blautia       Bacteroides fragilis
-#> 59_4_25 Methanobacteriaceae            Blautia     Bifidobacterium longum
-#> 59_3_21      Bacteroidaceae        Bacteroides Methanobrevibacter smithii
-#> 59_4_16      Bacteroidaceae        Bacteroides       Bacteroides fragilis
-#> 59_8_3  Methanobacteriaceae        Bacteroides     Bifidobacterium longum
-#> 59_5_19     Lachnospiraceae        Escherichia Methanobrevibacter smithii
-#> 65_9_9       Bacteroidaceae    Bifidobacterium     Bifidobacterium longum
-#> 59_2_6   Bifidobacteriaceae            Blautia           Escherichia coli
+#> 59_8_22  Bifidobacteriaceae    Bifidobacterium     Bifidobacterium longum
+#> 59_5_13     Lachnospiraceae        Escherichia     Bifidobacterium longum
+#> 59_8_12      Bacteroidaceae        Bacteroides           Blautia producta
+#> 65_3_22  Enterobacteriaceae Methanobrevibacter           Blautia producta
+#> 65_5_1   Enterobacteriaceae        Escherichia           Escherichia coli
+#> 65_1_10  Bifidobacteriaceae Methanobrevibacter       Bacteroides fragilis
+#> 65_7_12      Bacteroidaceae Methanobrevibacter     Bifidobacterium longum
+#> 59_6_1  Methanobacteriaceae        Bacteroides Methanobrevibacter smithii
+#> 65_2_17     Lachnospiraceae    Bifidobacterium     Bifidobacterium longum
+#> 65_9_26  Enterobacteriaceae        Bacteroides     Bifidobacterium longum
+#> 65_5_18      Bacteroidaceae            Blautia           Escherichia coli
+#> 65_8_12  Bifidobacteriaceae    Bifidobacterium           Escherichia coli
+#> 65_9_1      Lachnospiraceae    Bifidobacterium           Escherichia coli
+#> 59_9_26  Bifidobacteriaceae    Bifidobacterium       Bacteroides fragilis
+#> 9_6_28      Lachnospiraceae        Escherichia           Blautia producta
+#> 65_7_4   Bifidobacteriaceae            Blautia           Escherichia coli
+#> 65_4_26 Methanobacteriaceae            Blautia           Blautia producta
+#> 65_1_17  Bifidobacteriaceae Methanobrevibacter       Bacteroides fragilis
+#> 9_4_3        Bacteroidaceae Methanobrevibacter Methanobrevibacter smithii
+#> 65_8_7       Bacteroidaceae        Bacteroides           Escherichia coli
+#> 59_4_5      Lachnospiraceae        Escherichia       Bacteroides fragilis
+#> 59_5_2       Bacteroidaceae            Blautia           Blautia producta
+#> 65_6_2      Lachnospiraceae Methanobrevibacter       Bacteroides fragilis
+#> 65_4_10 Methanobacteriaceae Methanobrevibacter     Bifidobacterium longum
+#> 9_7_25   Bifidobacteriaceae            Blautia           Blautia producta
+#> 9_4_5       Lachnospiraceae Methanobrevibacter       Bacteroides fragilis
+#> 65_1_8  Methanobacteriaceae        Escherichia           Escherichia coli
+#> 65_2_5  Methanobacteriaceae            Blautia Methanobrevibacter smithii
+#> 59_7_6  Methanobacteriaceae        Bacteroides     Bifidobacterium longum
+#> 59_9_31      Bacteroidaceae    Bifidobacterium       Bacteroides fragilis
+#> 9_4_13  Methanobacteriaceae            Blautia     Bifidobacterium longum
+#> 9_6_3       Lachnospiraceae    Bifidobacterium     Bifidobacterium longum
+#> 59_9_18      Bacteroidaceae        Escherichia           Escherichia coli
+#> 65_9_13     Lachnospiraceae        Escherichia           Blautia producta
+#> 65_3_18  Bifidobacteriaceae        Bacteroides Methanobrevibacter smithii
+#> 65_8_25      Bacteroidaceae            Blautia       Bacteroides fragilis
+#> 65_8_29     Lachnospiraceae        Escherichia           Blautia producta
+#> 65_4_20  Enterobacteriaceae            Blautia Methanobrevibacter smithii
+#> 59_9_17      Bacteroidaceae        Bacteroides       Bacteroides fragilis
+#> 9_4_6    Enterobacteriaceae            Blautia     Bifidobacterium longum
+#> 59_4_25      Bacteroidaceae            Blautia           Blautia producta
+#> 59_3_21 Methanobacteriaceae        Escherichia Methanobrevibacter smithii
+#> 59_4_16     Lachnospiraceae Methanobrevibacter     Bifidobacterium longum
+#> 59_8_3       Bacteroidaceae        Escherichia           Blautia producta
+#> 59_5_19 Methanobacteriaceae        Escherichia       Bacteroides fragilis
+#> 65_9_9       Bacteroidaceae        Bacteroides           Blautia producta
+#> 59_2_6       Bacteroidaceae    Bifidobacterium           Escherichia coli
 ```
 
 ## Output
