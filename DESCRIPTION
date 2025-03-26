@@ -1,6 +1,6 @@
 Package: BRCore
 Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c(
     person("Bolívar", "Aponte Rolón", , "bolaponte@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2544-4551")),
     person("Brandon", "Kristy", role = c("aut")),
@@ -10,8 +10,7 @@ Authors@R: c(
     person("Phillip", "de Lorimier", role = "ctb")
   )
 Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
