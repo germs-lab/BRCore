@@ -21,6 +21,7 @@ Install the development version of `BRCore` from GitHub with:
 ``` r
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
+
 #> ℹ Loading metadata database✔ Loading metadata database ... done
 #>  
 #> → Will install 1 package.
@@ -34,6 +35,7 @@ pak::pak("germs-lab/BRCore")
 #> ✔ Built BRCore 0.0.0.9000 (9.5s)
 #> ✔ Installed BRCore 0.0.0.9000 (github::germs-lab/BRCore@1ad972a) (25ms)
 #> ✔ 1 pkg + 114 deps: kept 101, added 1, dld 1 (NA B) [15.8s]
+
 ```
 
 ## Step 1: Load Required Libraries and Data
@@ -151,8 +153,6 @@ core_result <- extract_core(
 #> ✔ BC dissimilarity based on the 1st ranked OTU complete
 #> ℹ Calculating BC dissimilarity based on ranked OTUs, starting at 2025-03-26 11:12:55.287585
 #> ✔ BC ranks done!
-#> Joining with `by = join_by(rank)`
-#> Joining with `by = join_by(rank, IncreaseBC)`
 #> ✔ Performing method 'increase'
 
 # View the results
@@ -332,7 +332,7 @@ print(core_result)
 #>   Sample Group SampleID
 #> B      B     A        B
 #> C      C     B        C
-#> D      D     B        D
+#> C      C     A        C
 #> 
 #> $taxonomy_table
 #>          Kingdom         Phylum               Class              Order
