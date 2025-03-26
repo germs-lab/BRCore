@@ -66,39 +66,39 @@ taxa_names <- taxa_names(esophagus)
 
 # Define realistic taxonomy levels
 kingdoms <- c("Bacteria", "Archaea")
-phyla <- c("Firmicutes", 
-"Bacteroidetes", 
-"Proteobacteria", 
-"Actinobacteria", 
+phyla <- c("Firmicutes",
+"Bacteroidetes",
+"Proteobacteria",
+"Actinobacteria",
 "Euryarchaeota")
-classes <- c("Clostridia", 
-"Bacteroidia", 
-"Gammaproteobacteria", 
-"Actinobacteria", 
+classes <- c("Clostridia",
+"Bacteroidia",
+"Gammaproteobacteria",
+"Actinobacteria",
 "Methanobacteria")
-orders <- c("Clostridiales", 
-"Bacteroidales", 
-"Enterobacterales", 
-"Bifidobacteriales", 
+orders <- c("Clostridiales",
+"Bacteroidales",
+"Enterobacterales",
+"Bifidobacteriales",
 "Methanobacteriales")
-families <- c("Lachnospiraceae", 
-"Bacteroidaceae", 
-"Enterobacteriaceae", 
-"Bifidobacteriaceae", 
+families <- c("Lachnospiraceae",
+"Bacteroidaceae",
+"Enterobacteriaceae",
+"Bifidobacteriaceae",
 "Methanobacteriaceae")
-genera <- c("Blautia", 
-"Bacteroides", 
-"Escherichia", 
-"Bifidobacterium", 
+genera <- c("Blautia",
+"Bacteroides",
+"Escherichia",
+"Bifidobacterium",
 "Methanobrevibacter")
-species <- c("Blautia producta", 
-"Bacteroides fragilis", 
-"Escherichia coli", 
-"Bifidobacterium longum", 
+species <- c("Blautia producta",
+"Bacteroides fragilis",
+"Escherichia coli",
+"Bifidobacterium longum",
 "Methanobrevibacter smithii")
 
 # Create a mock taxonomy table
-mock_taxonomy_table <- matrix(
+set.seed(8998); mock_taxonomy_table <- matrix(
   c(
     sample(kingdoms, length(taxa_names), replace = TRUE),
     sample(phyla, length(taxa_names), replace = TRUE),
@@ -127,7 +127,7 @@ sample_data <- data.frame(
 )
 
 # Add the taxonomy table to the esophagus dataset
-esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data)) 
+esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data))
 
 # Extract core taxa using the "increase" method
 core_result <- extract_core(

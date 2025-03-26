@@ -53,8 +53,8 @@ sncm.fit <- function(spp,
   d <- 1 / N
   
   ## Fit model parameter m (or Nm) using Non-linear least squares (NLS)
-  m.fit <- nlsLM(freq ~ pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE), start = list(m = 0.1))
-  m.ci <- confint(m.fit, "m", level = 0.95)
+  m.fit <- minpack.lm::nlsLM(freq ~ pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE), start = list(m = 0.1))
+  m.ci <- stats::confint(m.fit, "m", level = 0.95)
   
   ## Fit neutral model parameter m (or Nm) using Maximum likelihood estimation (MLE)
   sncm.LL <- function(m, sigma) {
@@ -62,7 +62,7 @@ sncm.fit <- function(spp,
     R <- dnorm(R, 0, sigma)
     - sum(log(R))
   }
-  m.mle <- mle(sncm.LL,
+  m.mle <- stats4::mle(sncm.LL,
                start = list(m = 0.1, sigma = 0.1),
                nobs = length(p))
   
@@ -75,7 +75,7 @@ sncm.fit <- function(spp,
   Rsqr <- 1 - (sum((freq - freq.pred)^2)) / (sum((freq - mean(freq))^2))
   RMSE <- sqrt(sum((freq - freq.pred)^2) / (length(freq) - 1))
   
-  pred.ci <- binconf(
+  pred.ci <- Hmisc::binconf(
     freq.pred * nrow(spp),
     nrow(spp),
     alpha = 0.05,
@@ -89,7 +89,7 @@ bino.LL <- function(mu, sigma) {
     R <- dnorm(R, mu, sigma)
     - sum(log(R))
   }
-  bino.mle <- mle(bino.LL,
+  bino.mle <- stats4::mle(bino.LL,
                   start = list(mu = 0, sigma = 0.1),
                   nobs = length(p))
   
@@ -101,7 +101,7 @@ bino.LL <- function(mu, sigma) {
   Rsqr.bino <- 1 - (sum((freq - bino.pred)^2)) / (sum((freq - mean(freq))^2))
   RMSE.bino <- sqrt(sum((freq - bino.pred)^2) / (length(freq) - 1))
   
-  bino.pred.ci <- binconf(
+  bino.pred.ci <- Hmisc::binconf(
     bino.pred * nrow(spp),
     nrow(spp),
     alpha = 0.05,
@@ -115,7 +115,7 @@ bino.LL <- function(mu, sigma) {
     R <- dnorm(R, mu, sigma)
     - sum(log(R))
   }
-  pois.mle <- mle(pois.LL,
+  pois.mle <- stats4::mle(pois.LL,
                   start = list(mu = 0, sigma = 0.1),
                   nobs = length(p))
   
