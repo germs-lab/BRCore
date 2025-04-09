@@ -1,6 +1,6 @@
 Package: BRCore
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.1
+Title: Provides a Set of Tools to Process and Analyze Microbial Data from Bioenergy Research Centers
+Version: 0.0.2
 Authors@R: c(
     person("Bolívar", "Aponte Rolón", , "bolaponte@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2544-4551")),
     person("Brandon", "Kristy", role = c("aut")),
@@ -35,3 +35,5 @@ Suggests:
     testthat (>= 3.0.0),
     tidyverse
 Config/testthat/edition: 3
+Depends: 
+    R (>= 4.4)
