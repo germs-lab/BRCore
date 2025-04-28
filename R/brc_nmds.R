@@ -21,7 +21,7 @@
 #' @import dplyr
 #' @import vegan
 #' @export
-calculate_nmds <- function(asv_matrix,
+brc_nmds <- function(asv_matrix,
                            physeq,
                            ncores = parallel::detectCores(),
                            k = 2,
