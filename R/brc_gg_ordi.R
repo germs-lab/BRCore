@@ -33,7 +33,7 @@
 #' # Create NMDS plot
 #' gg_ordi(nmds_data, .color = Management, ordi = "NMDS", .drop_na = Management)
 # Standard Ordination plot
-gg_ordi <- function(.data, .color, ordi, .drop_na = NULL) {
+brc_gg_ordi <- function(.data, .color, ordi, .drop_na = NULL) {
     # Input validation
     if (!inherits(.data, "data.frame")) {
         cli::cli_abort("{.arg .data} must be a data frame")
