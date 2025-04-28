@@ -31,7 +31,7 @@
 #' nmds_data <- cbind(nmds_scores, dune)
 #'
 #' # Create NMDS plot
-#' gg_ordi(nmds_data, .color = Management, ordi = "NMDS", .drop_na = Management)
+#' brc_gg_ordi(nmds_data, .color = Management, ordi = "NMDS", .drop_na = Management)
 # Standard Ordination plot
 brc_gg_ordi <- function(.data, .color, ordi, .drop_na = NULL) {
     # Input validation
