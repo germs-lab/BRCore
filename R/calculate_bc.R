@@ -21,14 +21,14 @@ calculate_bc <- function(matrix, nReads) {
     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
     return(list(values = numeric(0), names = character(0)))
   }
-
-  bc_values <- apply(combn(ncol(matrix), 2), 2, function(cols) {
-    sum(abs(matrix[, cols[1]] - matrix[, cols[2]])) / (2 * nReads)
+  
+  bc_values <- apply(combn(ncol(matrix), 2), 2, function(x) {
+    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
   })
-
-  x_names <- apply(combn(ncol(matrix), 2), 2, function(cols) {
-    paste(colnames(matrix)[cols], collapse = "-")
+  
+  x_names <- apply(combn(ncol(matrix), 2), 2, function(x) {
+    paste(colnames(matrix)[x], collapse = "-")
   })
-
+  
   list(values = bc_values, names = x_names)
 }
