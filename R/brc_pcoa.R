@@ -10,6 +10,8 @@
 #' @param add Logical indicating whether to add a constant to the non-diagonal dissimilarities such that all 
 #'   eigenvalues are non-negative. Default is FALSE.
 #' @param x.ret Logical indicating whether the rotated configuration should be returned. Default is FALSE.
+#' 
+#' #' @export
 
 brc_pcoa <- function(
   asv_matrix,
