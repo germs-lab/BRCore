@@ -14,7 +14,7 @@ multi_rarefy(physeq, depth_level, num_iter)
 \item{num_iter}{An integer specifying the number of iterations to perform for rarefaction.}
 }
 \value{
-A data frame with samples as rows and taxa as columns. The values represent the average abundance across all iterations. Samples with less than \code{depth_level} sequences will be discarded.
+A data frame with samples as rows and taxa as columns. The values represent the average abundance across all iterations. Samples with less than \code{depth_level} sequences are discarded.
 }
 \description{
 This function performs multiple rarefaction on a \code{phyloseq} object by randomly sub-sampling OTUs/ASVs within samples without replacement. The process is repeated for a specified number of iterations, and the results are averaged. Samples with fewer OTUs/ASVs than the specified \code{depth_level} are discarded.

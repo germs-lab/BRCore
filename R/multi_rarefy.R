@@ -6,7 +6,7 @@
 #' @param depth_level An integer specifying the sequencing depth (number of OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform for rarefaction.
 #'
-#' @return A data frame with samples as rows and taxa as columns. The values represent the average abundance across all iterations. Samples with less than `depth_level` sequences will be discarded.
+#' @return A data frame with samples as rows and taxa as columns. The values represent the average abundance across all iterations. Samples with less than `depth_level` sequences are discarded.
 #'
 #' @import phyloseq
 #' @import vegan
@@ -45,8 +45,3 @@ multi_rarefy <- function(physeq, depth_level, num_iter) {
     
     return(mean_data)
 }
-
-
-
-
-
