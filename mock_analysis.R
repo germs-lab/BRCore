@@ -17,7 +17,7 @@ test_small_phyloseq <- test_phyloseq %>%
 
 
 # test multi_rarefy.R function 
-oty_table_rare <-
+otu_table_rare <-
     multi_rarefy(physeq = test_small_phyloseq,
                  depth_level = 5000,
                  num_iter = 99)
@@ -26,7 +26,7 @@ oty_table_rare <-
 test_phyloseq_rare <-
     phyloseq(
         otu_table(
-            oty_table_rare %>%
+            otu_table_rare %>%
                 column_to_rownames("SampleID") %>%
                 t() %>%
                 as.matrix() %>%
