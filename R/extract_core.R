@@ -132,7 +132,8 @@ extract_core <- function(physeq,
                          method,
                          increase_value = NULL,
                          Group = NULL,
-                         Level = NULL) {
+                         Level = NULL, 
+                         trimOTUs = TRUE) {
   set.seed(37920)
   
   # Error handling: type check
@@ -166,7 +167,7 @@ extract_core <- function(physeq,
       rarefy_even_depth(
         physeq,
         sample.size = nReads,
-        trimOTUs = TRUE,
+        trimOTUs = trimOTUs,
         replace = TRUE,
         verbose = FALSE
       )
