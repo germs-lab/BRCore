@@ -45,6 +45,7 @@
 #' @import tibble
 #'
 #' @examples
+#' \dontrun{
 #' # Load the esophagus dataset
 #' library(phyloseq)
 #' data(esophagus, package = "phyloseq")
@@ -130,9 +131,10 @@
 #'
 #' # View the results
 #' print(core_result)
+#' }
 #' @export
 
-extract_core_parallel <- function(
+extract_core <- function(
   physeq,
   Var,
   method,
