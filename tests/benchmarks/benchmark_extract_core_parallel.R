@@ -125,9 +125,6 @@ for (dataset_name in names(benchmark_results)) {
     summary_data$dataset <- dataset_name
     summary_data$otu_count <- ntaxa(datasets[[dataset_name]])
     results_summary <- rbind(results_summary, summary_data)
-
-    # Append to results summary
-    results_summary <- rbind(results_summary, summary_data)
   }
 }
 
