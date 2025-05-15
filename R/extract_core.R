@@ -26,7 +26,7 @@
 #' @param Group A character string specifying the column name in the sample metadata to subset the data.
 #' @param Level A character vector specifying the level(s) within the `Group` column to subset the data.
 #' @param trimOTUs A logical value indicating whether to trim OTUs with zero abundance.
-#' @param .parallel A loogical value indicating whether to parallelize the calculations with `mcapply()` or not.
+#' @param .parallel A logical value indicating whether to parallelize the calculations with `mcapply()` or not.
 #' @param ncores An integer specifying the number of CPU cores to use for parallel processing. Default is `detectCores() - 1`.
 #'
 #' @return A list containing the following elements:

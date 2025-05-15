@@ -31,7 +31,7 @@ extract_core(
 
 \item{trimOTUs}{A logical value indicating whether to trim OTUs with zero abundance.}
 
-\item{.parallel}{A loogical value indicating whether to parallelize the calculations with \code{mcapply()} or not.}
+\item{.parallel}{A logical value indicating whether to parallelize the calculations with \code{mcapply()} or not.}
 
 \item{ncores}{An integer specifying the number of CPU cores to use for parallel processing. Default is \code{detectCores() - 1}.}
 }
