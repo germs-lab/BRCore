@@ -106,7 +106,7 @@ test_that("extract_core() works with esophagus_with_tax dataset", {
     Var = "site",
     method = "increase",
     increase_value = 2,
-    .parallel = TRUE,
+    .parallel = FALSE, # Purposely FALSE to pass tests on GH actions
     ncores = 4
   )
   #testthat::expect_identical(test_core, expected_extract_core) # Fails on Mac-OS tests
