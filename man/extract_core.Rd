@@ -10,7 +10,10 @@ extract_core(
   method,
   increase_value = NULL,
   Group = NULL,
-  Level = NULL
+  Level = NULL,
+  trimOTUs = TRUE,
+  .parallel = FALSE,
+  ncores = detectCores() - 1
 )
 }
 \arguments{
@@ -25,6 +28,12 @@ extract_core(
 \item{Group}{A character string specifying the column name in the sample metadata to subset the data.}
 
 \item{Level}{A character vector specifying the level(s) within the \code{Group} column to subset the data.}
+
+\item{trimOTUs}{A logical value indicating whether to trim OTUs with zero abundance.}
+
+\item{.parallel}{A logical value indicating whether to parallelize the calculations with \code{mcapply()} or not.}
+
+\item{ncores}{An integer specifying the number of CPU cores to use for parallel processing. Default is \code{detectCores() - 1}.}
 }
 \value{
 A list containing the following elements:
@@ -57,6 +66,7 @@ Error handling, helper functions and refactoring by Bolívar Aponte Rolón (CABB
 NOTE: This technique requires en even sampling depth to perform, which requires rarefaction.
 }
 \examples{
+\dontrun{
 # Load the esophagus dataset
 library(phyloseq)
 data(esophagus, package = "phyloseq")
@@ -134,9 +144,13 @@ core_result <- extract_core(
   physeq = esophagus_with_tax,
   Var = "Group",
   method = "increase",
-  increase_value = 2
+  increase_value = 2,
+  trimOTUs = TRUE,
+.parallel = FALSE,
+ncores = detectCores() - 1
 )
 
 # View the results
 print(core_result)
+}
 }
