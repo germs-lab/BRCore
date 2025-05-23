@@ -1,9 +1,9 @@
 # Test suite
-test_that("calculate_nmds() works with esophagus dataset", {
+test_that("brc_nmds() works with esophagus dataset", {
   # Load the esophagus dataset
   data(esophagus, package = "phyloseq")
   
-  # Add sample metadata to the esophagus dataset (required for calculate_nmds)
+  # Add sample metadata to the esophagus dataset
   sample_data <- data.frame(
     Sample = phyloseq::sample_names(esophagus),
     Group = sample(c("A", "B"), nsamples(esophagus), replace = TRUE), # Random groups
@@ -18,7 +18,7 @@ test_that("calculate_nmds() works with esophagus dataset", {
   esophagus_asv_matrix <- as.matrix(otu_table(esophagus_with_metadata))
 
   # Run the function
-  results <- calculate_nmds(esophagus_asv_matrix, esophagus_with_metadata,
+  results <- brc_nmds(esophagus_asv_matrix, esophagus_with_metadata,
     ncores = 1,
     k = 2,
     trymax = 100
