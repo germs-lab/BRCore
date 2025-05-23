@@ -4,11 +4,11 @@ test_that("phyloseq object correctly created", {
     load(here::here("tests/data/test_phyloseq.rda"))
     
     otu_table_rare <-
-        BRCore::multi_rarefy(physeq = test_phyloseq,
+        multi_rarefy(physeq = test_phyloseq,
                              depth_level = 500,
                              num_iter = 10)
     
-    test_phyloseq_rare <- BRCore::do_phyloseq(test_phyloseq, otu_table_rare)
+    test_phyloseq_rare <- do_phyloseq(test_phyloseq, otu_table_rare)
     read_counts <- sample_sums(test_phyloseq_rare)
     
     # Test if all the samples have the same number of reads
