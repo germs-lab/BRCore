@@ -52,9 +52,9 @@ for error handling, and performance improvements through iterative development a
 
 \examples{
 # For dbRDA:
-brc_flex_ordi(model, metadata, sample_id_col = "sample_id")
+# brc_flex_ordi(model, metadata, sample_id_col = "sample_id")
 
 # For PCoA/NMDS:
-brc_flex_ordi(ord_result, metadata, color_var = "Treatment")
+# brc_flex_ordi(ord_result, metadata, color_var = "Treatment")
 
 }
