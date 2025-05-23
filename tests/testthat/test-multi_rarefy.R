@@ -1,8 +1,10 @@
 test_that("rarefaction worked correctly", {
-    data(esophagus, package = "phyloseq")
     
-    otu_table_rare <<-
-        BRCore::multi_rarefy(physeq = test_phyloseq2,
+    # Load expected
+    load(here::here("tests/data/test_phyloseq.rda"))
+    
+    otu_table_rare <-
+        BRCore::multi_rarefy(physeq = test_phyloseq,
                              depth_level = 500,
                              num_iter = 10)
     
