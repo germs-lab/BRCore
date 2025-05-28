@@ -18,4 +18,5 @@ the number of cores to use if on a local machine.
 }
 \examples{
 setup_parallel_backend()
+
 }

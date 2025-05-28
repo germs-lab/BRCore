@@ -43,6 +43,8 @@
 #' @import tidyr
 #' @import vegan
 #' @import tibble
+#' @import parallel
+#' @import doParallel
 #'
 #' @examples
 #' \dontrun{

@@ -14,4 +14,5 @@ Check if running in an HPC environment
 }
 \examples{
 is_hpc_environment()
+
 }

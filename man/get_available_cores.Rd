@@ -19,4 +19,5 @@ we're in an HPC environment or a local machine.
 \examples{
 get_available_cores()
 get_available_cores(default = 2)
+
 }

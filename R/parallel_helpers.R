@@ -4,8 +4,11 @@
 #'
 #' @return Character string identifying the HPC environment type:
 #'   "slurm", "pbs", "sge", "lsf", "condor", "generic_hpc", or "local"
+#'
 #' @examples
 #' detect_hpc_type()
+#' 
+#' @export
 detect_hpc_type <- function() {
   # Map of environment variables to HPC types
   hpc_type_vars <- list(
@@ -50,6 +53,8 @@ detect_hpc_type <- function() {
 #' @return Logical indicating whether we're in any HPC environment
 #' @examples
 #' is_hpc_environment()
+#' 
+#' @export
 is_hpc_environment <- function() {
   !identical(detect_hpc_type(), "local")
 }
@@ -64,6 +69,11 @@ is_hpc_environment <- function() {
 #' @examples
 #' get_available_cores()
 #' get_available_cores(default = 2)
+#' 
+#' @import parallelly
+#' @import parallel
+#' 
+#' @export
 get_available_cores <- function(default = 1) {
   if (is_hpc_environment()) {
     # Check HPC-specific environment variables in a prioritized order
@@ -136,6 +146,10 @@ get_available_cores <- function(default = 1) {
 #' @return Either a cluster object (HPC) or integer number of cores (local)
 #' @examples
 #' setup_parallel_backend()
+#' 
+#' @import parallelly
+#' @import parallel
+#' @export
 setup_parallel_backend <- function(default = 1) {
   if (is_hpc_environment()) {
     if (requireNamespace("parallelly", quietly = TRUE)) {

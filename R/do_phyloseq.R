@@ -14,6 +14,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Load example data
 #' data(GlobalPatterns, package = "phyloseq")
 #'
@@ -23,6 +24,7 @@
 #' 
 #' rarefied_physeq <- do_phyloseq(physeq = GlobalPatterns, otu_rare=rarefied_data )
 #' head(otu_table(rarefied_physeq))
+#' }
 do_phyloseq <- function(physeq, otu_rare) {
     new_phyloseq <-
         phyloseq(

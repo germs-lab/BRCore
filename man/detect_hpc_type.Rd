@@ -15,4 +15,5 @@ Detects if code is running in an HPC environment and identifies which scheduler.
 }
 \examples{
 detect_hpc_type()
+
 }

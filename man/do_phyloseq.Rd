@@ -18,6 +18,7 @@ A \code{phyloseq} object.
 This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} object \code{otu_table()} layer.
 }
 \examples{
+\dontrun{
 # Load example data
 data(GlobalPatterns, package = "phyloseq")
 
@@ -27,4 +28,5 @@ head(rarefied_data)
 
 rarefied_physeq <- do_phyloseq(physeq = GlobalPatterns, otu_rare=rarefied_data )
 head(otu_table(rarefied_physeq))
+}
 }
