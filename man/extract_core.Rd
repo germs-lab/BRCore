@@ -13,7 +13,7 @@ extract_core(
   Level = NULL,
   trimOTUs = TRUE,
   .parallel = FALSE,
-  ncores = detectCores() - 1
+  ncores = get_available_cores()
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ extract_core(
 
 \item{.parallel}{A logical value indicating whether to parallelize the calculations with \code{mcapply()} or not.}
 
-\item{ncores}{An integer specifying the number of CPU cores to use for parallel processing. Default is \code{detectCores() - 1}.}
+\item{ncores}{An integer specifying the number of CPU cores to use for parallel processing. Default is \code{get_available_cores()}.}
 }
 \value{
 A list containing the following elements:
@@ -147,7 +147,7 @@ core_result <- extract_core(
   increase_value = 2,
   trimOTUs = TRUE,
 .parallel = FALSE,
-ncores = detectCores() - 1
+ncores = get_available_cores()
 )
 
 # View the results
