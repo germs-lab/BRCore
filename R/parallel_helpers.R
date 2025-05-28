@@ -156,7 +156,7 @@ setup_parallel_backend <- function(default = 1) {
       # Create a PSOCK cluster with available workers
       workers <- parallelly::availableWorkers()
       cli::cli_alert_info(
-        "Creating HPC cluster with {length(workers) - 1L} core(s)/worker(s) via parallely::makeClusterPSOCK().
+        "Creating HPC cluster with {length(workers) - 1L} core(s)/worker(s) via parallelly::makeClusterPSOCK().
         Keeping 1 core/worker available for system."
       )
       cl <- parallelly::makeClusterPSOCK(length(workers) - 1L, autoStop = TRUE) # Keep one for other processes
