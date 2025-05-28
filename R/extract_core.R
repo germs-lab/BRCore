@@ -281,7 +281,7 @@ extract_core <- function(physeq,
     
     list(values = bc_values, names = x_names)
   }
-  
+    
   # Calculating BC dissimilarity based on the 1st ranked OTU
   cli::cli_alert_info("Calculating BC dissimilarity based on the 1st ranked OTU")
   
@@ -411,7 +411,7 @@ extract_core <- function(physeq,
     occ_abun$fill <- "no"
     occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
   }
-  
+
   # Create named return list
   return_list <- list(
     core_otus = core_otus,
