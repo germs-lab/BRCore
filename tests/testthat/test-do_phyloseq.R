@@ -2,7 +2,7 @@ test_that("phyloseq object correctly created", {
     
     # Load expected
     load(here::here("tests/data/test_phyloseq.rda"))
-    
+
     otu_table_rare <-
         multi_rarefy(physeq = test_phyloseq,
                              depth_level = 500,
