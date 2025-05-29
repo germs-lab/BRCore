@@ -16,6 +16,7 @@
 #' @examples
 #' # Load the R library
 #' library(phyloseq)
+#' 
 #' # Load example data
 #' data(GlobalPatterns, package = "phyloseq")
 #'

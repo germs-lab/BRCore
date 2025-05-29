@@ -20,6 +20,7 @@ This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} 
 \examples{
 # Load the R library
 library(phyloseq)
+
 # Load example data
 data(GlobalPatterns, package = "phyloseq")
 
@@ -27,7 +28,7 @@ data(GlobalPatterns, package = "phyloseq")
 rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 500, num_iter = 99)
 
 # Check the rarefied data output
-head(rarefied_data)
+rowSums(rarefied_data)
 
 # Recreate the phyloseq object and check 
 rarefied_physeq <- do_phyloseq(physeq = GlobalPatterns, otu_rare=rarefied_data )
