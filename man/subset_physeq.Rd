@@ -8,7 +8,7 @@ subset_physeq(core_obj, physeq, .var, type)
 }
 \arguments{
 \item{core_obj}{A list object containing core microbiome analysis results.
-Expected to contain a dataframe at position [\link{4}] with OTU information.}
+Expected to contain a dataframe at position \code{[[4]]} with OTU information.}
 
 \item{physeq}{A phyloseq object to be subsetted.}
 
