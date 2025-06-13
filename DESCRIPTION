@@ -19,6 +19,7 @@ Imports:
     cli,
     doParallel,
     dplyr,
+    furrr,
     ggplot2,
     Hmisc,
     magrittr,
@@ -34,7 +35,6 @@ Imports:
 Suggests: 
     here,
     testthat (>= 3.0.0),
-    tidyverse
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.4)

@@ -12,7 +12,6 @@
 #' @import vegan
 #' @import dplyr
 #' @import tibble
-#' @export
 #'
 #' @examples
 #' # Load example data
@@ -21,6 +20,9 @@
 #' # Perform multiple rarefaction
 #' rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 1000, num_iter = 99)
 #' head(rarefied_data)
+#'
+#' @export
+
 multi_rarefy <- function(physeq, depth_level, num_iter) {
     dataframe <-
         as.data.frame(as.matrix(t(
