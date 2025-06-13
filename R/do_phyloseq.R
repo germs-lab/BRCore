@@ -1,4 +1,4 @@
-#' Import a rarefied otu_table into a phyloseq object
+#' Add a rarefied otu_table to a phyloseq object
 #'
 #' This function imports a rarefied otu_table (or normalized) in a `phyloseq` object `otu_table()` layer.
 #'

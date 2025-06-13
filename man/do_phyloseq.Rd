@@ -2,7 +2,7 @@
 % Please edit documentation in R/do_phyloseq.R
 \name{do_phyloseq}
 \alias{do_phyloseq}
-\title{Import a rarefied otu_table into a phyloseq object}
+\title{Add a rarefied otu_table to a phyloseq object}
 \usage{
 do_phyloseq(physeq, otu_rare)
 }
