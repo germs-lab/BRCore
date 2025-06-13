@@ -15,9 +15,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Load the R library
-#' library(phyloseq)
-#' 
 #' # Load example data
 #' data(GlobalPatterns, package = "phyloseq")
 #'

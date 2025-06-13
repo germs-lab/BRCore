@@ -19,9 +19,6 @@ This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} 
 }
 \examples{
 \dontrun{
-# Load the R library
-library(phyloseq)
-
 # Load example data
 data(GlobalPatterns, package = "phyloseq")
 
