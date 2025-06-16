@@ -12,5 +12,5 @@ test_that("rarefaction worked correctly", {
         )
 
 # Test if all the samples have the same number of reads
-expect_true(all(rowSums(otu_table_rare) == rowSums(otu_table_rare)[1]))
+expect_true(all(rowSums(otu_table_rare) == 500))
 })

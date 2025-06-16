@@ -18,7 +18,7 @@ test_that("phyloseq object correctly created", {
     print(read_counts)
     
     # Test if all the samples have the same number of reads
-    expect_true(all(read_counts == read_counts[1]))
+    expect_true(all(read_counts == 500))
     # Test if the created phyloseq object is class phyloseq
     expect_true(class(test_phyloseq_rare) == "phyloseq")
 })
