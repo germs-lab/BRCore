@@ -13,6 +13,9 @@ test_that("phyloseq object correctly created", {
     
     test_phyloseq_rare <- do_phyloseq(test_phyloseq, otu_table_rare)
     read_counts <- sample_sums(test_phyloseq_rare)
+
+    # Debugging: Print read counts for all samples
+    print(read_counts)
     
     # Test if all the samples have the same number of reads
     expect_true(all(read_counts == read_counts[1]))
