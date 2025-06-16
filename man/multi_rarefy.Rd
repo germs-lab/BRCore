@@ -4,7 +4,7 @@
 \alias{multi_rarefy}
 \title{Perform Multiple Rarefaction on a Phyloseq Object}
 \usage{
-multi_rarefy(physeq, depth_level, num_iter)
+multi_rarefy(physeq, depth_level, num_iter, set_seed = NULL)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing an OTU/ASV table.}
@@ -12,6 +12,8 @@ multi_rarefy(physeq, depth_level, num_iter)
 \item{depth_level}{An integer specifying the sequencing depth (number of OTUs/ASVs) to which samples should be rarefied.}
 
 \item{num_iter}{An integer specifying the number of iterations to perform for rarefaction.}
+
+\item{set_seed}{An optional integer to set the random seed for reproducibility. If \code{NULL}, no seed is set.}
 }
 \value{
 A data frame with taxa as rows and samples as columns. The values represent the average sequence counts calculated across all iterations. Samples with less than \code{depth_level} sequences are discarded.
@@ -26,4 +28,5 @@ data(GlobalPatterns, package = "phyloseq")
 # Perform multiple rarefaction
 rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 1000, num_iter = 99)
 head(rarefied_data)
+
 }

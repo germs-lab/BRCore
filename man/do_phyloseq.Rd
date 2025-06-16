@@ -28,8 +28,9 @@ rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 500, num_iter = 99)
 # Check the rarefied data output
 rowSums(rarefied_data)
 
-# Recreate the phyloseq object and check 
+# Recreate the phyloseq object and check
 rarefied_physeq <- do_phyloseq(physeq = GlobalPatterns, otu_rare=rarefied_data )
 head(otu_table(rarefied_physeq))
 }
+
 }

@@ -1,12 +1,15 @@
 test_that("phyloseq object correctly created", {
-    
     # Load expected
     load(here::here("tests/data/test_phyloseq.rda"))
-
+    
+    
     otu_table_rare <-
-        multi_rarefy(physeq = test_phyloseq,
-                             depth_level = 500,
-                             num_iter = 10)
+        multi_rarefy(
+            physeq = test_phyloseq,
+            depth_level = 500,
+            num_iter = 10,
+            set_seed = 1234
+        )
     
     test_phyloseq_rare <- do_phyloseq(test_phyloseq, otu_table_rare)
     read_counts <- sample_sums(test_phyloseq_rare)
