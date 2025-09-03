@@ -5,6 +5,7 @@
 #' @param physeq A `phyloseq` object containing an OTU/ASV table.
 #' @param depth_level An integer specifying the sequencing depth (number of OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform for rarefaction.
+#' @param set_seed An optional integer to set the random seed for reproducibility. If `NULL`, no seed is set.
 #'
 #' @return A data frame with taxa as rows and samples as columns. The values represent the average sequence counts calculated across all iterations. Samples with less than `depth_level` sequences are discarded.
 #'
@@ -12,7 +13,6 @@
 #' @import vegan
 #' @import dplyr
 #' @import tibble
-#' @export
 #'
 #' @examples
 #' # Load example data
@@ -21,7 +21,12 @@
 #' # Perform multiple rarefaction
 #' rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 1000, num_iter = 99)
 #' head(rarefied_data)
-multi_rarefy <- function(physeq, depth_level, num_iter) {
+#'
+#' @export
+
+multi_rarefy <- function(physeq, depth_level, num_iter, set_seed = NULL) {
+    
+
     dataframe <-
         as.data.frame(as.matrix(t(
             otu_table(physeq, taxa_are_rows = TRUE)
@@ -29,6 +34,8 @@ multi_rarefy <- function(physeq, depth_level, num_iter) {
 
     com_iter <- vector(mode = "list", length = num_iter)
 
+    set.seed(set_seed)
+    
     for (i in seq_along(com_iter)) {
         com_iter[[i]] <- as.data.frame(suppressWarnings(vegan::rrarefy(
             dataframe,

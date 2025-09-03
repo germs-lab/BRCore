@@ -17,11 +17,15 @@ RoxygenNote: 7.3.2
 Imports: 
     Biostrings,
     cli,
+    doParallel,
     dplyr,
+    furrr,
     ggplot2,
     Hmisc,
     magrittr,
     minpack.lm,
+    parallel,
+    parallelly,
     phyloseq,
     rlang,
     stats4,
@@ -31,7 +35,6 @@ Imports:
 Suggests: 
     here,
     testthat (>= 3.0.0),
-    tidyverse
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.4)

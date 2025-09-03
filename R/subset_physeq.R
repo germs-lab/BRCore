@@ -5,11 +5,11 @@
 #' Returns both the subsetted phyloseq object and corresponding ASV matrix.
 #'
 #' @param core_obj A list object containing core microbiome analysis results.
-#'        Expected to contain a dataframe at position [[4]] with OTU information.
+#'        Expected to contain a dataframe at position \code{[[4]]} with OTU information.
 #' @param physeq A phyloseq object to be subsetted.
-#' @param .var Character string specifying the column name in `core_obj[[4]]`
+#' @param .var Character string specifying the column name in \code{core_obj[[4]]}
 #'        containing sample/group identifiers to filter by.
-#' @param type Value to filter by in the 'fill' column of `core_obj[[4]]`.
+#' @param type Value to filter by in the 'fill' column of \code{core_obj[[4]]}.
 #'        Determines which OTUs are retained.
 #'
 #' @return A list containing two elements:

@@ -25,6 +25,9 @@
 #' @param increase_value A numeric value specifying the threshold for core taxa selection.
 #' @param Group A character string specifying the column name in the sample metadata to subset the data.
 #' @param Level A character vector specifying the level(s) within the `Group` column to subset the data.
+#' @param trimOTUs A logical value indicating whether to trim OTUs with zero abundance.
+#' @param .parallel A logical value indicating whether to parallelize the calculations with `mcapply()` or not.
+#' @param ncores An integer specifying the number of CPU cores to use for parallel processing. Default is `get_available_cores()`.
 #'
 #' @return A list containing the following elements:
 #'   - `core_otus`: A vector of core OTU IDs.
@@ -40,8 +43,11 @@
 #' @import tidyr
 #' @import vegan
 #' @import tibble
+#' @import parallel
+#' @import doParallel
 #'
 #' @examples
+#' \dontrun{
 #' # Load the esophagus dataset
 #' library(phyloseq)
 #' data(esophagus, package = "phyloseq")
@@ -119,20 +125,28 @@
 #'   physeq = esophagus_with_tax,
 #'   Var = "Group",
 #'   method = "increase",
-#'   increase_value = 2
+#'   increase_value = 2,
+#'   trimOTUs = TRUE,
+#' .parallel = FALSE,
+#' ncores = get_available_cores()
 #' )
 #'
 #' # View the results
 #' print(core_result)
+#' }
 #' @export
 
-
-extract_core <- function(physeq,
-                         Var,
-                         method,
-                         increase_value = NULL,
-                         Group = NULL,
-                         Level = NULL) {
+extract_core<- function(
+    physeq,
+    Var,
+    method,
+    increase_value = NULL,
+    Group = NULL,
+    Level = NULL,
+    trimOTUs = TRUE,
+    .parallel = FALSE,
+    ncores = get_available_cores()
+) {
   set.seed(37920)
   
   # Error handling: type check
@@ -144,10 +158,9 @@ extract_core <- function(physeq,
   # If the check passes, continue processing
   cli::cli_alert_success("Input phyloseq object is valid!")
   
-  
-  #################
-  ## Rarefaction ##
-  #################
+  #-------------------------------
+  # Rarefaction
+  #-------------------------------
   
   # input dataset needs to be rarified and minimum depth included
   nReads <- min(sample_sums(physeq))
@@ -166,7 +179,7 @@ extract_core <- function(physeq,
       rarefy_even_depth(
         physeq,
         sample.size = nReads,
-        trimOTUs = TRUE,
+        trimOTUs = trimOTUs,
         replace = TRUE,
         verbose = FALSE
       )
@@ -175,10 +188,9 @@ extract_core <- function(physeq,
       as.data.frame.matrix()
   }
   
-  
-  #################
-  ## Subsetting ##
-  #################
+  #-------------------------------
+  # Subsetting
+  #-------------------------------
   
   # choosing a subset or using the whole phyloseq object as is
   if (is.null(Group)) {
@@ -186,13 +198,20 @@ extract_core <- function(physeq,
     map <- rarefied@sam_data %>% as("data.frame")
   } else {
     sub_group <- substitute(Group)
-    sub_set <- subset(sample_data(rarefied), eval(parse(text = sub_group)) %in% Level)
-    physeq1 <- merge_phyloseq(otu_table(rarefied),
-                              tax_table(rarefied),
-                              refseq(rarefied),
-                              sub_set)
+    sub_set <- subset(
+      sample_data(rarefied),
+      eval(parse(text = sub_group)) %in% Level
+    )
+    physeq1 <- merge_phyloseq(
+      otu_table(rarefied),
+      tax_table(rarefied),
+      refseq(rarefied),
+      sub_set
+    )
     
-    otu_table(physeq1) <- otu_table(physeq1)[which(rowSums(otu_table(physeq1)) > 0), ]
+    otu_table(physeq1) <- otu_table(physeq1)[
+      which(rowSums(otu_table(physeq1)) > 0),
+    ]
     otu <- physeq1@otu_table %>% as("matrix")
     map <- physeq1@sam_data %>% as("data.frame")
     print("Grouping Factor")
@@ -203,11 +222,10 @@ extract_core <- function(physeq,
   }
   
   map$SampleID <- rownames(map)
-
   
-  #############################
-  ## occupancy and abundance ##
-  #############################
+  #-------------------------------
+  # Occupancy and Abundance #
+  #-------------------------------
   
   # calculating occupancy and abundance
   otu_PA <-
@@ -216,17 +234,14 @@ extract_core <- function(physeq,
     rowSums(otu_PA) / ncol(otu_PA) # occupancy calculation
   otu_rel <-
     apply(decostand(otu, method = "total", MARGIN = 2), 1, mean) # mean relative abundance
-  # tibble::rownames_to_column appears to create an error at line #106 for left_join(), sticking with add_rownames for now
-  #   occ_abun <-
-  #     add_rownames(as.data.frame(cbind(otu_occ, otu_rel)), "otu") # combining occupancy and abundance data frame
-  # NOTE! add_rownames is deprecated and generates a warning, a bug of tidyverse,
-  # alternative you can use:
-  occ_abun <- tibble::rownames_to_column(as.data.frame(cbind(otu_occ, otu_rel)), "otu")
+  occ_abun <- tibble::rownames_to_column(
+    as.data.frame(cbind(otu_occ, otu_rel)),
+    "otu"
+  )
   
-  
-  ##################
-  ## Ranking OTUs ##
-  ##################
+  #-------------------------------
+  # Ranking OTUs
+  #-------------------------------
   
   # Ranking OTUs based on their occupancy
   # For calculating ranking index we included following conditions:
@@ -252,127 +267,159 @@ extract_core <- function(physeq,
       Index = (sumF + sumG) / nS
     ) # calculating weighting Index based on number of points detected
   
-  
   # Ranked OTUs
   otu_ranked <- occ_abun %>%
     left_join(PresenceSum, by = "otu") %>%
     transmute(otu = otu, rank = Index) %>%
     arrange(desc(rank))
-
   
-  ###############################
-  ## Bray-Curtis Dissimilarity ##
-  ###############################
+  #-------------------------------
+  # Bray-Curtis Dissimilarity
+  #-------------------------------
   
-  # Helper function: Calculate Bray-Curtis values
-  calculate_bc <- function(matrix, nReads) {
-    if (nrow(matrix) == 0) {
-      cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
-      return(list(values = numeric(0), names = character(0)))
-    }
-    
-    bc_values <- apply(combn(ncol(matrix), 2), 2, function(x) {
-      sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
-    })
-    
-    x_names <- apply(combn(ncol(matrix), 2), 2, function(x) {
-      paste(colnames(matrix)[x], collapse = "-")
-    })
-    
-    list(values = bc_values, names = x_names)
-  }
-    
   # Calculating BC dissimilarity based on the 1st ranked OTU
-  cli::cli_alert_info("Calculating BC dissimilarity based on the 1st ranked OTU")
+  cli::cli_alert_info(
+    "Calculating BC dissimilarity based on the 1st ranked OTU"
+  )
   
   start_matrix <- t(as.matrix(otu[otu_ranked$otu[1], ]))
   first_bc <- calculate_bc(start_matrix, nReads)
   BCaddition <- data.frame(x_names = first_bc$names, "1" = first_bc$values)
   
-  cli::cli_alert_success("BC dissimilarity based on the 1st ranked OTU complete")
-  
-  # Calculating BC dissimilarity based on additon of ranked OTUs from 2nd to nth.
-  # Set to the entire length of OTUs in the dataset. It might take some time if more than 5000 OTUs are included.
-  
-  cli::cli_alert_info("Calculating BC dissimilarity based on ranked OTUs, starting at {Sys.time()}")
-  progressbar_calc_bc <- cli::cli_progress_bar(
-    name = "Calculating BC rankings",
-    total = nrow(otu_ranked) - 1,
-    format = "{cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
-    .auto_close = TRUE,
-    .envir = parent.frame()
+  cli::cli_alert_success(
+    "BC dissimilarity based on the 1st ranked OTU complete"
   )
   
-  for (i in 2:nrow(otu_ranked)) {
-    # Add next OTU
-    current_matrix <- rbind(start_matrix, t(otu[otu_ranked$otu[i], ]))
+  # Calculating BC dissimilarity based on additon of ranked OTUs from 2nd to nth.
+  # Set to the entire length of OTUs in the dataset.
+  
+  cli::cli_alert_info(
+    "Calculating BC dissimilarity based on ranked OTUs, starting at {Sys.time()}"
+  )
+  
+  # Helper function to rank BC using calculate_bc() for each ranked OTU
+  bc_rank_task <- function(i) {
+    set.seed(37920)
     
-    # Calculate BC
+    current_matrix <- rbind(start_matrix, t(otu[otu_ranked$otu[i], ]))
     current_bc <- calculate_bc(current_matrix, nReads)
     
-    # Update data frame
     df_a <- data.frame(x_names = current_bc$names, val = current_bc$values)
     names(df_a)[2] <- i
-    BCaddition <- left_join(BCaddition, df_a, by = "x_names")
     
-    cli::cli_progress_update(id = progressbar_calc_bc)
+    return(df_a)
   }
   
-  cli::cli_progress_done(id = progressbar_calc_bc)
+  if (.parallel) {
+    # Backend
+    if (!parallelly::supportsMulticore()) {
+      cl <- setup_parallel_backend()
+      doParallel::registerDoParallel(cl)
+    } else {
+      cli::cli_alert_info("Running in parallel with {ncores} cores")
+    }
+    
+    # Run in parallel
+    parallel_results <- parallel::mclapply(
+      2:nrow(otu_ranked),
+      bc_rank_task,
+      mc.cores = ncores
+    )
+    
+    # Combine results
+    for (i in 1:length(parallel_results)) {
+      BCaddition <- left_join(
+        BCaddition,
+        parallel_results[[i]],
+        by = "x_names"
+      )
+    }
+  }
+  
+  if (!.parallel) {
+    cli::cli_alert_info("Running in serial")
+    
+    progressbar_calc_bc <- cli::cli_progress_bar(
+      name = "Calculating BC rankings",
+      total = nrow(otu_ranked) - 1,
+      format = "{cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+      .auto_close = TRUE,
+      .envir = parent.frame()
+    )
+    
+    for (i in 2:nrow(otu_ranked)) {
+      df_a <- bc_rank_task(i)
+      BCaddition <- left_join(BCaddition, df_a, by = "x_names")
+      
+      cli::cli_progress_update(
+        id = progressbar_calc_bc
+      )
+    }
+    
+    cli::cli_progress_done(id = progressbar_calc_bc)
+  }
   
   cli::cli_alert_success("BC ranks done!")
-  
-  
   
   # Ranking the obtained BC
   rownames(BCaddition) <- BCaddition$x_names
   temp_BC <- BCaddition
   temp_BC$x_names <- NULL
   temp_BC_matrix <- as.matrix(temp_BC)
-  BC_ranked <- data.frame(rank = as.factor(row.names(t(temp_BC_matrix))), t(temp_BC_matrix)) %>%
+  BC_ranked <- data.frame(
+    rank = as.factor(row.names(t(
+      temp_BC_matrix
+    ))),
+    t(temp_BC_matrix)
+  ) %>%
     gather(comparison, BC, -rank) %>%
     group_by(rank) %>%
     summarise(MeanBC = mean(BC)) %>% # Calculate mean Bray-Curtis dissimilarity
     arrange(desc(-MeanBC)) %>%
     mutate(proportionBC = MeanBC / max(MeanBC)) # Calculate proportion of the dissimilarity explained by the n number of ranked OTUs
-
   
-  # Calculating the increase BC
-  Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-length(BC_ranked$MeanBC)]
-  increaseDF <- data.frame(IncreaseBC = c(0, (Increase)), rank = factor(c(1:(
-    length(Increase) + 1
-  ))))
-  BC_ranked <- left_join(BC_ranked, increaseDF, by = join_by(rank))
+  #-------------------------------
+  # Increase in Bray-Curtis
+  #-------------------------------
+  
+  # Calculating the increase in BC similarity
+  Increase <- BC_ranked$MeanBC[-1] /
+    BC_ranked$MeanBC[-length(BC_ranked$MeanBC)]
+  increaseDF <- data.frame(
+    IncreaseBC = c(1, (Increase)), # Start with 1 instead of 0 for first OTU (no increase)
+    rank = factor(c(1:(length(Increase) + 1)))
+  )
+  
+  # Join the increase values to the BC_ranked data frame
+  BC_ranked <- left_join(
+    BC_ranked,
+    increaseDF,
+    by = join_by(rank)
+  )
+  
+  # Remove the last row and any rows with NA values
   BC_ranked <- BC_ranked[-nrow(BC_ranked), ]
   BC_ranked <- drop_na(BC_ranked)
   
-  
-  #############################
-  ## Increase in Bray-Curtis ##
-  #############################
-  
-  # Calculating the increase BC
-  Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-length(BC_ranked$MeanBC)]
-  increaseDF <- data.frame(IncreaseBC = c(0, (Increase)), rank = factor(c(1:(
-    length(Increase) + 1
-  ))))
-  BC_ranked <- left_join(BC_ranked, increaseDF, by = join_by(rank, IncreaseBC))
-  BC_ranked <- BC_ranked[-nrow(BC_ranked), ]
-  BC_ranked <- drop_na(BC_ranked)
-  
+  #-------------------------------
+  # Methods
+  #-------------------------------
   
   # Error handling: Make sure a method is specified as 'increase' or 'elbow'
   # Check if method is provided and is one of the allowed values
   if (missing(method) || !method %in% c("increase", "elbow")) {
-    cli::cli_abort("{.arg method} must be specified as either 'increase' or 'elbow'.",
-                   call. = FALSE)
+    cli::cli_abort(
+      "{.arg method} must be specified as either 'increase' or 'elbow'.",
+      call. = FALSE
+    )
   }
   
   if (method == "elbow") {
-    cli::cli_alert_success("Performing method 'elbow'")
+    cli::cli_alert_info("Performing method 'elbow'")
     fo_difference <- function(pos) {
       left <- (BC_ranked[pos, 2] - BC_ranked[1, 2]) / pos
-      right <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[pos, 2]) / (nrow(BC_ranked) - pos)
+      right <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[pos, 2]) /
+        (nrow(BC_ranked) - pos)
       core_otus <- otu_ranked$otu[1:elbow]
       # core_otus %T>% print()
     }
@@ -383,34 +430,45 @@ extract_core <- function(physeq,
   # Creating threshold for core inclusion - last call method using a
   # final increase in BC similarity of equal or greater than increase_value
   if (method == "increase") {
-    # Error handling: If method 'increase' is chosen, make sure that                                      'increase_value' is specified
+    # Error handling: If method 'increase' is chosen, make sure that 'increase_value' is specified
     if (missing(increase_value) || is.null(increase_value)) {
-      cli::cli_abort("{.arg increase_value} must be specified when method is 'increase'.")
+      cli::cli_abort(
+        "{.arg increase_value} must be specified when method is 'increase'."
+      )
     }
     if (!is.numeric(increase_value)) {
       cli::cli_abort("{arg increase_value} must be a numeric value.")
     }
     
-    cli::cli_alert_success("Performing method 'increase'")
+    cli::cli_alert_info("Performing method 'increase'")
     
     # Convert the % increase into a decimal value and add 1
     perc_increase <- 1 + (increase_value * 0.01)
     
     lastCall <-
-      as.numeric(as.character(
+      as.character(
         dplyr::filter(BC_ranked, IncreaseBC >= perc_increase)$rank
-      ))
+      )
     
-    # Convert lastCall to character to subset core_otus by rowname
-    lastCall <- as.character(lastCall)
+    # If no ranks meet the threshold, use just the top OTU
+    if (length(lastCall) == 0) {
+      cli::cli_alert_warning(
+        "No OTUs meet the specified increase threshold. Using top OTU only."
+      )
+      lastCall <- 1
+    }
     core_otus <- otu_ranked[rownames(otu_ranked) %in% lastCall, ]
-    
     core_otus <- as.vector(core_otus$otu)
     
     # Filter non-core and core OTUs
     occ_abun$fill <- "no"
     occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
   }
+  
+  
+  #-------------------------------
+  # Results
+  #-------------------------------
 
   # Create named return list
   return_list <- list(
@@ -428,5 +486,6 @@ extract_core <- function(physeq,
     cli::cli_alert_warning("One or more return list elements are NULL.")
   }
   
+  cli::cli_alert_success("Analysis complete!")
   return(return_list)
 }
