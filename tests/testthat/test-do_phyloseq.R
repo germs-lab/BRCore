@@ -13,12 +13,18 @@ test_that("phyloseq object correctly created", {
     
     test_phyloseq_rare <- do_phyloseq(test_phyloseq, otu_table_rare)
     read_counts <- sample_sums(test_phyloseq_rare)
-
-    # Debugging: Print read counts for all samples
-    print(read_counts)
+    
+    
+    expect_true(class(test_phyloseq_rare) == "phyloseq")
+    
+    expect_true(is.numeric(read_counts))
+    expect_true(length(read_counts) > 0)
+    expect_true(all(read_counts > 0))
     
     # Test if all the samples have the same number of reads
-    expect_true(all(read_counts == 500))
-    # Test if the created phyloseq object is class phyloseq
-    expect_true(class(test_phyloseq_rare) == "phyloseq")
+    expect_true(all(rowSums(otu_table_rare) == 500))
+    expect_equal(max(read_counts) - min(read_counts), 0) # All values are identical
+    expect_equal(median(read_counts), mean(read_counts))
+    
+    
 })
