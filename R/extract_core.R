@@ -465,10 +465,11 @@ extract_core<- function(
     occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
   }
   
+  
   #-------------------------------
   # Results
   #-------------------------------
-  
+
   # Create named return list
   return_list <- list(
     core_otus = core_otus,
