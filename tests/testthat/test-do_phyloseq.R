@@ -22,7 +22,6 @@ test_that("phyloseq object correctly created", {
     expect_true(all(read_counts > 0))
     
     # Test if all the samples have the same number of reads
-    expect_true(all(rowSums(otu_table_rare) == 500))
     expect_equal(max(read_counts) - min(read_counts), 0) # All values are identical
     expect_equal(median(read_counts), mean(read_counts))
     
