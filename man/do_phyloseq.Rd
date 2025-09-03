@@ -2,12 +2,12 @@
 % Please edit documentation in R/do_phyloseq.R
 \name{do_phyloseq}
 \alias{do_phyloseq}
-\title{Import a rarefied otu_table into a phyloseq object}
+\title{Add a rarefied otu_table to a phyloseq object}
 \usage{
 do_phyloseq(physeq, otu_rare)
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object in which I want to add the rarefied OTU/ASV table.}
+\item{physeq}{A \code{phyloseq} object in which you want to add the rarefied OTU/ASV table.}
 
 \item{otu_rare}{A rarefied otu_table dataframe.}
 }
@@ -23,10 +23,14 @@ This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} 
 data(GlobalPatterns, package = "phyloseq")
 
 # Perform multiple rarefaction
-rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 1000, num_iter = 99)
-head(rarefied_data)
+rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 500, num_iter = 99)
 
+# Check the rarefied data output
+rowSums(rarefied_data)
+
+# Recreate the phyloseq object and check
 rarefied_physeq <- do_phyloseq(physeq = GlobalPatterns, otu_rare=rarefied_data )
 head(otu_table(rarefied_physeq))
 }
+
 }
