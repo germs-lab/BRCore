@@ -37,7 +37,7 @@
 #'     do_phyloseq(physeq = GlobalPatterns, 
 #'                 otu_rare = rarefied_data )
 #'     
-#' head(phyloseq::otu_table(rarefied_physeq))
+#' rarefied_physeq
 #'
 #' @export
 do_phyloseq <- function(physeq, otu_rare) {

@@ -32,9 +32,18 @@ rarefied_data <-
 # Check the rarefied data output
 rowSums(rarefied_data)
 
+<<<<<<< HEAD
 if (is.null(rarefied_data) || nrow(rarefied_data) == 0 || ncol(rarefied_data) == 0) {
 stop("rarefied_data has zero dimensions. Check data preprocessing and input files.")
 }
+=======
+# Recreate the phyloseq object and check
+rarefied_physeq <- 
+    do_phyloseq(physeq = GlobalPatterns, 
+    otu_rare=rarefied_data )
+    
+head(phyloseq::otu_table(rarefied_physeq))
+>>>>>>> 1c6f6e5c472aa74764462c7699a3cd63a8af72e5
 
 # Recreate the phyloseq object and check
 rarefied_physeq <- 
