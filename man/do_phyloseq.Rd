@@ -18,19 +18,29 @@ A \code{phyloseq} object.
 This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} object \code{otu_table()} layer.
 }
 \examples{
-\dontrun{
 # Load example data
 data(GlobalPatterns, package = "phyloseq")
 
 # Perform multiple rarefaction
-rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 500, num_iter = 99)
+rarefied_data <- 
+    multi_rarefy(GlobalPatterns, 
+    depth_level = 500, 
+    num_iter = 99, 
+    threads = 4, 
+    set_seed = 654)
 
 # Check the rarefied data output
 rowSums(rarefied_data)
 
-# Recreate the phyloseq object and check
-rarefied_physeq <- do_phyloseq(physeq = GlobalPatterns, otu_rare=rarefied_data )
-head(otu_table(rarefied_physeq))
+if (is.null(rarefied_data) || nrow(rarefied_data) == 0 || ncol(rarefied_data) == 0) {
+stop("rarefied_data has zero dimensions. Check data preprocessing and input files.")
 }
+
+# Recreate the phyloseq object and check
+rarefied_physeq <- 
+    do_phyloseq(physeq = GlobalPatterns, 
+                otu_rare = rarefied_data )
+    
+head(phyloseq::otu_table(rarefied_physeq))
 
 }
