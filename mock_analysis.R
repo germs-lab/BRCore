@@ -1,13 +1,25 @@
 # Setup
 source("R/utils/000_setup.R")
-load(
-  "tests/data/test_phyloseq.rda"
-)
+load("data/test_phyloseq.rda")
+
+# Changing sample and 
+# Generate new sample names like "sample001", "sample002", ...
+sample_names <- sprintf("sample%03d", seq_along(sample_names(test_phyloseq)))
+otu_names <- sprintf("otu%03d", seq_along(taxa_names(test_phyloseq)))
+
+# Apply with speedyseq
+test_phyloseq2 <- test_phyloseq
+sample_names(test_phyloseq2) <- sample_names
+taxa_names(test_phyloseq2) <- otu_names
+
+head(otu_table(test_phyloseq2))
+head(sample_data(test_phyloseq2))
+head(tax_table(test_phyloseq2))
 
 # Test data set
-## Making it small to it can run fast
+# Making it small to it can run fast
 
-test_small_phyloseq <- test_phyloseq %>%
+test_small_phyloseq <- test_phyloseq2 %>%
   prune_taxa(taxa_sums(.) > 5000 & taxa_sums(.) < 50000, .) %>%
   prune_samples(sample_sums(.) >= 1, .)
 
@@ -20,34 +32,37 @@ test_small_phyloseq <- test_phyloseq %>%
 otu_table_rare <-
     multi_rarefy(physeq = test_small_phyloseq,
                  depth_level = 5000,
-                 num_iter = 99)
+                 num_iter = 99, 
+                 threads = 4)
+
+rowSums(otu_table_rare)
+otu_table_rare[1:10, 1:10]
+str(otu_table_rare)
+
 
 # Recreate the phyloseq object with the rarefied otu_table
-test_phyloseq_rare <-
-    phyloseq(
-        otu_table(
-            otu_table_rare %>%
-                column_to_rownames("SampleID") %>%
-                t() %>%
-                as.matrix() %>%
-                as.data.frame(),
-            taxa_are_rows = TRUE
-        ),
-        test_small_phyloseq@sam_data,
-        test_small_phyloseq@tax_table
-    ) %>%
-    prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
-    prune_samples(sample_sums(x = .) > 0, x = .)
+rarefied_physeq <- 
+    do_phyloseq(physeq = test_small_phyloseq, 
+                otu_rare=otu_table_rare )
+
+rarefied_physeq
+sample_sums(rarefied_physeq)
 
 
-# Extract the 'spatial' core microbiome across all sites. The 'Var' in the extract_core is 'site'.
+# Extract the 'spatial' core microbiome across all sites. 
+#The 'Var' in the extract_core is 'site'.
 
 spatial_core <- extract_core(
     test_small_phyloseq,
     Var = "site",
     method = "increase",
-    increase_value = 2
-) # Minimum seq depth was ~10,000 reads.
+    increase_value = 2,
+    ncores = 12
+    ) 
+
+spatial_core
+
+# Minimum seq depth was ~10,000 reads.
 
 
 BC_ranked <- spatial_core[[2]]
