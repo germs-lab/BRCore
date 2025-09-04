@@ -4,16 +4,16 @@
 \alias{sncm.fit}
 \title{Fit a Neutral Model to Microbial Community Data}
 \usage{
-sncm.fit(spp, pool = NULL, stats = TRUE, taxon = NULL)
+sncm.fit(spp, pool = NULL, taxon = NULL)
 }
 \arguments{
 \item{spp}{A community data matrix (samples as rows, taxa as columns).}
 
 \item{pool}{An optional community data matrix representing the source pool. If \code{NULL}, the average relative abundance of each taxon across \code{spp} is used.}
 
-\item{stats}{A logical value indicating whether to return model statistics (\code{TRUE}) or detailed predictions for each taxon (\code{FALSE}). Default is \code{TRUE}.}
-
 \item{taxon}{An optional data frame containing taxonomic information for each taxon. If provided, the output will include taxonomic details.}
+
+\item{stats}{A logical value indicating whether to return model statistics (\code{TRUE}) or detailed predictions for each taxon (\code{FALSE}). Default is \code{TRUE}.}
 }
 \value{
 If \code{stats = TRUE}, a data frame containing model statistics such as AIC, BIC, R-squared, and RMSE. If \code{stats = FALSE}, a data frame with detailed predictions for each taxon, including observed and predicted frequencies, confidence intervals, and taxonomic information (if provided).
