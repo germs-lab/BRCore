@@ -98,8 +98,9 @@ test_that("extract_core() works with esophagus_with_tax dataset", {
   )
 
   # Load expected
-  load(here::here("tests/testthat/expected_extract_core.rda"))
-
+  #load(here::here("tests/testthat/testdata/expected_extract_core.rda"))
+  load(testthat::test_path("testdata", "expected_extract_core.rda"))
+  
   # Run the function
   test_core <- extract_core(
     esophagus_with_tax,

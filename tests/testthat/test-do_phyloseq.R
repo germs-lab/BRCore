@@ -1,7 +1,7 @@
 test_that("phyloseq object correctly created", {
     # Load expected
-    load(here::here("tests/data/test_phyloseq.rda"))
-    
+    #load(here::here("tests/testthat/testdata/test_phyloseq.rda"))
+    load(testthat::test_path("testdata", "test_phyloseq.rda"))
     
     otu_table_rare <-
         multi_rarefy(

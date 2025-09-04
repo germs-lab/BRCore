@@ -4,7 +4,7 @@ Version: 0.0.2
 Authors@R: c(
     person("Bolívar", "Aponte Rolón", , "bolaponte@pm.me", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-2544-4551")),
     person("Brandon", "Kristy", role = c("aut")),
-    person("Gian", "Benucci", role = c("aut")),
+    person("Gian Maria Niccolo", "Benucci", role = c("aut")),
     person("Adina", "Howe", role = "ctb"),
     person("Jaejin", "Lee", role = "ctb"),
     person("Phillip", "de Lorimier", role = "ctb")
@@ -38,3 +38,4 @@ Suggests:
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.4)
+LazyData: true
