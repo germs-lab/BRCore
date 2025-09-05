@@ -36,11 +36,11 @@ developed by Sanders in 1968 it has been adopted widely in ecology research.
 
 ```{r rarefy-Globalpatterns, echo=TRUE}
 rarefied_otutable <-
-    multi_rarefy(physeq = GlobalPatterns,
-                 depth_level = 5000,
-                 num_iter = 10, 
-                 threads = 4, 
-                 set_seed = 213)
+    parallelly_rarefy(physeq = GlobalPatterns, 
+                      depth_level = 500, 
+                      num_iter = 9, 
+                      threads = 2, 
+                      set_seed = 100)
 
 rowSums(rarefied_otutable)
 rarefied_otutable[1:10, 1:10]

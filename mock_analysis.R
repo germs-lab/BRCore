@@ -75,6 +75,18 @@ rowSums(otu_table_rare)
 otu_table_rare[1:10, 1:10]
 str(otu_table_rare)
 
+otu_table_rare <-
+    parallelly_rarefy(physeq = GlobalPatterns, 
+                      depth_level = 500, 
+                      num_iter = 9, 
+                      threads = 8, 
+                      set_seed = 100)
+
+rowSums(otu_table_rare)
+otu_table_rare[1:10, 1:10]
+str(otu_table_rare)
+
+
 # Recreate the phyloseq object with the rarefied otu_table
 rarefied_physeq <- 
     do_phyloseq(physeq = test_small_phyloseq, 
@@ -96,6 +108,19 @@ spatial_core <- extract_core(
 
 spatial_core
 str(spatial_core)
+
+spatial_core_rare <- parallel_extract_core(
+    rarefied_physeq,
+    Var = "site",
+    method = "increase",
+    increase_value = 3,
+    ncores = 10
+) 
+
+spatial_core_rare
+str(spatial_core_rare)
+spatial_core_rare$sample_metadata
+
 
 # Minimum seq depth was ~10,000 reads.
 increase_value <- 3

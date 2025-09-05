@@ -31,11 +31,10 @@
 #'   physeq = GlobalPatterns,
 #'   depth_level = 500,
 #'   num_iter = 10,
-#'   threads = 2,
 #'   set_seed = 123
 #' )
-#'
-#' head(test_otutable_rare)
+#' 
+#' rowSums(test_otutable_rare)
 #'
 #' @export
 parallelly_rarefy <- function(physeq,
