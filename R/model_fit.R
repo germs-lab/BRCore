@@ -4,7 +4,6 @@
 #'
 #' @param spp A community data matrix (samples as rows, taxa as columns).
 #' @param pool An optional community data matrix representing the source pool. If `NULL`, the average relative abundance of each taxon across `spp` is used.
-#' @param stats A logical value indicating whether to return model statistics (`TRUE`) or detailed predictions for each taxon (`FALSE`). Default is `TRUE`.
 #' @param taxon An optional data frame containing taxonomic information for each taxon. If provided, the output will include taxonomic details.
 #'
 #' @return If `stats = TRUE`, a data frame containing model statistics such as AIC, BIC, R-squared, and RMSE. If `stats = FALSE`, a data frame with detailed predictions for each taxon, including observed and predicted frequencies, confidence intervals, and taxonomic information (if provided).

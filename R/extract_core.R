@@ -45,6 +45,8 @@
 #' @import tibble
 #' @import parallel
 #' @import doParallel
+#' @importFrom magrittr %T>%
+#' @importFrom dplyr %>% 
 #'
 #' @examples
 #' \dontrun{

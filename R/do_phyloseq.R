@@ -11,6 +11,7 @@
 #' @import vegan
 #' @import dplyr
 #' @import tibble
+#' @importFrom dplyr %>% 
 #'
 #' @examples
 #' # Load example data
@@ -21,9 +22,9 @@
 #' rarefied_data <- 
 #'     multi_rarefy(GlobalPatterns, 
 #'     depth_level = 500, 
-#'     num_iter = 99, 
-#'     threads = 4, 
-#'     set_seed = 654)
+#'     num_iter = 10, 
+#'     threads = 2, 
+#'     set_seed = 453)
 #'
 #' # Check the rarefied data output
 #' rowSums(rarefied_data)

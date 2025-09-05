@@ -16,6 +16,9 @@
 #' @import vegan
 #' @import dplyr
 #' @import tibble
+#' @importFrom future plan multisession
+#' @importFrom magrittr %T>%
+#' @importFrom dplyr %>% 
 #'
 #' @examples
 #' data(GlobalPatterns, package = "phyloseq")
@@ -23,7 +26,7 @@
 #'   physeq = GlobalPatterns,
 #'   depth_level = 500,
 #'   num_iter = 10,
-#'   threads = 4,
+#'   threads = 2,
 #'   set_seed = 123
 #' )
 #'

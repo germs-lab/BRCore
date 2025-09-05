@@ -32,7 +32,7 @@ test_otutable_rare <- multi_rarefy(
   physeq = GlobalPatterns,
   depth_level = 500,
   num_iter = 10,
-  threads = 4,
+  threads = 2,
   set_seed = 123
 )
 
