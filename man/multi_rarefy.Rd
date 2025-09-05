@@ -4,7 +4,7 @@
 \alias{multi_rarefy}
 \title{Run multiple rarefaction for microbiome count tables}
 \usage{
-multi_rarefy(physeq, depth_level, num_iter = 100, threads = 4, set_seed = 123)
+multi_rarefy(physeq, depth_level, num_iter = 100, threads = 4, set_seed = NULL)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing an OTU/ASV table.}

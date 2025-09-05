@@ -34,9 +34,13 @@ Imports:
     tidyr,
     vegan
 Suggests: 
+    phyloseq,
     here,
-    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.4)
 LazyData: true
+VignetteBuilder: knitr

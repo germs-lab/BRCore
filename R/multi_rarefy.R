@@ -37,7 +37,7 @@ multi_rarefy <- function(physeq,
                          depth_level, 
                          num_iter = 100, 
                          threads = 4,
-                         set_seed = 123) {
+                         set_seed = NULL) {
     
     cat("\nSeed used:", set_seed)
     

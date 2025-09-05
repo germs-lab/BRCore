@@ -38,3 +38,5 @@ vignettes/*.pdf
 ### Dependency Management ###
 renv/
 renv.lock
+/doc/
+/Meta/
