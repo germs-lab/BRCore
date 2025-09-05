@@ -63,11 +63,8 @@ str(otu_table_rare)
 # Recreate the phyloseq object with the rarefied otu_table
 rarefied_physeq <- 
     do_phyloseq(physeq = test_small_phyloseq, 
-<<<<<<< HEAD
                 otu_rare=otu_table_rare)
-=======
                 otu_rare=otu_table_rare )
->>>>>>> 1c6f6e5c472aa74764462c7699a3cd63a8af72e5
 
 rarefied_physeq
 sample_sums(rarefied_physeq)
@@ -83,13 +80,6 @@ spatial_core <- extract_core(
     increase_value = 2,
     ncores = 12
     ) 
-<<<<<<< HEAD
-=======
-
-spatial_core
-
-# Minimum seq depth was ~10,000 reads.
->>>>>>> 1c6f6e5c472aa74764462c7699a3cd63a8af72e5
 
 spatial_core
 

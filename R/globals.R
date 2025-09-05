@@ -3,3 +3,4 @@ utils::globalVariables(c(
   "coreTime", "sumF", "sumG", "nS", "Index", "comparison", "BC", "MeanBC",
   "elbow", "IncreaseBC", "freq.pred"
 ))
+utils::globalVariables(c("%>%", "%T>%"))

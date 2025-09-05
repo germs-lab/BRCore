@@ -11,6 +11,7 @@
 #' @import vegan
 #' @import dplyr
 #' @import tibble
+#' @importFrom dplyr %>% 
 #'
 #' @examples
 #' # Load example data
