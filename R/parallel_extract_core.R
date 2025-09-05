@@ -123,14 +123,14 @@
 #' esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data))
 #'
 #' # Extract core taxa using the "increase" method
-#' core_result <- extract_core(
+#' core_result <- parallel_extract_core(
 #'   physeq = esophagus_with_tax,
 #'   Var = "Group",
 #'   method = "increase",
 #'   increase_value = 2,
 #'   trimOTUs = TRUE,
-#' .parallel = FALSE,
-#' ncores = get_available_cores()
+#'   .parallel = FALSE,
+#'   ncores = get_available_cores()
 #' )
 #'
 #' # View the results
@@ -138,7 +138,7 @@
 #' }
 #' @export
 
-extract_core<- function(
+parallel_extract_core<- function(
     physeq,
     Var,
     method,
@@ -161,33 +161,22 @@ extract_core<- function(
   cli::cli_alert_success("Input phyloseq object is valid!")
   
   #-------------------------------
-  # Rarefaction
+  # Rarefaction requirements
   #-------------------------------
   
-  # input dataset needs to be rarified and minimum depth included
-  nReads <- min(sample_sums(physeq))
+  # input dataset needs to be rarified 
   
   if (min(sample_sums(physeq)) == max(sample_sums(physeq))) {
     # nReads %T>% print()
     # rarefied %T>% print()
-    taxon <- tax_table(physeq) %>%
+     nReads <- min(sample_sums(physeq))
+      
+     taxon <- tax_table(physeq) %>%
       as.data.frame.matrix()
     
     dim(taxon) %T>% print()
   } else {
-    nReads <- min(sample_sums(physeq))
-    # nReads %T>% print()
-    rarefied <-
-      rarefy_even_depth(
-        physeq,
-        sample.size = nReads,
-        trimOTUs = trimOTUs,
-        replace = TRUE,
-        verbose = FALSE
-      )
-    
-    taxon <- tax_table(rarefied) %>%
-      as.data.frame.matrix()
+      stop("The otu_table() is not rarefied!")
   }
   
   #-------------------------------
@@ -196,18 +185,18 @@ extract_core<- function(
   
   # choosing a subset or using the whole phyloseq object as is
   if (is.null(Group)) {
-    otu <- rarefied@otu_table %>% as("matrix")
-    map <- rarefied@sam_data %>% as("data.frame")
+    otu <- physeq@otu_table %>% as("matrix")
+    map <- physeq@sam_data %>% as("data.frame")
   } else {
     sub_group <- substitute(Group)
     sub_set <- subset(
-      sample_data(rarefied),
+      sample_data(physeq),
       eval(parse(text = sub_group)) %in% Level
     )
     physeq1 <- merge_phyloseq(
-      otu_table(rarefied),
-      tax_table(rarefied),
-      refseq(rarefied),
+      otu_table(physeq),
+      tax_table(physeq),
+      refseq(physeq),
       sub_set
     )
     

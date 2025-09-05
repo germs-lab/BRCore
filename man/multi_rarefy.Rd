@@ -2,9 +2,9 @@
 % Please edit documentation in R/multi_rarefy.R
 \name{multi_rarefy}
 \alias{multi_rarefy}
-\title{Perform Multiple Rarefaction on a Phyloseq Object}
+\title{Run multiple rarefaction for microbiome count tables}
 \usage{
-multi_rarefy(physeq, depth_level, num_iter, set_seed = NULL)
+multi_rarefy(physeq, depth_level, num_iter = 100, threads = 4, set_seed = NULL)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing an OTU/ASV table.}
@@ -13,7 +13,9 @@ multi_rarefy(physeq, depth_level, num_iter, set_seed = NULL)
 
 \item{num_iter}{An integer specifying the number of iterations to perform for rarefaction.}
 
-\item{set_seed}{An optional integer to set the random seed for reproducibility. If \code{NULL}, no seed is set.}
+\item{threads}{Number of threads (deafault = 4).}
+
+\item{set_seed}{An optional integer to set the random seed for reproducibility (default=\code{123}).}
 }
 \value{
 A data frame with taxa as rows and samples as columns. The values represent the average sequence counts calculated across all iterations. Samples with less than \code{depth_level} sequences are discarded.
@@ -21,12 +23,19 @@ A data frame with taxa as rows and samples as columns. The values represent the 
 \description{
 This function performs multiple rarefaction on a \code{phyloseq} object by randomly sub-sampling OTUs/ASVs within samples without replacement. The process is repeated for a specified number of iterations, and the results are averaged. Samples with fewer OTUs/ASVs than the specified \code{depth_level} are discarded.
 }
+\details{
+Firstly introduced by Sanders in 1968, rarefaction is a technique to standardize the number of observations (i.e. sequence reads counts in microbiome data) across samples when we want to compare diversity. It works by subsampling all samples in a dataset to a predefined smaller size. Single rarefaction, one subsampling round, may introduce element of randomness and may not fully represent the observed diversity. In multuple rarefacton the result is the mean of several rarefaction iterations or subsampling (with replacement) rounds, providing a more robust and less biased estimate.
+}
 \examples{
-# Load example data
 data(GlobalPatterns, package = "phyloseq")
+test_otutable_rare <- multi_rarefy(
+  physeq = GlobalPatterns,
+  depth_level = 500,
+  num_iter = 10,
+  threads = 2,
+  set_seed = 123
+)
 
-# Perform multiple rarefaction
-rarefied_data <- multi_rarefy(GlobalPatterns, depth_level = 1000, num_iter = 99)
-head(rarefied_data)
+head(test_otutable_rare)
 
 }

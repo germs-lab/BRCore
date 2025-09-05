@@ -1,0 +1,100 @@
+---
+title: "Introduction to BRCore"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to BRCore}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=TRUE}
+library(BRCore)
+library(phyloseq)
+
+```
+
+I am going to use the `GlobalPatterns` dataset for now, to be changed with our 
+provided dataset in the final vignette.
+
+```{r load-Globalpatters, echo=TRUE}
+data(GlobalPatterns, package = "phyloseq")
+GlobalPatterns
+sample_data(GlobalPatterns)
+```
+
+### Perform mutiple rarefaction
+
+The best way to rarefy your data is to use the multiple rarefaction approach. Originally
+developed by Sanders in 1968 it has been adopted widely in ecology research. 
+
+```{r rarefy-Globalpatterns, echo=TRUE}
+rarefied_otutable <-
+    parallelly_rarefy(physeq = GlobalPatterns, 
+                      depth_level = 500, 
+                      num_iter = 9, 
+                      threads = 2, 
+                      set_seed = 100)
+
+rowSums(rarefied_otutable)
+rarefied_otutable[1:10, 1:10]
+```
+
+### Recreate a phyloseq object with rarefied `otu_table()` 
+
+You can then use the function below to replace the `otu_table()` with the rarefied
+table you just created. Or, you can create a new object with rarefied otu_table.
+
+```{r rarefied-Globalpatters, echo=TRUE}
+GlobalPatterns_rare <- GlobalPatterns
+
+GlobalPatterns_rare <- 
+    do_phyloseq(physeq = GlobalPatterns_rare, 
+                otu_rare=rarefied_otutable)
+
+GlobalPatterns_rare
+sample_sums(GlobalPatterns_rare)
+```
+
+
+### Extracting the core OTU/ASV set
+
+You can now extract the core using the abundance/occupancy based on Bray Curtis 
+distances.
+
+The output is a list with 7 datasets... 
+
+```{r extract_core-Globalpatterns, echo=TRUE}
+spatial_core <- extract_core(
+    GlobalPatterns,
+    Var = "SampleType",
+    method = "increase",
+    Group = NULL,
+    Level = NULL,
+    trimOTUs = TRUE,
+    .parallel = FALSE,
+    increase_value = 3,
+    ncores = 2
+)
+
+str(spatial_core)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
