@@ -146,8 +146,8 @@ core_result <- parallel_extract_core(
   method = "increase",
   increase_value = 2,
   trimOTUs = TRUE,
-.parallel = FALSE,
-ncores = get_available_cores()
+  .parallel = FALSE,
+  ncores = get_available_cores()
 )
 
 # View the results

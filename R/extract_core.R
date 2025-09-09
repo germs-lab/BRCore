@@ -419,7 +419,7 @@ extract_core<- function(
   if (method == "elbow") {
     cli::cli_alert_info("Performing method 'elbow'")
     fo_difference <- function(pos) {
-      left <- (BC_ranked[pos, 2] - BC_ranked[1, 2]) / pos
+      left <- (BC_ranked[pos, 2] - BC_ranked[1, 2]) / pos #  where these left and right go?
       right <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[pos, 2]) /
         (nrow(BC_ranked) - pos)
       core_otus <- otu_ranked$otu[1:elbow]

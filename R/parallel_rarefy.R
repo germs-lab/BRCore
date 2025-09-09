@@ -27,7 +27,7 @@
 #'
 #' @examples
 #' data(GlobalPatterns, package = "phyloseq")
-#' test_otutable_rare <- parallelly_rarefy(
+#' test_otutable_rare <- parallel_rarefy(
 #'   physeq = GlobalPatterns,
 #'   depth_level = 500,
 #'   num_iter = 10,
@@ -37,7 +37,7 @@
 #' rowSums(test_otutable_rare)
 #'
 #' @export
-parallelly_rarefy <- function(physeq,
+parallel_rarefy <- function(physeq,
                          depth_level,
                          num_iter = 100,
                          threads = get_available_cores(),

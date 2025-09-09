@@ -170,11 +170,11 @@ parallel_extract_core<- function(
     # nReads %T>% print()
     # rarefied %T>% print()
      nReads <- min(sample_sums(physeq))
-      
+     cli::cli_alert_info("Dataset is rarefied at a depth of: {nReads}")
+     
      taxon <- tax_table(physeq) %>%
       as.data.frame.matrix()
-    
-    dim(taxon) %T>% print()
+     
   } else {
       stop("The otu_table() is not rarefied!")
   }
@@ -187,8 +187,12 @@ parallel_extract_core<- function(
   if (is.null(Group)) {
     otu <- physeq@otu_table %>% as("matrix")
     map <- physeq@sam_data %>% as("data.frame")
+    
+    cli::cli_alert_info("Group: not used.")
+    
   } else {
     sub_group <- substitute(Group)
+    
     sub_set <- subset(
       sample_data(physeq),
       eval(parse(text = sub_group)) %in% Level
@@ -200,16 +204,19 @@ parallel_extract_core<- function(
       sub_set
     )
     
+    # Filter empty taxa
     otu_table(physeq1) <- otu_table(physeq1)[
-      which(rowSums(otu_table(physeq1)) > 0),
+        which(rowSums(otu_table(physeq1)) > 0),
     ]
+    
+    # Extract data
     otu <- physeq1@otu_table %>% as("matrix")
     map <- physeq1@sam_data %>% as("data.frame")
-    print("Grouping Factor")
-    map[, Group] %T>% print()
+    taxon <- tax_table(physeq1) %>% as.data.frame.matrix()
     
-    taxon <- tax_table(physeq1) %>%
-      as.data.frame.matrix()
+    # Messaging
+    cli::cli_alert_info("Group factor: {.field {Group}}")
+    cli::cli_inform("Unique groups: {.val {unique(map[, Group])}}")
   }
   
   map$SampleID <- rownames(map)
@@ -240,17 +247,21 @@ parallel_extract_core<- function(
   # - replication consistency (sumG) = has occupancy of 1 in at least one time point (genotype or site) (1 if occupancy 1, else 0)
   
   Var <- rlang::enquo(Var) # lazy evaluation
+  
+    var_name <- rlang::as_name(Var)  # Convert to string
+    cli::cli_alert_info("Core calculated across: {var_name}")
+ 
   PresenceSum <-
     data.frame(otu = as.factor(row.names(otu)), otu) %>%
     gather(SampleID, abun, -otu) %>%
-    left_join(map, by = "SampleID") %>%
+    dplyr::left_join(map, by = "SampleID") %>%
     group_by(otu, !!Var) %>%
     dplyr::summarise(
       time_freq = sum(abun > 0) / length(abun),
       # frequency of detection between time points
       coreTime = ifelse(time_freq == 1, 1, 0)
     ) %>% # 1 only if occupancy 1 with specific time, 0 if not
-    group_by(otu) %>%
+    dplyr::group_by(otu) %>%
     dplyr::summarise(
       sumF = sum(time_freq),
       sumG = sum(coreTime),
@@ -260,9 +271,9 @@ parallel_extract_core<- function(
   
   # Ranked OTUs
   otu_ranked <- occ_abun %>%
-    left_join(PresenceSum, by = "otu") %>%
-    transmute(otu = otu, rank = Index) %>%
-    arrange(desc(rank))
+      dplyr::left_join(PresenceSum, by = "otu") %>%
+      dplyr::transmute(otu = otu, rank = Index) %>%
+      dplyr::arrange(desc(rank))
   
   #-------------------------------
   # Bray-Curtis Dissimilarity
@@ -363,11 +374,11 @@ parallel_extract_core<- function(
     ))),
     t(temp_BC_matrix)
   ) %>%
-    gather(comparison, BC, -rank) %>%
-    group_by(rank) %>%
-    summarise(MeanBC = mean(BC)) %>% # Calculate mean Bray-Curtis dissimilarity
-    arrange(desc(-MeanBC)) %>%
-    mutate(proportionBC = MeanBC / max(MeanBC)) # Calculate proportion of the dissimilarity explained by the n number of ranked OTUs
+      tidyr::gather(comparison, BC, -rank) %>%
+      dplyr::group_by(rank) %>%
+      dplyr::summarise(MeanBC = mean(BC)) %>% # Calculate mean Bray-Curtis dissimilarity
+      dplyr::arrange(desc(-MeanBC)) %>%
+      dplyr::mutate(proportionBC = MeanBC / max(MeanBC)) # Calculate proportion of the dissimilarity explained by the n number of ranked OTUs
   
   #-------------------------------
   # Increase in Bray-Curtis
@@ -398,6 +409,8 @@ parallel_extract_core<- function(
   
   # Error handling: Make sure a method is specified as 'increase' or 'elbow'
   # Check if method is provided and is one of the allowed values
+  
+  ### NOTE. The elbow method doed not require a specific % increase to be set!
   if (missing(method) || !method %in% c("increase", "elbow")) {
     cli::cli_abort(
       "{.arg method} must be specified as either 'increase' or 'elbow'.",
@@ -407,15 +420,45 @@ parallel_extract_core<- function(
   
   if (method == "elbow") {
     cli::cli_alert_info("Performing method 'elbow'")
-    fo_difference <- function(pos) {
-      left <- (BC_ranked[pos, 2] - BC_ranked[1, 2]) / pos
-      right <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[pos, 2]) /
-        (nrow(BC_ranked) - pos)
-      core_otus <- otu_ranked$otu[1:elbow]
-      # core_otus %T>% print()
-    }
-    occ_abun$fill <- "no"
-    occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
+      
+      # Calculate first-order differences to find elbow point
+      calculate_slope_difference <- function(position) {
+          left_slope <- (BC_ranked[position, 2] - BC_ranked[1, 2]) / position # Left slope
+          right_slope <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[position, 2]) / 
+              (nrow(BC_ranked) - position) # Right slope
+          # Return difference (elbow maximizes this)
+          return(left_slope - right_slope)
+      }
+      # Apply to all positions
+      BC_ranked$slope_differences <- sapply(seq_len(nrow(BC_ranked)), calculate_slope_difference)
+      elbow_position <- which.max(BC_ranked$slope_differences)
+      core_otus <- otu_ranked$otu[seq_len(elbow_position)]
+      
+      cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
+      
+      # Coordinates: rank vs MeanBC
+      #x <- as.numeric(as.character(BC_ranked$rank))
+      #y <- BC_ranked$MeanBC
+      
+      # Line from first to last
+      #line_vec <- c(x[length(x)] - x[1], y[length(y)] - y[1])
+      #line_vec <- line_vec / sqrt(sum(line_vec^2))  # normalize
+      
+      # Distances from line
+      #distances <- numeric(length(x))
+      #for (i in seq_along(x)) {
+      #   vec <- c(x[i] - x[1], y[i] - y[1])
+      #    proj <- sum(vec * line_vec) * line_vec
+      #    dist <- sqrt(sum((vec - proj)^2))
+      #    distances[i] <- dist
+      #}
+      
+      #elbow <- which.max(distances)  # index of elbow point
+      
+      #core_otus <- otu_ranked$otu[1:elbow]
+      
+      occ_abun$fill <- "no"
+      occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
   }
   
   # Creating threshold for core inclusion - last call method using a
@@ -450,6 +493,8 @@ parallel_extract_core<- function(
     }
     core_otus <- otu_ranked[rownames(otu_ranked) %in% lastCall, ]
     core_otus <- as.vector(core_otus$otu)
+    
+    cli::cli_alert_success("% increase method identified {.val {length(core_otus)}} core OTUs")
     
     # Filter non-core and core OTUs
     occ_abun$fill <- "no"

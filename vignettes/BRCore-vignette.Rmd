@@ -36,7 +36,7 @@ developed by Sanders in 1968 it has been adopted widely in ecology research.
 
 ```{r rarefy-Globalpatterns, echo=TRUE}
 rarefied_otutable <-
-    parallelly_rarefy(physeq = GlobalPatterns, 
+    parallel_rarefy(physeq = GlobalPatterns, 
                       depth_level = 500, 
                       num_iter = 9, 
                       threads = 2, 
@@ -65,29 +65,70 @@ sample_sums(GlobalPatterns_rare)
 
 ### Extracting the core OTU/ASV set
 
-You can now extract the core using the abundance/occupancy based on Bray Curtis 
-distances.
+One way to systematically explore the abundance and occupancy inclusion thresholds used to define the core microbiome is to evaluate how well the resulting core membership captures the overarching patterns of beta diversity found in the complete dataset. This approach treats the core microbiome as a representative subset that should preserve the main ecological relationships and sample-to-sample differences observed when using all taxa. By measuring how closely the beta diversity patterns calculated from core taxa alone match those from the full dataset, researchers can objectively assess whether their chosen thresholds produce a meaningful and informative core that maintains the essential structural information of the microbial community while reducing complexity.
+
+To identify the optimal point where increasing the core inclusion threshold provides diminishing returns in explanatory value, we offer two automated methods. 
+
+1) The first is a more stringent `elbow` approach that finds the bend in the abundance-occupancy curve where adding more taxa yields progressively smaller improvements. This method calculates the first-order difference (numerical differentiation) by assigning a score to each potential cutoff point, splitting the curve into two parts, and finding the point that maximizes the difference in average rates of change between these parts. 
+
+2) The second method uses a final percent `increase` threshold in beta-diversity (we recommend 2% or more), which continues adding taxa until improvements fall below this percentage. 
+
+Both methods measure improvement using Bray-Curtis similarity through the equation `C = 1 - (BC_core/BC_all)`, where `C` represents the contribution of ranked taxa to total similarity, `BC_core` is the Bray-Curtis similarity using only core taxa, and `BC_all` uses the complete dataset. 
+
+The cumulative explanatory value of adding each next-ranked taxon can be plotted using the plot_bc_increase function, with the red line indicating the elbow method cutoff and colored lines showing the 2% threshold cutoff. These approaches eliminate the need for subjective threshold setting by automatically identifying natural breakpoints where additional taxa provide marginal returns in explanatory power.
 
 The output is a list with 7 datasets... 
 
-```{r extract_core-Globalpatterns, echo=TRUE}
-spatial_core <- extract_core(
-    GlobalPatterns,
+```{r extract_core-Globalpatterns elbow, echo=TRUE}
+spatial_core_elb <- parallel_extract_core(
+    GlobalPatterns_rare,
+    Var = "SampleType",
+    method = "elbow",
+    Group = NULL,
+    Level = NULL,
+    trimOTUs = TRUE,
+    .parallel = FALSE,
+    increase_value = 2,
+    ncores = 2
+)
+
+str(spatial_core_elb)
+spatial_core_elb$core_otus
+```
+
+```{r extract_core-Globalpatterns % increase, echo=TRUE}
+spatial_core_inc <- parallel_extract_core(
+    GlobalPatterns_rare,
     Var = "SampleType",
     method = "increase",
     Group = NULL,
     Level = NULL,
     trimOTUs = TRUE,
     .parallel = FALSE,
-    increase_value = 3,
+    increase_value = 2,
     ncores = 2
 )
 
-str(spatial_core)
+str(spatial_core_inc)
+spatial_core_inc$core_otus
+```
+
+Now we can plot the % incease 
+
+```{r plot_core_breakpoint, echo=TRUE}
+
+
+
+
+
 ```
 
 
+Fit the Neutral models
 
+```{r}
+
+```
 
 
 
