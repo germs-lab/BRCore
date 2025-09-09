@@ -278,7 +278,7 @@ parallel_extract_core<- function(
   #-------------------------------
   # Bray-Curtis Dissimilarity
   #-------------------------------
-  
+   
   # Calculating BC dissimilarity based on the 1st ranked OTU
   cli::cli_alert_info(
     "Calculating BC dissimilarity based on the 1st ranked OTU"

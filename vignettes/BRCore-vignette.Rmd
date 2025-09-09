@@ -113,7 +113,7 @@ str(spatial_core_inc)
 spatial_core_inc$core_otus
 ```
 
-Now we can plot the % incease 
+Now we can plot the % increase 
 
 ```{r plot_core_breakpoint, echo=TRUE}
 
@@ -125,15 +125,6 @@ Now we can plot the % incease
 
 
 Fit the Neutral models
-
-```{r}
-
-```
-
-
-
-
-
 
 
 

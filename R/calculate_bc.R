@@ -17,18 +17,24 @@
 #' @export
 
 calculate_bc <- function(matrix, nReads) {
-  if (nrow(matrix) == 0) {
-    cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
-    return(list(values = numeric(0), names = character(0)))
-  }
-  
-  bc_values <- apply(combn(ncol(matrix), 2), 2, function(x) {
-    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
-  })
-  
-  x_names <- apply(combn(ncol(matrix), 2), 2, function(x) {
-    paste(colnames(matrix)[x], collapse = "-")
-  })
-  
-  list(values = bc_values, names = x_names)
+    if (nrow(matrix) == 0) {
+        cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
+        return(list(values = numeric(0), names = character(0)))
+    }
+    
+    if (ncol(matrix) < 2) {
+        cli::cli_alert_warning("{.arg matrix} has fewer than 2 columns. 
+                               Need at least 2 columns to calculate pairwise distances.")
+        return(list(values = numeric(0), names = character(0)))
+    }
+    
+    bc_values <- apply(combn(ncol(matrix), 2), 2, function(x) {
+        sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
+    })
+    
+    x_names <- apply(combn(ncol(matrix), 2), 2, function(x) {
+        paste(colnames(matrix)[x], collapse = "-")
+    })
+    
+    list(values = bc_values, names = x_names)
 }
