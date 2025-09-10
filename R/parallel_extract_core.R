@@ -436,27 +436,6 @@ parallel_extract_core<- function(
       
       cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
       
-      # Coordinates: rank vs MeanBC
-      #x <- as.numeric(as.character(BC_ranked$rank))
-      #y <- BC_ranked$MeanBC
-      
-      # Line from first to last
-      #line_vec <- c(x[length(x)] - x[1], y[length(y)] - y[1])
-      #line_vec <- line_vec / sqrt(sum(line_vec^2))  # normalize
-      
-      # Distances from line
-      #distances <- numeric(length(x))
-      #for (i in seq_along(x)) {
-      #   vec <- c(x[i] - x[1], y[i] - y[1])
-      #    proj <- sum(vec * line_vec) * line_vec
-      #    dist <- sqrt(sum((vec - proj)^2))
-      #    distances[i] <- dist
-      #}
-      
-      #elbow <- which.max(distances)  # index of elbow point
-      
-      #core_otus <- otu_ranked$otu[1:elbow]
-      
       occ_abun$fill <- "no"
       occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
   }
