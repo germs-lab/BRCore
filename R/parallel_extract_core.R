@@ -441,8 +441,13 @@ parallel_extract_core <- function(physeq,
     
     cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
     
-    occ_abun$fill <- "no"
-    occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
+    occ_abun <- occ_abun %>%
+        dplyr::mutate(
+            fill = case_when(otu %in% core_otus ~ "core",TRUE ~ "no")
+            )
+
+    #occ_abun$fill <- "no"
+    #occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
   }
   
   # Creating threshold for core inclusion - last call method using a
