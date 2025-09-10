@@ -23,7 +23,7 @@ for rarefaction.}
 
 \item{threads}{Number of threads (default = 4).}
 
-\item{set_seed}{An optional integer to set the random seed for reproducibility (default = 123).}
+\item{set_seed}{An optional integer to set the random seed for reproducibility (default = NULL).}
 }
 \value{
 A data frame with taxa as rows and samples as columns. The values

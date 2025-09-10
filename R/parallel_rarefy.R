@@ -11,7 +11,7 @@
 #' @param num_iter An integer specifying the number of iterations to perform
 #'   for rarefaction.
 #' @param threads Number of threads (default = 4).
-#' @param set_seed An optional integer to set the random seed for reproducibility (default = 123).
+#' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
 #'
 #' @return A data frame with taxa as rows and samples as columns. The values
 #'   represent the average sequence counts calculated across all iterations.
@@ -43,8 +43,14 @@ parallel_rarefy <- function(physeq,
                          threads = get_available_cores(),
                          set_seed = NULL) {
     
-    cat("\nSeed used:", set_seed, "\n")
-    if (!is.null(set_seed)) set.seed(set_seed)
+    cli::cli_text("\nSeed used: {set_seed}\n")
+    
+    if (is.null(set_seed)) {
+        cli::cli_warn("No seed was set. Results may not be reproducible.")
+    } else {
+        set.seed(set_seed)
+    }
+  
     
     # Check object class
     if (!inherits(physeq, "phyloseq")) {

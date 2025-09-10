@@ -28,7 +28,8 @@
 #' @param trimOTUs A logical value indicating whether to trim OTUs with zero abundance.
 #' @param .parallel A logical value indicating whether to parallelize the calculations with `mcapply()` or not.
 #' @param ncores An integer specifying the number of CPU cores to use for parallel processing. Default is `get_available_cores()`.
-#'
+#' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
+#' 
 #' @return A list containing the following elements:
 #'   - `core_otus`: A vector of core OTU IDs.
 #'   - `bray_curtis_ranked`: A data frame of Bray-Curtis dissimilarity rankings.
@@ -130,7 +131,8 @@
 #'   increase_value = 2,
 #'   trimOTUs = TRUE,
 #'   .parallel = FALSE,
-#'   ncores = get_available_cores()
+#'   ncores = get_available_cores(), 
+#'   set_seed = NULL
 #' )
 #'
 #' # View the results
@@ -147,9 +149,17 @@ parallel_extract_core<- function(
     Level = NULL,
     trimOTUs = TRUE,
     .parallel = FALSE,
-    ncores = get_available_cores()
+    ncores = get_available_cores(),
+    set_seed = NULL
 ) {
-  set.seed(37920)
+
+    cli::cli_text("\nSeed used: {set_seed}\n")
+    
+    if (is.null(set_seed)) {
+        cli::cli_warn("No seed was set. Results may not be reproducible.")
+    } else {
+        set.seed(set_seed)
+    }
   
   # Error handling: type check
   if (!inherits(physeq, "phyloseq")) {
@@ -301,7 +311,7 @@ parallel_extract_core<- function(
   
   # Helper function to rank BC using calculate_bc() for each ranked OTU
   bc_rank_task <- function(i) {
-    set.seed(37920)
+    set.seed(set_seed)
     
     current_matrix <- rbind(start_matrix, t(otu[otu_ranked$otu[i], ]))
     current_bc <- calculate_bc(current_matrix, nReads)
@@ -368,12 +378,10 @@ parallel_extract_core<- function(
   temp_BC <- BCaddition
   temp_BC$x_names <- NULL
   temp_BC_matrix <- as.matrix(temp_BC)
-  BC_ranked <- data.frame(
-    rank = as.factor(row.names(t(
-      temp_BC_matrix
-    ))),
-    t(temp_BC_matrix)
-  ) %>%
+  BC_ranked <- t(temp_BC_matrix) %>% 
+      as.data.frame() %>% 
+      tibble::rownames_to_column("rank") %>% 
+      dplyr::mutate(rank = as.factor(rank)) %>%
       tidyr::gather(comparison, BC, -rank) %>%
       dplyr::group_by(rank) %>%
       dplyr::summarise(MeanBC = mean(BC)) %>% # Calculate mean Bray-Curtis dissimilarity

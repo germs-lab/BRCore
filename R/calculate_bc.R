@@ -23,8 +23,7 @@ calculate_bc <- function(matrix, nReads) {
     }
     
     if (ncol(matrix) < 2) {
-        cli::cli_alert_warning("{.arg matrix} has fewer than 2 columns. 
-                               Need at least 2 columns to calculate pairwise distances.")
+        cli::cli_alert_warning("{.arg matrix} has fewer than 2 columns. Need at least 2 columns to calculate pairwise distances.")
         return(list(values = numeric(0), names = character(0)))
     }
     
