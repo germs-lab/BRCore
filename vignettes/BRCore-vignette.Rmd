@@ -83,21 +83,21 @@ The output is a list with 7 datasets...
 
 # Setting this to be run later... Check failing on MacOS on Github.
 
-#spatial_core_elb <- parallel_extract_core(
-#    physeq = GlobalPatterns_rare,
-#    Var = "crop",
-#    method = "elbow",
-#    Group = NULL,
-#    Level = NULL,
-#    trimOTUs = TRUE,
-#    .parallel = TRUE,
-#    increase_value = 2,
-#    ncores = 2,
-#    set_seed = 100
-#)
+spatial_core_elb <- parallel_extract_core(
+    physeq = GlobalPatterns_rare,
+    Var = "crop",
+    method = "elbow",
+    Group = NULL,
+    Level = NULL,
+    trimOTUs = TRUE,
+    .parallel = TRUE,
+    increase_value = 2,
+    ncores = 2,
+    set_seed = 100
+)
 
-#str(spatial_core_elb)
-#spatial_core_elb$core_otus
+str(spatial_core_elb)
+spatial_core_elb$core_otus
 ```
 
 ```{r extract_core-Globalpatterns % increase, echo=TRUE}

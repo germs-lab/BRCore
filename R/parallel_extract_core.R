@@ -419,36 +419,72 @@ parallel_extract_core <- function(physeq,
   }
   
   if (method == "elbow") {
-    cli::cli_alert_info("Performing method 'elbow'")
+      cli::cli_alert_info("Performing method 'elbow'")
+      
+      n <- nrow(BC_ranked)
+      if (n < 3) cli::cli_abort("Elbow method needs at least 3 ranks.")
+      
+      # Always pull vectors (avoid tibble indexing bugs)
+      y <- if ("MeanBC" %in% names(BC_ranked)) {
+          BC_ranked[["MeanBC"]]
+      } else {
+          # fallback to 2nd column as vector
+          BC_ranked[, 2, drop = TRUE]
+      }
+      
+      # Compute only on interior points to avoid /0
+      idx <- 2:(n - 1)
+      
+      # Use true slopes vs first/last points
+      # left slope denominator should be (i - 1), not i
+      slope_diff <- vapply(idx, function(i) {
+          left  <- (y[i] - y[1]) / (i - 1)
+          right <- (y[n] - y[i]) / (n - i)
+          left - right
+      }, numeric(1))
+      
+      elbow_pos <- idx[which.max(slope_diff)]  # 2..n-1
+      
+      # Select top-k OTUs by elbow position (no rownames gymnastics)
+      core_otus <- head(otu_ranked$otu, elbow_pos)
+      
+      cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
+      
+      occ_abun <- occ_abun %>%
+          dplyr::mutate(fill = dplyr::if_else(otu %in% core_otus, "core", "no"))
+  }
+  
+  #if (method == "elbow") {
+  #  cli::cli_alert_info("Performing method 'elbow'")
     
-    # Calculate first-order differences to find elbow point
-    calculate_slope_difference <- function(position) {
-      left_slope <- (BC_ranked[position, 2] - BC_ranked[1, 2]) / position # Left slope
-      right_slope <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[position, 2]) /
-        (nrow(BC_ranked) - position) # Right slope
-      # Return difference (elbow maximizes this)
-      return(left_slope - right_slope)
-    }
-    # Apply to all positions
-    BC_ranked$slope_differences <- sapply(seq_len(nrow(BC_ranked)), calculate_slope_difference)
-    core_otus <- BC_ranked %>%
-      pull(slope_differences) %>%
-      which.max() %>%
-      {
-        otu_ranked[rownames(otu_ranked) %in% ., "otu"]
-      } %>%
-      as.vector()
-    
-    cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
-    
-    occ_abun <- occ_abun %>%
-        dplyr::mutate(
-            fill = case_when(otu %in% core_otus ~ "core",TRUE ~ "no")
-            )
+  #  # Calculate first-order differences to find elbow point
+  #  calculate_slope_difference <- function(position) {
+  #    left_slope <- (BC_ranked[position, 2] - BC_ranked[1, 2]) / position # Left slope
+  #    right_slope <- (BC_ranked[nrow(BC_ranked), 2] - BC_ranked[position, 2]) /
+  #      (nrow(BC_ranked) - position) # Right slope
+  #    # Return difference (elbow maximizes this)
+  #    return(left_slope - right_slope)
+  #  }
+  #  # Apply to all positions
+  #  BC_ranked$slope_differences <- sapply(seq_len(nrow(BC_ranked)), calculate_slope_difference)
+  #  core_otus <- BC_ranked %>%
+  #    pull(slope_differences) %>%
+  #    which.max() %>%
+  #    {
+  #      otu_ranked[rownames(otu_ranked) %in% ., "otu"]
+  #    } %>%
+  #   as.vector()
+  #  
+  #  cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
+  #  
+  #  occ_abun <- occ_abun %>%
+  #      dplyr::mutate(
+  #          fill = case_when(otu %in% core_otus ~ "core",TRUE ~ "no")
+  #          )
 
     #occ_abun$fill <- "no"
     #occ_abun$fill[occ_abun$otu %in% core_otus] <- "core"
-  }
+  #}
   
   # Creating threshold for core inclusion - last call method using a
   # final increase in BC similarity of equal or greater than increase_value
