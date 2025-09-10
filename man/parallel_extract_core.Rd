@@ -150,7 +150,7 @@ core_result <- parallel_extract_core(
   increase_value = 2,
   trimOTUs = TRUE,
   .parallel = FALSE,
-  ncores = get_available_cores(), 
+  ncores = get_available_cores(),
   set_seed = NULL
 )
 

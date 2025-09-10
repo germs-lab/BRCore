@@ -82,14 +82,15 @@ The output is a list with 7 datasets...
 ```{r extract_core-Globalpatterns elbow, echo=TRUE}
 spatial_core_elb <- parallel_extract_core(
     physeq = GlobalPatterns_rare,
-    Var = "SampleType",
+    Var = "crop",
     method = "elbow",
     Group = NULL,
     Level = NULL,
     trimOTUs = TRUE,
-    .parallel = FALSE,
+    .parallel = TRUE,
     increase_value = 2,
-    ncores = 2
+    ncores = 2,
+    set_seed = 100
 )
 
 str(spatial_core_elb)
@@ -99,14 +100,15 @@ spatial_core_elb$core_otus
 ```{r extract_core-Globalpatterns % increase, echo=TRUE}
 spatial_core_inc <- parallel_extract_core(
     physeq = GlobalPatterns_rare,
-    Var = "SampleType",
+    Var = "crop",
     method = "increase",
     Group = NULL,
     Level = NULL,
     trimOTUs = TRUE,
-    .parallel = FALSE,
+    .parallel = TRUE,
     increase_value = 2,
-    ncores = 2
+    ncores = 2,
+    set_seed = 100
 )
 
 str(spatial_core_inc)
