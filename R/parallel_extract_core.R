@@ -377,16 +377,39 @@ parallel_extract_core<- function(
   rownames(BCaddition) <- BCaddition$x_names
   temp_BC <- BCaddition
   temp_BC$x_names <- NULL
-  temp_BC_matrix <- as.matrix(temp_BC)
-  BC_ranked <- t(temp_BC_matrix) %>% 
+  
+  # Convert to matrix and tidy to long format
+  BC_ranked <- t(as.matrix(temp_BC)) %>% 
       as.data.frame() %>% 
       tibble::rownames_to_column("rank") %>% 
       dplyr::mutate(rank = as.factor(rank)) %>%
-      tidyr::gather(comparison, BC, -rank) %>%
+      tidyr::pivot_longer(
+          cols = -rank,
+          names_to = "comparison",
+          values_to = "BC"
+      ) %>%
       dplyr::group_by(rank) %>%
-      dplyr::summarise(MeanBC = mean(BC)) %>% # Calculate mean Bray-Curtis dissimilarity
-      dplyr::arrange(desc(-MeanBC)) %>%
-      dplyr::mutate(proportionBC = MeanBC / max(MeanBC)) # Calculate proportion of the dissimilarity explained by the n number of ranked OTUs
+      dplyr::summarise(MeanBC = mean(BC, na.rm = TRUE),
+                       .groups = "drop") %>% # Calculate mean Bray-Curtis dissimilarity
+      dplyr::arrange(desc(MeanBC)) %>%
+      dplyr::mutate(
+          proportionBC = MeanBC / max(MeanBC, na.rm = TRUE)
+          ) # Calculate proportion of the dissimilarity explained by the n number of ranked OTUs
+  
+  
+#  rownames(BCaddition) <- BCaddition$x_names
+#  temp_BC <- BCaddition
+#  temp_BC$x_names <- NULL
+#  temp_BC_matrix <- as.matrix(temp_BC)
+#  BC_ranked <- t(temp_BC_matrix) %>% 
+#      as.data.frame() %>% 
+#      tibble::rownames_to_column("rank") %>% 
+#      dplyr::mutate(rank = as.factor(rank)) %>%
+#      tidyr::gather(comparison, BC, -rank) %>%
+#      dplyr::group_by(rank) %>%
+#      dplyr::summarise(MeanBC = mean(BC)) %>% # Calculate mean Bray-Curtis dissimilarity
+#      dplyr::arrange(desc(-MeanBC)) %>%
+#      dplyr::mutate(proportionBC = MeanBC / max(MeanBC)) # Calculate proportion of the dissimilarity explained by the n number of ranked OTUs
   
   #-------------------------------
   # Increase in Bray-Curtis
