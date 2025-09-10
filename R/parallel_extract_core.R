@@ -462,9 +462,12 @@ parallel_extract_core<- function(
       }
       # Apply to all positions
       BC_ranked$slope_differences <- sapply(seq_len(nrow(BC_ranked)), calculate_slope_difference)
-      elbow_position <- which.max(BC_ranked$slope_differences)
-      core_otus <- otu_ranked$otu[seq_len(elbow_position)]
-      
+      core_otus <- BC_ranked %>%
+        pull(slope_differences) %>%
+        which.max() %>%
+        {otu_ranked[rownames(otu_ranked) %in% ., "otu"]} %>%
+        as.vector()
+
       cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
       
       occ_abun$fill <- "no"
@@ -501,8 +504,9 @@ parallel_extract_core<- function(
       )
       lastCall <- 1
     }
-    core_otus <- otu_ranked[rownames(otu_ranked) %in% lastCall, ]
-    core_otus <- as.vector(core_otus$otu)
+    core_otus <- otu_ranked[otu_ranked$rank %in% lastCall, ] %>% 
+        pull(otu) %>% 
+        as.vector()
     
     cli::cli_alert_success("% increase method identified {.val {length(core_otus)}} core OTUs")
     
