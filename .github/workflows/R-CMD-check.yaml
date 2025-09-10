@@ -55,6 +55,7 @@ jobs:
       - name: Setup R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          use-public-rspm: true
           extra-packages: |
             any::rcmdcheck
             any::tidyverse
