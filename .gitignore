@@ -17,6 +17,9 @@ inst/doc
 docs/
 vignettes/*.html
 vignettes/*.pdf
+vignettes/
+vignettes/.gitignore
+vignettes/BRCore-vignettes.Rmd
 
 ### Build Artifacts ###
 /*.tar.gz
