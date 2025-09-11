@@ -24,6 +24,8 @@ jobs:
       matrix:
         config:
           - {os: macos-latest,   r: 'release'}
+          #- {os: macos-15,   r: 'release'}
+          #- {os: macos-latest-large,   r: 'release'}
           # - {os: windows-latest, r: 'release'}
           # use 4.0 or 4.1 to check with rtools40's older compiler
           - {os: ubuntu-latest,  r: 'release'}
@@ -55,6 +57,7 @@ jobs:
       - name: Setup R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          use-public-rspm: true
           extra-packages: |
             any::rcmdcheck
             any::tidyverse

@@ -13,7 +13,8 @@ parallel_extract_core(
   Level = NULL,
   trimOTUs = TRUE,
   .parallel = FALSE,
-  ncores = get_available_cores()
+  ncores = get_available_cores(),
+  set_seed = NULL
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ parallel_extract_core(
 \item{.parallel}{A logical value indicating whether to parallelize the calculations with \code{mcapply()} or not.}
 
 \item{ncores}{An integer specifying the number of CPU cores to use for parallel processing. Default is \code{get_available_cores()}.}
+
+\item{set_seed}{An optional integer to set the random seed for reproducibility (default = NULL).}
 }
 \value{
 A list containing the following elements:
@@ -146,8 +149,9 @@ core_result <- parallel_extract_core(
   method = "increase",
   increase_value = 2,
   trimOTUs = TRUE,
-.parallel = FALSE,
-ncores = get_available_cores()
+  .parallel = FALSE,
+  ncores = get_available_cores(),
+  set_seed = NULL
 )
 
 # View the results
