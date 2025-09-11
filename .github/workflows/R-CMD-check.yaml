@@ -59,6 +59,8 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             any::tidyverse
+            any::vegan
+            any::phyloseq
           needs: check
 
       - name: Check package

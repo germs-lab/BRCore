@@ -450,8 +450,11 @@ parallel_extract_core <- function(physeq,
       
       cli::cli_alert_success("Elbow method identified {.val {length(core_otus)}} core OTUs")
       
+      # Filter non-core and core OTUs
       occ_abun <- occ_abun %>%
-          dplyr::mutate(fill = dplyr::if_else(otu %in% core_otus, "core", "no"))
+          dplyr::mutate(
+              fill = case_when(otu %in% core_otus ~ "core",TRUE ~ "no")
+          )
   }
   
   #if (method == "elbow") {

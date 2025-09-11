@@ -35,6 +35,7 @@ Imports:
     vegan
 Suggests: 
     phyloseq,
+    vegan,
     here,
     knitr,
     rmarkdown,
