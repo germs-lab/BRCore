@@ -34,8 +34,6 @@ Imports:
     tidyr,
     vegan
 Suggests: 
-    phyloseq,
-    vegan,
     here,
     knitr,
     rmarkdown,
