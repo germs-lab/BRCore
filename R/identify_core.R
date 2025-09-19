@@ -2,33 +2,32 @@
 #'
 #' @description
 #' This function identifies core microbial taxa based on abundance-occupancy 
-#' distributions and their contributions to Bray-Curtis dissimilarity. Core taxa 
-#' are selected using either the "increase" or "elbow" method. This fucntion 
-#' implements the method developed by Shade and Stopnisek (2019) Curr Opin 
-#' Microbiol, see below for details.
+#' distributions and their contributions to Bray-Curtis similarity between 
+#' biological samples. Core taxa are selected using either the "increase" or 
+#' "elbow" method. This function implements the method developed by Shade 
+#' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 #'
-#' @param physeq_obj A \code{phyloseq} object with \code{otu_table} and
-#'   \code{sample_data}.
-#' @param priority_var Bare column name \emph{or} a string naming a column in
-#'   \code{sample_data(physeq_obj)} (e.g., \code{sampling_date}, \code{"Site"}).
-#'   This variable defines the groups in which per-group presence frequency is
-#'   calculated.
-#' @param increase_value Numeric scalar (default \code{0.02}) used for the
-#'   BC-increase threshold. The cut is taken at the last rank where
-#'   \code{IncreaseBC >= 1 + increase_value}.
+#' @param physeq_obj A `phyloseq` object with at least`otu_table` and `sample_data`.
+#' @param priority_var The column name in the `sample_data` (e.g. "sampling_date", 
+#' "site") that is used for propritizing the core microbiome.
+#' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02).
+#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
+#'   abundance in the ranking score. `0` (default) uses occupancy/composite
+#'   only. `1` ranks purely by abundance. Values in between blend the two 
+#'   (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
 #' @param seed Optional integer to set the RNG seed for reproducibility.
 #'
 #' @return A list with:
 #' \itemize{
-#'   \item \code{bray_curtis_ranked} tibble with \code{rank}, mean BC across
-#'         sample pairs at each cumulative rank, normalized proportion, the
-#'         multiplicative \code{IncreaseBC}, and the elbow helper metric.
-#'   \item \code{otu_ranked} tibble with \code{otu} and composite \code{rank}.
-#'   \item \code{occupancy_abundance} tibble with \code{otu}, occupancy
-#'         (\code{otu_occ}) and mean relative abundance (\code{otu_rel}).
+#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis similarity 
+#'   across sample pairs (`MeanBC`) at each cumulative `rank`, normalized proportion
+#'   (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric (`fo_diff`).
+#'   \item \code{otu_ranked} tibble with ranked OTU/ASVs .
+#'   \item \code{occupancy_abundance} tibble with OTU/ASVs names, occupancy 
+#'      (`otu_occ`), and mean relative abundance (`otu_rel`).
 #'   \item \code{elbow} core set identified by elbow method (integer).
 #'   \item \code{bc_increase} core set identified by last % BC-increase (integer).
-#'   \item \code{increase_value} % increase value used in the calculation.
+#'   \item \code{increase_value} increase value (numeric, scalar) used in the calculation (e.g. 0.02).
 #'   \item \code{elbow_core} core OTU/ASVs using elbow method (character vector).
 #'   \item \code{increase_core} core OTU/ASVs using last % BC-increase method (character vector).
 #'   \item \code{otu_table} otu_table counts (otu x samples) used (data.frame).
@@ -37,13 +36,29 @@
 #' }
 #'
 #' @details
-#' The function ranks taxa by a composite index (occupancy + "core within group" 
-#' frequency) computed per level of a user-specified sample metadata variable (e.g., 
-#' sampling_date,  genotype, site). Then, it simulates Bray-Curtis (BC) accumulation across
-#' samples while iteratively adding taxa in rank order to find (1) an "elbow"
-#' cut and (2) a multiplicative BC-increase threshold cut to prioritize the core set.
+#' The core set is defined using two separate methods:
 #' 
-#' @references Ashley Shade and Nejc Stopnisek (2019) Abundance-occupancy 
+#' The function rank OTU/ASVs by occupancy (optionally with abundance 
+#' weighting: `rank_score = (1 − weight) * Index + weight * scaled_abundance`, 
+#' where scaled_abundance is mean relative abundance rescaled to `[0,1]`). For 
+#' each `k = 1..K`, recompute `S_k` as the mean Bray-Curtis similarity across 
+#' all sample pairs using only the first `k` ranked OTUs; when `k = K`, this 
+#' yields `S_K`, the value computed with all OTUs. Normalizing by `S_K` 
+#' gives `C_k = S_k / S_K`.
+#'
+#' The **elbow** is the point of diminishing returns: for each `k`, compare the 
+#' average *left* slope `(S_k − S_1) / (k − 1)` to the average *right* slope 
+#' `(S_K − S_k) / (K − k)`, and choose the `k` that maximizes `(left − right)`.
+#'
+#' The **last percent Bray-Curtis increase** method uses the same accumulation 
+#' curve, examine the multiplicative step when adding the `k-th` OTU: 
+#' `Increase_k = S_k / S_{k−1}` (equivalently, `Increase_k = C_k / C_{k−1}`). 
+#' Choose the largest `k` such that `Increase_k ≥ 1 + p`, where `p` is your 
+#' chosen percent threshold (increase_value; recommended `p ≥ 0.02` or `2%`). 
+#' This selects the final rank for which adding one more taxon still increases 
+#' the explained Bray-Curtis similarity by at least `p`.
+#'
+#' @references Shade A, Stopnisek N (2019) Abundance-occupancy 
 #' distributions to prioritize plant core microbiome membership. Current 
 #' Opinion in Microbiology, 49:50-58 DOI:https://doi.org/10.1016/j.mib.2019.09.008
 #'
@@ -61,27 +76,28 @@
 #'
 #' @examplesIf requireNamespace("phyloseq", quietly = TRUE)
 #' \donttest{
-#'   # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
-#'   data("switchgrass", package = "BRCore")
+#' # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
+#' data("switchgrass", package = "BRCore")
 #'
-#'   res <- identify_core(
-#'     physeq_obj     = switchgrass,
-#'     priority_var   = "sampling_date",
-#'     increase_value = 0.02,
-#'     seed           = 091825
-#'   )
+#' res <- identify_core(
+#'   physeq_obj     = switchgrass,
+#'   priority_var   = "sampling_date",
+#'   increase_value = 0.02,
+#'   seed           = 091825
+#' )
 #'
-#'   # Inspect results
-#'   str(res)
+#' # Inspect results
+#'  str(res)
 #' }
 #' 
 #' @export
 identify_core <- function(physeq_obj,
                           priority_var,
                           increase_value = 0.02,
+                          abundance_weight = 0,
                           seed = NULL) {
     
-    # ------------------------- check seed -------------------------
+    # ----------------------------- check seed ---------------------------------
     cli::cli_text("\nSeed used: {seed}\n")
     
     if (is.null(seed)) {
@@ -90,7 +106,7 @@ identify_core <- function(physeq_obj,
         set.seed(seed)
     }
     
-    # ------------------------- input checks -------------------------
+    # ----------------------------- input checks -------------------------------
     # Error handling: type check
     if (!inherits(physeq_obj, "phyloseq")) {
         cli::cli_abort(
@@ -100,7 +116,7 @@ identify_core <- function(physeq_obj,
     # If the check passes, continue processing
     cli::cli_alert_success("Input phyloseq object is valid!")
     
-    # ------------------------- define arguments -------------------------
+    # ------------------------- define arguments -------------------------------
     
     if (min(phyloseq::sample_sums(physeq_obj)) == max(phyloseq::sample_sums(physeq_obj))) {
         nReads <- min(phyloseq::sample_sums(physeq_obj))
@@ -129,11 +145,20 @@ identify_core <- function(physeq_obj,
         cli::cli_alert_info("No taxonomy found (or empty). Continuing without taxonomy.")
     }
     
-    # ---------------------- core prioritizing variable -------------------------
+    # ---------------------- core prioritizing variable ------------------------
     data_var <- priority_var
     cli::cli_alert_success("Core prioritizing variable: {data_var}")
     
-    # ---------------------- abundance occupancy -------------------------
+    # ---------------------- validate abundance_weight -------------------------
+    if (!is.numeric(abundance_weight) || length(abundance_weight) != 1L || is.na(abundance_weight)) {
+        stop("`abundance_weight` must be a single numeric in [0,1].")
+    }
+    if (abundance_weight < 0 || abundance_weight > 1) {
+        cli::cli_warn("`abundance_weight`={abundance_weight} is outside [0,1]; clamping.")
+        abundance_weight <- max(0, min(1, abundance_weight))
+    }
+    
+    # ------------------------ abundance occupancy -----------------------------
     # occupancy and mean rel. abundance
     otu_PA  <- 1 * (otu > 0)
     otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
@@ -163,12 +188,30 @@ identify_core <- function(physeq_obj,
             .groups = "drop"
         )
     
+    #otu_ranked <- occ_abun %>%
+    #    dplyr::left_join(PresenceSum, by = "otu") %>%
+    #    dplyr::transmute(otu, rank = .data$Index) %>%
+    #    dplyr::arrange(dplyr::desc(.data$rank))
+    
+    # scale mean relative abundance to [0,1] for blending
+    rng <- range(occ_abun$otu_rel, na.rm = TRUE)
+    rel_scaled <- if (rng[2] > rng[1]) (occ_abun$otu_rel - rng[1]) / (rng[2] - rng[1]) 
+    else rep(0, nrow(occ_abun))
+    
     otu_ranked <- occ_abun %>%
+        dplyr::mutate(rel_scaled = rel_scaled) %>%
         dplyr::left_join(PresenceSum, by = "otu") %>%
-        dplyr::transmute(otu, rank = .data$Index) %>%
+        dplyr::mutate(score = (1 - abundance_weight) * .data$Index +
+                          abundance_weight * .data$rel_scaled) %>%
+        dplyr::transmute(
+            otu,
+            rank       = .data$score,     # used for ordering downstream
+            Index      = .data$Index,     # keep for transparency
+            rel_scaled = .data$rel_scaled # keep for transparency
+        ) %>%
         dplyr::arrange(dplyr::desc(.data$rank))
     
-    # ------------------------- BC accumulation -------------------------
+    # --------------------------- BC accumulation ------------------------------
     # cumulative BC across samples while adding taxa in rank order
     # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
     sample_pairs <- utils::combn(ncol(otu), 2)
@@ -248,7 +291,7 @@ identify_core <- function(physeq_obj,
     valid_increases <- which(BC_ranked$IncreaseBC >= thr)
     lastCall <- if (length(valid_increases)) utils::tail(valid_increases, 1) else 1
     
-    # ------------------------- select cores -------------------------
+    # ------------------------- identified core sets ---------------------------
     elbow_core <- otu_ranked %>%
         tibble::rownames_to_column("otu_order") %>%
         dplyr::mutate(otu_order = as.numeric(.data$otu_order)) %>%
@@ -261,7 +304,7 @@ identify_core <- function(physeq_obj,
         dplyr::filter(.data$otu_order <= lastCall) %>%
         dplyr::pull(.data$otu)
     
-    # ------------------------- return -------------------------
+    # ------------------------------ return ------------------------------------
     out <- list(
         bray_curtis_ranked  = BC_ranked,
         otu_ranked          = otu_ranked,
@@ -269,6 +312,7 @@ identify_core <- function(physeq_obj,
         elbow               = as.integer(elbow),
         bc_increase         = as.integer(lastCall),
         increase_value      = increase_value,
+        abundance_weight    = abundance_weight,
         elbow_core          = elbow_core,
         increase_core       = increase_core,
         otu_table           = otu,

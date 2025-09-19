@@ -1,50 +1,46 @@
-#' Plot % Bray-Curtis accumulation over ranked OTU/ASVs
+#' Plot Bray-Curtis increase over ranked OTU/ASVs
 #'
 #' @description
-#' Visualize the cumulative normalized mean Bray-Curtis curve returned by
-#' \link[=identify_core]{identify_core()}, with vertical markers for the elbow
-#' cut and the increase-threshold cut (labeled from \code{increase_value}).
+#' Visualize the cumulative normalized mean Bray-Curtis increase returned by 
+#' \link[=identify_core]{identify_core()}, over ranked OTU/ASVs and shows cutoff 
+#' points for elbow percent increase methods.
 #'
-#' @param bray_curtis_ranked A data frame/tibble as returned by
-#'   \code{identify_core()$bray_curtis_ranked}, containing at least columns
-#'   \code{rank} and \code{proportionBC}.
-#' @param elbow Integer; elbow index (typically \code{identify_core(...)$elbow}).
-#' @param lastCall Integer; threshold index (typically
-#'   \code{identify_core(...)$bc_increase}).
-#' @param increase_value Numeric in \code{[0,1]} used only to format the label
-#'   for the threshold line (e.g., \code{0.02} -> \dQuote{Last 2\%}). Defaults
-#'   to \code{0.02}. It does not change the plotted cuts.
+#' @param bray_curtis_ranked A tibble as returned by `identify_core()$bray_curtis_ranked`.
+#' @param elbow The number of OTU/ASVs identified by the elbow method (Integer).
+#' @param lastCall The number of OTU/ASVs identified by the last percent 
+#' Bray-Curtis increase method (Integer).
+#' @param increase_value The percent increase value in decimal (e.g. 0.02) used 
+#' for the Bray-Curtis increase method.
 #'
 #' @return A \pkg{ggplot2} object.
 #'
 #' @details
-#' The function converts the \code{rank} column to integers and zooms the x-axis
-#' to the first \code{1.2 * lastCall} ranks for readability. Label positions are
-#' computed dynamically from the observed \code{proportionBC} range to avoid
-#' overlap with points and axes.
+#' The function converts `rank` to integers and zooms the x-axis to the first
+#' `1.2 * lastCall` ranks. Label positions are computed dynamically from the
+#' observed `proportionBC` range to avoid overlap.
 #'
 #' @seealso \link[=identify_core]{identify_core()}
 #'
 #' @examplesIf requireNamespace("phyloseq", quietly = TRUE)
 #' \donttest{
-#'   # Example with the package switchgrass dataset
-#'   data("switchgrass", package = "BRCore")
+#' # Example with the package switchgrass dataset
+#' data("switchgrass", package = "BRCore")
 #'
-#'   # Identify core taxa
-#'   res <- identify_core(
-#'     physeq_obj    = switchgrass,
-#'     priority_var  = "sampling_date",
-#'     increase_value = 0.02,
-#'     seed          = 4
-#'   )
+#' # Identify core taxa
+#' res <- identify_core(
+#'  physeq_obj = switchgrass,
+#'  priority_var = "sampling_date",
+#'  increase_value = 0.02,
+#'  seed = 48821
+#' )
 #'
-#'   # Plot using the returned curve and cut indices; label from increase_value
-#'   plot_identified_core(
-#'     bray_curtis_ranked = res$bray_curtis_ranked,
-#'     elbow              = res$elbow,
-#'     lastCall           = res$bc_increase,
-#'     increase_value     = res$increase_value
-#'   )
+#' # Plot using the returned curve and cut indices; label from increase_value
+#' plot_identified_core(
+#'   bray_curtis_ranked = res$bray_curtis_ranked,
+#'   elbow = res$elbow,
+#'   lastCall = res$bc_increase,
+#'   increase_value = res$increase_value
+#'  )
 #' }
 #'
 #' @importFrom magrittr %>%
@@ -118,15 +114,16 @@ plot_identified_core <- function(bray_curtis_ranked,
     ggplot2::theme(
       plot.title = ggplot2::element_text(hjust = 0.5, size = 12, face = "bold"),
       plot.subtitle = ggplot2::element_text(hjust = 0.5, size = 9)) +
-    #  axis.title = ggplot2::element_text(size = 11),
-    #  axis.text = ggplot2::element_text(size = 9),
-    #  panel.grid.minor = ggplot2::element_blank(),
-    #  panel.grid.major.x = ggplot2::element_line(color = "gray90", size = 0.3),
-    #  panel.grid.major.y = ggplot2::element_line(color = "gray90", size = 0.3)
-    #) +
-    # Ensure proper scaling
-    #ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(0.02, 0.02))) +
-    #ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.02, 0.05)))
+      # Ensure proper scaling
+      ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(0.02, 0.02))) +
+      ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.02, 0.05)))
+    
+    # To add some more fancy graphics later...
+    # axis.title = ggplot2::element_text(size = 11),
+    # axis.text = ggplot2::element_text(size = 9),
+    # panel.grid.minor = ggplot2::element_blank(),
+    # panel.grid.major.x = ggplot2::element_line(color = "gray90", size = 0.3),
+    # panel.grid.major.y = ggplot2::element_line(color = "gray90", size = 0.3))
     
     return(p)
 }

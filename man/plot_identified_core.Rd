@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_identified_core.R
 \name{plot_identified_core}
 \alias{plot_identified_core}
-\title{Plot \% Bray-Curtis accumulation over ranked OTU/ASVs}
+\title{Plot Bray-Curtis increase over ranked OTU/ASVs}
 \usage{
 plot_identified_core(
   bray_curtis_ranked,
@@ -12,54 +12,50 @@ plot_identified_core(
 )
 }
 \arguments{
-\item{bray_curtis_ranked}{A data frame/tibble as returned by
-\code{identify_core()$bray_curtis_ranked}, containing at least columns
-\code{rank} and \code{proportionBC}.}
+\item{bray_curtis_ranked}{A tibble as returned by \code{identify_core()$bray_curtis_ranked}.}
 
-\item{elbow}{Integer; elbow index (typically \code{identify_core(...)$elbow}).}
+\item{elbow}{The number of OTU/ASVs identified by the elbow method (Integer).}
 
-\item{lastCall}{Integer; threshold index (typically
-\code{identify_core(...)$bc_increase}).}
+\item{lastCall}{The number of OTU/ASVs identified by the last percent
+Bray-Curtis increase method (Integer).}
 
-\item{increase_value}{Numeric in \code{[0,1]} used only to format the label
-for the threshold line (e.g., \code{0.02} -> \dQuote{Last 2\\%}). Defaults
-to \code{0.02}. It does not change the plotted cuts.}
+\item{increase_value}{The percent increase value in decimal (e.g. 0.02) used
+for the Bray-Curtis increase method.}
 }
 \value{
 A \pkg{ggplot2} object.
 }
 \description{
-Visualize the cumulative normalized mean Bray-Curtis curve returned by
-\link[=identify_core]{identify_core()}, with vertical markers for the elbow
-cut and the increase-threshold cut (labeled from \code{increase_value}).
+Visualize the cumulative normalized mean Bray-Curtis increase returned by
+\link[=identify_core]{identify_core()}, over ranked OTU/ASVs and shows cutoff
+points for elbow percent increase methods.
 }
 \details{
-The function converts the \code{rank} column to integers and zooms the x-axis
-to the first \code{1.2 * lastCall} ranks for readability. Label positions are
-computed dynamically from the observed \code{proportionBC} range to avoid
-overlap with points and axes.
+The function converts \code{rank} to integers and zooms the x-axis to the first
+\code{1.2 * lastCall} ranks. Label positions are computed dynamically from the
+observed \code{proportionBC} range to avoid overlap.
 }
 \examples{
 \dontshow{if (requireNamespace("phyloseq", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
-  # Example with the package switchgrass dataset
-  data("switchgrass", package = "BRCore")
+# Example with the package switchgrass dataset
+data("switchgrass", package = "BRCore")
 
-  # Identify core taxa
-  res <- identify_core(
-    physeq_obj    = switchgrass,
-    priority_var  = "sampling_date",
-    increase_value = 0.02,
-    seed          = 4
-  )
+# Identify core taxa
+res <- identify_core(
+ physeq_obj = switchgrass,
+ priority_var = "sampling_date",
+ increase_value = 0.02,
+ seed = 48821
+)
 
-  # Plot using the returned curve and cut indices; label from increase_value
-  plot_identified_core(
-    bray_curtis_ranked = res$bray_curtis_ranked,
-    elbow              = res$elbow,
-    lastCall           = res$bc_increase,
-    increase_value     = res$increase_value
-  )
+# Plot using the returned curve and cut indices; label from increase_value
+plot_identified_core(
+  bray_curtis_ranked = res$bray_curtis_ranked,
+  elbow = res$elbow,
+  lastCall = res$bc_increase,
+  increase_value = res$increase_value
+ )
 }
 \dontshow{\}) # examplesIf}
 }
