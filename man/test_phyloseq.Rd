@@ -11,7 +11,7 @@ An object class "phyloseq".
 Internal test data for BRCore package.
 }
 \usage{
-data(test_phyloseq)
+data("test_phyloseq")
 }
 \description{
 A 16S amplicon dataset containing 474 OTU (Operational Taxonomic Unit) across 622 samples.
