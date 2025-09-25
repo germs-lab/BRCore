@@ -88,5 +88,8 @@ parallel_rarefy <- function(physeq,
         dplyr::filter(rowSums(dplyr::across(dplyr::where(is.numeric))) >= depth_level) %>%
         tibble::column_to_rownames("sample_id")
     
+    # Remove ASVs/OTUs with zero total abundance using base R
+    mean_data <- mean_data[, colSums(mean_data) > 0]
+    
     return(mean_data)
 }

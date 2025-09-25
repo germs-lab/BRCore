@@ -52,7 +52,8 @@ do_phyloseq <- function(physeq, otu_rare) {
                 taxa_are_rows = TRUE
             ),
             physeq@sam_data,
-            physeq@tax_table
+            physeq@tax_table,
+            physeq@refseq
         ) %>%
         prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
         prune_samples(sample_sums(x = .) > 0, x = .)
