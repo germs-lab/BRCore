@@ -59,12 +59,10 @@
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
 #' @importFrom stats4 mle
+#' @importFrom stats pbeta
 #' 
 #' @export
 sncm.fit <- function(spp, pool=NULL, stats=TRUE, taxon=NULL){
-    require(minpack.lm)
-    require(Hmisc)
-    require(stats4)
     
     base::options(warn=-1)
     

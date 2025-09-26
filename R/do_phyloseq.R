@@ -14,31 +14,30 @@
 #' @importFrom dplyr %>% 
 #'
 #' @examples
-#' # Load example data
+#' \donttest{
 #' library(phyloseq)
 #' data(GlobalPatterns, package = "phyloseq")
 #'
 #' # Perform multiple rarefaction
-#' rarefied_data <- 
-#'     multi_rarefy(GlobalPatterns, 
-#'     depth_level = 500, 
-#'     num_iter = 10, 
-#'     threads = 2, 
-#'     set_seed = 453)
+#' otu_table_rare <- 
+#'     parallel_rarefy(
+#'         physeq = GlobalPatterns,
+#'         depth_level = 200,
+#'         num_iter = 3,
+#'         threads = 1,
+#'         set_seed = 123
+#'     )
 #'
 #' # Check the rarefied data output
-#' rowSums(rarefied_data)
-#'
-#' if (is.null(rarefied_data) || nrow(rarefied_data) == 0 || ncol(rarefied_data) == 0) {
-#' stop("rarefied_data has zero dimensions. Check data preprocessing and input files.")
-#' }
+#' rowSums(otu_table_rare)
 #'
 #' # Recreate the phyloseq object and check
-#' rarefied_physeq <- 
+#' rarefied_GlobalPatterns<- 
 #'     do_phyloseq(physeq = GlobalPatterns, 
-#'                 otu_rare = rarefied_data )
+#'                 otu_rare = otu_table_rare )
 #'     
-#' rarefied_physeq
+#' sample_sums(rarefied_GlobalPatterns)
+#'}
 #'
 #' @export
 do_phyloseq <- function(physeq, otu_rare) {

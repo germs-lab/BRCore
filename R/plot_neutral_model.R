@@ -40,10 +40,11 @@
 #' 
 #' @seealso \code{\link{fit_neutral_model}}
 #' 
+#' @import ggplot2
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
 #' @importFrom ggplot2 ggplot aes geom_point geom_line labs theme_classic theme
-#'   element_text annotate
+#'   element_text element_blank annotate 
 #' @importFrom grid unit
 #' @export
 plot_neutral_model <- function(fit_result){
@@ -111,7 +112,7 @@ plot_neutral_model <- function(fit_result){
             legend.background    = ggplot2::element_rect(fill = ggplot2::alpha("white", 0.7), color = NA),
             legend.key.height    = grid::unit(0.2, "cm"),
             legend.key.width     = grid::unit(0.3, "cm"),
-            legend.title = element_blank(),
+            legend.title = ggplot2::element_blank(),
             legend.text          = ggplot2::element_text(size = 8)
         ) +
         # White box with two lines: R^2 on top, m below (above the legend)

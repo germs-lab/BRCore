@@ -26,15 +26,22 @@
 #' @importFrom dplyr %>% 
 #'
 #' @examples
+#' \donttest{
+#' library(phyloseq)
 #' data(GlobalPatterns, package = "phyloseq")
-#' test_otutable_rare <- parallel_rarefy(
-#'   physeq = GlobalPatterns,
-#'   depth_level = 500,
-#'   num_iter = 10,
-#'   set_seed = 123
-#' )
-#' 
-#' rowSums(test_otutable_rare)
+#'
+#' # Example rarefaction (single iteration, single core to keep examples fast)
+#' otu_table_rare <-
+#'     parallel_rarefy(
+#'         physeq = GlobalPatterns,
+#'         depth_level = 200,
+#'         num_iter = 3,
+#'         threads = 1,
+#'         set_seed = 123
+#'     )
+#'
+#' rowSums(otu_table_rare)
+#' }
 #'
 #' @export
 parallel_rarefy <- function(physeq,
