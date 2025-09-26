@@ -10,7 +10,7 @@ test_that("GlobalPatterns pipeline -> fit_neutral_model basic structure", {
     data(GlobalPatterns, package = "phyloseq")
     testthat::expect_s4_class(GlobalPatterns, "phyloseq")
     
-    rarefied_data <- parallel_rarefy(
+    rarefied_otu <- parallel_rarefy(
         physeq      = GlobalPatterns,
         depth_level = 100,
         num_iter    = 3,
@@ -18,40 +18,40 @@ test_that("GlobalPatterns pipeline -> fit_neutral_model basic structure", {
         set_seed    = 999
     )
     
-    rarefied_physeq <- do_phyloseq(
+    GlobalPatterns_rare <- do_phyloseq(
         physeq   = GlobalPatterns,
-        otu_rare = rarefied_data
+        otu_rare = rarefied_otu
     )
-    testthat::expect_s4_class(rarefied_physeq, "phyloseq")
+    testthat::expect_s4_class(GlobalPatterns_rare, "phyloseq")
     
-    GP_core <- identify_core(
-        physeq_obj       = rarefied_physeq,
+    GlobalPatterns_core <- identify_core(
+        physeq_obj       = GlobalPatterns_rare,
         priority_var     = "SampleType",
         increase_value   = 0.02,
         abundance_weight = 0,
-        seed             = 2324
+        seed             = 123
     )
     
     # sanity on core output
-    testthat::expect_true(all(c("otu_table", "increase_core", "occupancy_abundance") %in% names(GP_core)))
+    testthat::expect_true(all(c("otu_table", "increase_core", "occupancy_abundance") %in% names(GlobalPatterns_core)))
     
     # --- neutral model fit (matches how you call it) ---
-    res <- fit_neutral_model(
-        otu_table           = t(GP_core$otu_table),
-        core_set            = GP_core$increase_core,
-        abundance_occupancy = GP_core$occupancy_abundance
+    GlobalPatterns_fit <- fit_neutral_model(
+        otu_table           = t(GlobalPatterns_core$otu_table),
+        core_set            = GlobalPatterns_core$increase_core,
+        abundance_occupancy = GlobalPatterns_core$occupancy_abundance
     )
     
     # basic structure only
-    testthat::expect_type(res, "list")
-    testthat::expect_true(all(c("model_prediction", "goodness_of_fit") %in% names(res)))
-    testthat::expect_s3_class(res$model_prediction, "data.frame")
-    testthat::expect_s3_class(res$goodness_of_fit,  "data.frame")
-    testthat::expect_gt(nrow(res$model_prediction), 0)
+    testthat::expect_type(GlobalPatterns_fit, "list")
+    testthat::expect_true(all(c("model_prediction", "goodness_of_fit") %in% names(GlobalPatterns_fit)))
+    testthat::expect_s3_class(GlobalPatterns_fit$model_prediction, "data.frame")
+    testthat::expect_s3_class(GlobalPatterns_fit$goodness_of_fit,  "data.frame")
+    testthat::expect_gt(nrow(GlobalPatterns_fit$model_prediction), 0)
     
     # OPTIONAL: quick plot smoke test (remove if you want this file to be faster)
     if (exists("plot_neutral_model")) {
-        p <- plot_neutral_model(res)
+        p <- plot_neutral_model(GlobalPatterns_fit)
         testthat::expect_s3_class(p, "ggplot")
         testthat::expect_silent(ggplot2::ggplot_build(p))
     }
