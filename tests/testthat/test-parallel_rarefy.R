@@ -1,12 +1,11 @@
-test_that("rarefaction worked correctly", {
-    # Load expected
-    #load(here::here("tests/testthat/testdata/test_phyloseq.rda"))
+test_that("Test if parallel rarefaction works correctly", {
+    # Load data
     load(testthat::test_path("testdata", "test_phyloseq.rda"))
     
     otu_table_rare <-
         parallel_rarefy(
             physeq = test_phyloseq,
-            depth_level = 200,
+            depth_level = 300,
             num_iter = 3,
             threads = 1,
             set_seed = 123

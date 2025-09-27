@@ -93,13 +93,13 @@ plot_neutral_model <- function(fit_result){
         ) +
         # Keep lines but remove their legends
         ggplot2::geom_line(data = obs1, ggplot2::aes(x = log10(p), y = freq.pred),
-                           color = "blue", size = 0.8, alpha = 0.25,
+                           color = "blue", linewidth = 0.8, alpha = 0.25,
                            inherit.aes = FALSE, show.legend = FALSE) +
         ggplot2::geom_line(data = obs1, ggplot2::aes(x = log10(p), y = pred.upr),
-                           color = "black", size = 0.8, linetype = "twodash", alpha = 0.25,
+                           color = "black", linewidth = 0.8, linetype = "twodash", alpha = 0.25,
                            inherit.aes = FALSE, show.legend = FALSE) +
         ggplot2::geom_line(data = obs1, ggplot2::aes(x = log10(p), y = pred.lwr),
-                           color = "black", size = 0.8, linetype = "twodash", alpha = 0.25,
+                           color = "black", linewidth = 0.8, linetype = "twodash", alpha = 0.25,
                            inherit.aes = FALSE, show.legend = FALSE) +
         # Make sure only the Membership legend remains
         ggplot2::guides(color = "none", linetype = "none") +
@@ -123,7 +123,7 @@ plot_neutral_model <- function(fit_result){
                 ",italic(m)==",       sprintf("%.3f", mV), ")"
             ),
             parse = TRUE, hjust = 1, vjust = 0, size = 3,
-            label.size = 0, fill = "white", alpha = 0.9, lineheight = 1.05
+            fill = "white", alpha = 0.9, lineheight = 1.05
         ) +
         ggplot2::labs(title = "Neutral model",
                       x = "Log10(mean abundance)",
