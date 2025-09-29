@@ -20,7 +20,7 @@
 #'
 #' # Perform multiple rarefaction
 #' otu_table_rare <- 
-#'     parallel_rarefy(
+#'     multi_rarefy(
 #'         physeq = GlobalPatterns,
 #'         depth_level = 200,
 #'         num_iter = 3,

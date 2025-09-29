@@ -43,6 +43,8 @@
 #'  )
 #' }
 #'
+#' @seealso \code{\link{identify_core}} 
+#'
 #' @importFrom magrittr %>%
 #' @importFrom grid unit
 #' @export

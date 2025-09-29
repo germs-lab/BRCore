@@ -21,6 +21,7 @@ A \link[ggplot2:ggplot]{ggplot} object with:
 \item An inset white label reporting \emph{R}\eqn{^2} and \emph{m} taken
 directly from \code{fit_result$goodness_of_fit}.
 }
+
 The function does not recompute statistics; it only visualizes the supplied
 predictions and metrics.
 }
@@ -40,9 +41,11 @@ Points are split into four groups for display:
 }
 \examples{
 \dontrun{
-# Assuming you have run a neutral model fit:
-# fit_result$model_prediction and fit_result$goodness_of_fit are data.frames
-p <- plot_neutral_model(fit_result)
+# Assuming you have run a neutral model fit on the switchgrass data.frames
+is.data.frame(switchgrass_core_fit$model_prediction)
+is.data.frame(switchgrass_core_fit$goodness_of_fit)
+
+p <- plot_neutral_model(switchgrass_core_fit)
 print(p)
 }
 

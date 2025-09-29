@@ -32,6 +32,30 @@ stochastically or randomply distributed) above (i.e. interpreted as deterministi
 predictably selected) and below (i.e. interpreted as dispersally limited) the
 model predictions.
 }
+\examples{
+\donttest{
+# Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
+data("switchgrass", package = "BRCore")
+
+switchgrass_core <- identify_core(
+  physeq_obj     = switchgrass,
+  priority_var   = "sampling_date",
+  increase_value = 0.02,
+  seed           = 092825
+)
+ 
+switchgrass_core_fit <- fit_neutral_model(
+    otu_table = t(switchgrass_core$otu_table),
+    core_set = switchgrass_core$increase_core,
+    abundance_occupancy = switchgrass_core$occupancy_abundance
+    )
+
+str(switchgrass_core_fit)
+switchgrass_core_fit$goodness_of_fit
+switchgrass_core_fit$model_prediction \%>\% head()
+}
+
+}
 \references{
 Sloan WT, Lunn M, Woodcock S, Head IM, Nee S, Curtis TP. (2006) Quantifying the
 roles of immigration and chance in shaping prokaryote community structure.

@@ -61,4 +61,6 @@ plot_identified_core(
 }
 \seealso{
 \link[=identify_core]{identify_core()}
+
+\code{\link{identify_core}}
 }

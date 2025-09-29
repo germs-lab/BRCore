@@ -3,7 +3,7 @@ test_that("Test if parallel rarefaction works correctly", {
     load(testthat::test_path("testdata", "test_phyloseq.rda"))
     
     otu_table_rare <-
-        parallel_rarefy(
+        multi_rarefy(
             physeq = test_phyloseq,
             depth_level = 300,
             num_iter = 3,

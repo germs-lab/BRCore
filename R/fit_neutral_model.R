@@ -35,6 +35,29 @@
 #' 
 #' @seealso \code{\link{plot_neutral_model}} 
 #' 
+#' @examples
+#' \donttest{
+#' # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
+#' data("switchgrass", package = "BRCore")
+#'
+#' switchgrass_core <- identify_core(
+#'   physeq_obj     = switchgrass,
+#'   priority_var   = "sampling_date",
+#'   increase_value = 0.02,
+#'   seed           = 092825
+#' )
+#'  
+#' switchgrass_core_fit <- fit_neutral_model(
+#'     otu_table = t(switchgrass_core$otu_table),
+#'     core_set = switchgrass_core$increase_core,
+#'     abundance_occupancy = switchgrass_core$occupancy_abundance
+#'     )
+#' 
+#' str(switchgrass_core_fit)
+#' switchgrass_core_fit$goodness_of_fit
+#' switchgrass_core_fit$model_prediction %>% head()
+#' }
+#' 
 #' @importFrom stats confint pbeta pbinom ppois dnorm AIC BIC coef
 #' @importFrom stats4 mle
 #' @importFrom minpack.lm nlsLM

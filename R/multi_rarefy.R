@@ -32,7 +32,7 @@
 #'
 #' # Example rarefaction (single iteration, single core to keep examples fast)
 #' otu_table_rare <-
-#'     parallel_rarefy(
+#'     multi_rarefy(
 #'         physeq = GlobalPatterns,
 #'         depth_level = 200,
 #'         num_iter = 3,
@@ -44,7 +44,7 @@
 #' }
 #'
 #' @export
-parallel_rarefy <- function(physeq,
+multi_rarefy <- function(physeq,
                          depth_level,
                          num_iter = 100,
                          threads = get_available_cores(),
