@@ -43,6 +43,8 @@
 #'  )
 #' }
 #'
+#' @seealso \code{\link{identify_core}} 
+#'
 #' @importFrom magrittr %>%
 #' @importFrom grid unit
 #' @export
@@ -111,6 +113,7 @@ plot_identified_core <- function(bray_curtis_ranked,
             x = "Ranked OTUs", 
             y = "% Bray-Curtis similarity"
         )  +
+    ggplot2::theme_classic() +
     ggplot2::theme(
       plot.title = ggplot2::element_text(hjust = 0.5, size = 12, face = "bold"),
       plot.subtitle = ggplot2::element_text(hjust = 0.5, size = 9)) +

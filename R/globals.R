@@ -22,4 +22,5 @@ utils::globalVariables(
         "freq.pred"
     )
 )
+
 utils::globalVariables(c("%>%", "%T>%"))

@@ -14,8 +14,8 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
     
     # run once with a fixed seed for reproducibility
     res <- identify_core(
-        physeq_obj    = switchgrass,
-        priority_var  = "sampling_date",
+        physeq_obj = switchgrass,
+        priority_var = "sampling_date",
         increase_value = 0.02,
         seed          = 4
     )
@@ -69,9 +69,10 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
         physeq_obj    = switchgrass,
         priority_var  = "sampling_date",
         increase_value = 0.02,
-        seed          = 4
+        abundance_weight = 0,
+        seed = 4
     )
     expect_equal(res$bray_curtis_ranked$MeanBC, res2$bray_curtis_ranked$MeanBC, tolerance = 1e-12)
-    expect_equal(res$elbow,       res2$elbow)
+    expect_equal(res$elbow, res2$elbow)
     expect_equal(res$bc_increase, res2$bc_increase)
 })

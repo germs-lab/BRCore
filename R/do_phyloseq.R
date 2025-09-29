@@ -14,48 +14,75 @@
 #' @importFrom dplyr %>% 
 #'
 #' @examples
-#' # Load example data
+#' \donttest{
 #' library(phyloseq)
 #' data(GlobalPatterns, package = "phyloseq")
 #'
 #' # Perform multiple rarefaction
-#' rarefied_data <- 
-#'     multi_rarefy(GlobalPatterns, 
-#'     depth_level = 500, 
-#'     num_iter = 10, 
-#'     threads = 2, 
-#'     set_seed = 453)
+#' otu_table_rare <- 
+#'     multi_rarefy(
+#'         physeq = GlobalPatterns,
+#'         depth_level = 200,
+#'         num_iter = 3,
+#'         threads = 1,
+#'         set_seed = 123
+#'     )
 #'
 #' # Check the rarefied data output
-#' rowSums(rarefied_data)
-#'
-#' if (is.null(rarefied_data) || nrow(rarefied_data) == 0 || ncol(rarefied_data) == 0) {
-#' stop("rarefied_data has zero dimensions. Check data preprocessing and input files.")
-#' }
+#' rowSums(otu_table_rare)
 #'
 #' # Recreate the phyloseq object and check
-#' rarefied_physeq <- 
+#' rarefied_GlobalPatterns<- 
 #'     do_phyloseq(physeq = GlobalPatterns, 
-#'                 otu_rare = rarefied_data )
+#'                 otu_rare = otu_table_rare )
 #'     
-#' rarefied_physeq
+#' sample_sums(rarefied_GlobalPatterns)
+#'}
 #'
 #' @export
 do_phyloseq <- function(physeq, otu_rare) {
-    new_phyloseq <-
-        phyloseq(
-            otu_table(
-                otu_rare %>%
-                    t() %>%
-                    as.matrix() %>%
-                    as.data.frame(),
-                taxa_are_rows = TRUE
-            ),
-            physeq@sam_data,
-            physeq@tax_table
-        ) %>%
-        prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
-        prune_samples(sample_sums(x = .) > 0, x = .)
-
+    # Get sample names from the original phyloseq object and rarefied otu_table
+    physeq_samples <- sample_names(physeq)
+    otu_rare_samples <- rownames(otu_rare)
+    
+    # Check for samples removed due to rarefaction
+    if (!all(physeq_samples %in% otu_rare_samples)) {
+        removed_samples <- physeq_samples[!(physeq_samples %in% otu_rare_samples)]
+        cli::cli_alert_warning("Samples removed due to rarefaction: {paste(removed_samples, collapse = ', ')}")
+    } else {
+        # Calculate rarefaction depth (assuming all samples have the same depth after rarefaction)
+        rarefaction_depth <- sum(otu_rare[1, ])
+        cli::cli_alert_success("All samples kept after rarefaction at depth of: {rarefaction_depth}")
+    }
+    
+    # Create list of components for the new phyloseq object
+    phyloseq_components <- list(
+        phyloseq::otu_table(
+            otu_rare %>%
+                as.matrix() %>%
+                as.data.frame(),
+            taxa_are_rows = FALSE
+        ),
+        phyloseq::sample_data(physeq)
+    )
+    
+    # Add optional components if they exist and are not empty
+    if (!is.null(phyloseq::tax_table(physeq, errorIfNULL = FALSE))) {
+        phyloseq_components <- c(phyloseq_components, list(phyloseq::tax_table(physeq)))
+    }
+    
+    if (!is.null(phyloseq::phy_tree(physeq, errorIfNULL = FALSE))) {
+        phyloseq_components <- c(phyloseq_components, list(phyloseq::phy_tree(physeq)))
+    }
+    
+    if (!is.null(phyloseq::refseq(physeq, errorIfNULL = FALSE))) {
+        phyloseq_components <- c(phyloseq_components, list(phyloseq::refseq(physeq)))
+    }
+    
+    # Build the new phyloseq object
+    new_phyloseq <- do.call(phyloseq::phyloseq, phyloseq_components) %>%
+        phyloseq::prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
+        phyloseq::prune_samples(sample_sums(x = .) > 0, x = .)
+    
     return(new_phyloseq)
 }

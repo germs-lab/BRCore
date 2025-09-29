@@ -1,75 +1,102 @@
 #' Run multiple rarefaction for microbiome count tables
 #'
-#' This function performs multiple rarefaction on a `phyloseq` object by randomly sub-sampling OTUs/ASVs within samples without replacement. The process is repeated for a specified number of iterations, and the results are averaged. Samples with fewer OTUs/ASVs than the specified `depth_level` are discarded.
+#' This function performs multiple rarefaction on a `phyloseq` object by randomly
+#' sub-sampling OTUs/ASVs within samples without replacement. The process is
+#' repeated for a specified number of iterations, and the results are averaged.
+#' Samples with fewer OTUs/ASVs than the specified `depth_level` are discarded.
 #'
 #' @param physeq A `phyloseq` object containing an OTU/ASV table.
-#' @param depth_level An integer specifying the sequencing depth (number of OTUs/ASVs) to which samples should be rarefied.
-#' @param num_iter An integer specifying the number of iterations to perform for rarefaction.
-#' @param threads Number of threads (deafault = 4).
-#' @param set_seed An optional integer to set the random seed for reproducibility (default=`123`).
+#' @param depth_level An integer specifying the sequencing depth (number of
+#'   OTUs/ASVs) to which samples should be rarefied.
+#' @param num_iter An integer specifying the number of iterations to perform
+#'   for rarefaction.
+#' @param threads Number of threads (default = 4).
+#' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
 #'
-#' @details Firstly introduced by Sanders in 1968, rarefaction is a technique to standardize the number of observations (i.e. sequence reads counts in microbiome data) across samples when we want to compare diversity. It works by subsampling all samples in a dataset to a predefined smaller size. Single rarefaction, one subsampling round, may introduce element of randomness and may not fully represent the observed diversity. In multuple rarefacton the result is the mean of several rarefaction iterations or subsampling (with replacement) rounds, providing a more robust and less biased estimate.
-#'
-#' @return A data frame with taxa as rows and samples as columns. The values represent the average sequence counts calculated across all iterations. Samples with less than `depth_level` sequences are discarded.
+#' @return A data frame with taxa as rows and samples as columns. The values
+#'   represent the average sequence counts calculated across all iterations.
+#'   Samples with less than `depth_level` sequences are discarded.
 #'
 #' @import phyloseq
 #' @import vegan
 #' @import dplyr
 #' @import tibble
-#' @importFrom future plan multisession
-#' @importFrom magrittr %T>%
+#' @importFrom parallelly availableCores
+#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
 #' @importFrom dplyr %>% 
 #'
 #' @examples
+#' \donttest{
+#' library(phyloseq)
 #' data(GlobalPatterns, package = "phyloseq")
-#' test_otutable_rare <- multi_rarefy(
-#'   physeq = GlobalPatterns,
-#'   depth_level = 500,
-#'   num_iter = 10,
-#'   threads = 2,
-#'   set_seed = 123
-#' )
 #'
-#' head(test_otutable_rare)
+#' # Example rarefaction (single iteration, single core to keep examples fast)
+#' otu_table_rare <-
+#'     multi_rarefy(
+#'         physeq = GlobalPatterns,
+#'         depth_level = 200,
+#'         num_iter = 3,
+#'         threads = 1,
+#'         set_seed = 123
+#'     )
+#'
+#' rowSums(otu_table_rare)
+#' }
 #'
 #' @export
-multi_rarefy <- function(physeq, 
-                         depth_level, 
-                         num_iter = 100, 
-                         threads = 4,
+multi_rarefy <- function(physeq,
+                         depth_level,
+                         num_iter = 100,
+                         threads = get_available_cores(),
                          set_seed = NULL) {
     
-    cat("\nSeed used:", set_seed)
+    cli::cli_text("\nSeed used: {set_seed}\n")
     
-    # Set up parallel workers
-    future::plan(future::multisession, workers = threads)
+    if (is.null(set_seed)) {
+        cli::cli_warn("No seed was set. Results may not be reproducible.")
+    } else {
+        set.seed(set_seed)
+    }
+  
     
     # Check object class
-    if (inherits(physeq, "phyloseq")) {
-        dataframe <- as.data.frame(as.matrix(t(phyloseq::otu_table(physeq, taxa_are_rows = TRUE))))
-    } else {
-        stop("Input must be a phyloseq object not a data.frame")
+    if (!inherits(physeq, "phyloseq")) {
+        stop("Input must be a phyloseq object, not a data.frame")
     }
     
-    # Parallel rarefaction
-    com_iter <- furrr::future_map(1:num_iter, ~ {
-        vegan::rrarefy(dataframe, sample = depth_level) %>%
-            as.data.frame() %>%
-            tibble::rownames_to_column("SampleID")
-    }, .options = furrr::furrr_options(seed = TRUE))
+    dataframe <- as.data.frame(
+        as.matrix(t(phyloseq::otu_table(physeq, taxa_are_rows = TRUE)))
+    )
     
-    # There are warnings generated by rrarefy about the samples with less
-    # than num_iter sequences not being rarefied. We can suppress it since the
-    # function removes all the samples with less than num_iter sequences.
+    # Parallel setup
+    threads <- min(threads, parallelly::availableCores())
+    cl <- parallel::makeCluster(threads)
+    on.exit(parallel::stopCluster(cl), add = TRUE)
     
+    # Export needed objects/packages to workers
+    parallel::clusterExport(
+        cl,
+        varlist = c("dataframe", "depth_level"),
+        envir = environment()
+    )
+    
+    # Run rarefactions in parallel
+    com_iter <- parallel::parLapply(cl, 1:num_iter, function(i) {
+        set.seed(set_seed + i) # each worker gets a different but reproducible seed
+        df <- vegan::rrarefy(dataframe, sample = depth_level)
+        df <- as.data.frame(df)
+        tibble::rownames_to_column(df, "sample_id")
+    })
+    
+    # Aggregate results
     mean_data <- dplyr::bind_rows(com_iter) %>%
-        dplyr::group_by(SampleID) %>%
-        dplyr::summarise(dplyr::across(dplyr::everything(), mean)) %>%
+        dplyr::group_by(sample_id) %>%
+        dplyr::summarise(dplyr::across(dplyr::everything(), mean), .groups = "drop") %>%
         dplyr::filter(rowSums(dplyr::across(dplyr::where(is.numeric))) >= depth_level) %>%
-        tibble::column_to_rownames("SampleID")
+        tibble::column_to_rownames("sample_id")
     
-    # Return to sequential execution
-    future::plan(future::sequential)
+    # Remove ASVs/OTUs with zero total abundance using base R
+    mean_data <- mean_data[, colSums(mean_data) > 0]
     
     return(mean_data)
 }
