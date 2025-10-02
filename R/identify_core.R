@@ -3,7 +3,7 @@
 #' @description
 #' This function identifies core microbial taxa based on abundance-occupancy 
 #' distributions and their contributions to Bray-Curtis similarity between 
-#' biological samples. Core taxa are selected using either the "increase" or 
+#' biological samples. Core taxa are selected using either a "last % increase" or 
 #' "elbow" method. This function implements the method developed by Shade 
 #' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 #'
@@ -25,6 +25,7 @@
 #'   \item \code{otu_ranked} tibble with ranked OTU/ASVs .
 #'   \item \code{occupancy_abundance} tibble with OTU/ASVs names, occupancy 
 #'      (`otu_occ`), and mean relative abundance (`otu_rel`).
+#'   \item \code{priority_var} character, the variable used for prioritizing the core.   
 #'   \item \code{elbow} core set identified by elbow method (integer).
 #'   \item \code{bc_increase} core set identified by last % BC-increase (integer).
 #'   \item \code{increase_value} increase value (numeric, scalar) used in the calculation (e.g. 0.02).
@@ -309,6 +310,7 @@ identify_core <- function(physeq_obj,
         bray_curtis_ranked  = BC_ranked,
         otu_ranked          = otu_ranked,
         occupancy_abundance = occ_abun,
+        priority_var        = data_var,
         elbow               = as.integer(elbow),
         bc_increase         = as.integer(lastCall),
         increase_value      = increase_value,
@@ -320,5 +322,8 @@ identify_core <- function(physeq_obj,
         taxonomy            = taxa
     )
     class(out) <- c("identify_core_result", class(out))
+    
+    cli::cli_alert_success("Analysis complete!")
+    
     out
 }

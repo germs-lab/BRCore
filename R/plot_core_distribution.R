@@ -126,7 +126,7 @@ plot_core_distribution <- function(core_result,
             legend.text = ggplot2::element_text(size = 8)
         ) +
         labs(
-            title = paste("Core set occupancy across", group_var),
+            title = paste("Core set occupancy across:", group_var),
             x = "Ranked ASV/OTUs",
             y = "Occupancy"
         ) +

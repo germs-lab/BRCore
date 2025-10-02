@@ -112,5 +112,8 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy){
         model_prediction = fit_table
     )
     class(out) <- c("fit_neutral_model", class(out))
+    
+    cli::cli_alert_success("Analysis complete!")
+    
     out
 }
