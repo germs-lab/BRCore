@@ -126,7 +126,8 @@ plot_neutral_model <- function(fit_result){
                 ",italic(m)==",       sprintf("%.3f", mV), ")"
             ),
             parse = TRUE, hjust = 1, vjust = 0, size = 3,
-            fill = "white", alpha = 0.9, lineheight = 1.05
+            fill = "white", alpha = 0.9, lineheight = 1.05,
+            label.size = 0  # This removes the border
         ) +
         ggplot2::labs(title = "Neutral model",
                       x = "Log10(mean abundance)",
