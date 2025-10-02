@@ -2,12 +2,12 @@
 % Please edit documentation in R/plot_abundance_occupancy.R
 \name{plot_abundance_occupancy}
 \alias{plot_abundance_occupancy}
-\title{Plot Abundance-Occupancy Relationship for Core Taxa}
+\title{Plot Abundance-Occupancy Curve and Displays the Core Taxa}
 \usage{
 plot_abundance_occupancy(core_result, core_set = "elbow")
 }
 \arguments{
-\item{core_result}{A list object returned by a core identification function,
+\item{core_result}{A list object returned by \code{\link{identify_core}},
 containing at minimum:
 \itemize{
 \item \code{occupancy_abundance}: A data frame with columns \code{otu},
@@ -31,27 +31,31 @@ Creates a scatter plot showing the relationship between mean relative abundance
 and occupancy (occurrence frequency) of taxa, with core taxa highlighted.
 }
 \details{
-The function creates a scatter plot where each point represents a taxon.
-Core taxa (as defined by the selected method) are shown in red, while non-core
-taxa are shown in grey. The plot uses a log10 scale for abundance to better
-visualize the full range of abundances typically found in microbiome data.
+The function creates a scatter plot where each point represents a
+taxon (i.e. ASV or OTU). Core taxa (as defined by the selected method) are
+shown in red, while non-core taxa are shown in grey. The plot uses a log10
+scale for abundance to better visualize the full range of abundances typically
+found in microbiome data.
 }
 \examples{
 \dontrun{
-# Generate an object from identify_core and then plot
+# Generate an object from `identify_core()` and then plot
 
 data("switchgrass", package = "BRCore")
 
 switchgrass_core <- identify_core(
   physeq_obj = switchgrass,
-  priority_var = "sampling_date",  
+  priority_var = "sampling_date",
   increase_value = 0.02,
   abundance_weight = 0,
   seed = 1234)
 )
-  
-plot_abundance_occupancy(core_result =switchgrass_core,
+
+plot_abundance_occupancy(core_result = switchgrass_core,
                          core_set = "increase")
 }
 
+}
+\seealso{
+\code{\link{plot_core_distribution}} and \code{\link{identify_core}}
 }

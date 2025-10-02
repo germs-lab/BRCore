@@ -1,9 +1,26 @@
-#' Plot Core OTUs/ASVs by Occupancy
+#' Plot Core Taxa  Occupancy Across Metadata Groups
 #'
-#' Creates a bar plot showing core OTU occupancy patterns across a grouping variable.
-#'
-#' @param core_result List containing core analysis results (elbow_core, increase_core, 
-#'   otu_table, metadata, otu_ranked).
+#' Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across 
+#' a grouping variable.
+#' 
+#' @param core_result A list object returned by \code{\link{identify_core}},
+#'   containing at minimum:
+#'   \itemize{
+#'     \item \code{otu_table}: A data frame with ASV/OTUs as rows and samples 
+#'       as columns.
+#'     \item \code{metadata}: A data frame with samples as rows and grouping 
+#'       variables as columns.
+#'     \item \code{otu_ranked}: A data frame with ranked taxa containing:
+#'       \itemize{
+#'         \item \code{otu}: A column with taxa names.
+#'         \item \code{rank}: A column with the rank for each taxon.
+#'       }
+#'     \item \code{elbow_core}: Character vector of OTU IDs identified as core
+#'       using the elbow method.
+#'     \item \code{increase_core}: Character vector of OTU IDs identified as core
+#'       using the increase method.
+#' }
+#' 
 #' @param core_set Which core set to plot: "elbow" (default) or "increase".
 #' @param group_var Metadata column for bar coloring. Default: "sampling_date".
 #'
@@ -29,9 +46,8 @@
 #'
 #' @export
 plot_core_distribution <- function(core_result,
-                                core_set = "elbow",
-                                group_var = "sampling_date") {
-    
+                                   core_set = "elbow",
+                                   group_var = "sampling_date") {
     # Validate core_set argument
     if (!core_set %in% c("elbow", "increase")) {
         stop("core_set must be either 'elbow' or 'increase'")
@@ -45,11 +61,9 @@ plot_core_distribution <- function(core_result,
     }
     
     # Calculate relative abundance
-    otu_relabun <- vegan::decostand(
-        as.data.frame(core_result$otu_table), 
-        method = "total", 
-        MARGIN = 2
-    )
+    otu_relabun <- vegan::decostand(as.data.frame(core_result$otu_table),
+                                    method = "total",
+                                    MARGIN = 2)
     
     # Prepare metadata
     map <- as.data.frame(core_result$metadata)
@@ -69,18 +83,16 @@ plot_core_distribution <- function(core_result,
     plotDF <- otu_relabun %>%
         as.data.frame() %>%
         tibble::rownames_to_column(var = "otu") %>%
-        tidyr::pivot_longer(
-            cols = -otu, 
-            names_to = "sample_id", 
-            values_to = "relabun"
-        ) %>% 
+        tidyr::pivot_longer(cols = -otu,
+                            names_to = "sample_id",
+                            values_to = "relabun") %>%
         dplyr::left_join(map, by = "sample_id") %>%
         dplyr::left_join(otu_ranked, by = 'otu') %>%
-        dplyr::filter(otu %in% core_otus) %>% 
+        dplyr::filter(otu %in% core_otus) %>%
         dplyr::group_by(otu, .data[[group_var]]) %>%
         dplyr::summarise(
-            time_freq = sum(relabun > 0) / dplyr::n(),        
-            coreTime = ifelse(time_freq == 1, 1, 0),      
+            time_freq = sum(relabun > 0) / dplyr::n(),
+            coreTime = ifelse(time_freq == 1, 1, 0),
             detect = ifelse(time_freq > 0, 1, 0),
             .groups = "drop"
         )
@@ -91,13 +103,21 @@ plot_core_distribution <- function(core_result,
     plotDF$otu <- factor(plotDF$otu, levels = core_levels)
     
     # Create plot
-    p <- ggplot(plotDF, aes(x = otu, y = time_freq, fill = factor(.data[[group_var]]))) +    
+    p <- ggplot(plotDF, aes(
+        x = otu,
+        y = time_freq,
+        fill = factor(.data[[group_var]])
+    )) +
         geom_bar(stat = 'identity', position = 'dodge') +
         coord_flip() +
         scale_x_discrete(limits = rev(levels(plotDF$otu))) +
         ggplot2::theme_classic() +
         ggplot2::theme(
-            plot.title = ggplot2::element_text(hjust = 0.5, size = 12, face = "bold"),
+            plot.title = ggplot2::element_text(
+                hjust = 0.5,
+                size = 12,
+                face = "bold"
+            ),
             plot.subtitle = ggplot2::element_text(hjust = 0.5, size = 9),
             axis.text = element_text(size = 6),
             legend.key.height = grid::unit(0.4, "cm"),
@@ -105,9 +125,11 @@ plot_core_distribution <- function(core_result,
             legend.title = ggplot2::element_blank(),
             legend.text = ggplot2::element_text(size = 8)
         ) +
-        labs(title = paste("Core set occupancy across", group_var),
-             x = "Ranked ASV/OTUs", 
-             y = "Occupancy") +
+        labs(
+            title = paste("Core set occupancy across", group_var),
+            x = "Ranked ASV/OTUs",
+            y = "Occupancy"
+        ) +
         ggsci::scale_fill_npg()
     
     return(p)

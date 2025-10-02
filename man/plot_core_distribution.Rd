@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_core_distribution.R
 \name{plot_core_distribution}
 \alias{plot_core_distribution}
-\title{Plot Core OTUs/ASVs by Occupancy}
+\title{Plot Core Taxa  Occupancy Across Metadata Groups}
 \usage{
 plot_core_distribution(
   core_result,
@@ -11,8 +11,23 @@ plot_core_distribution(
 )
 }
 \arguments{
-\item{core_result}{List containing core analysis results (elbow_core, increase_core,
-otu_table, metadata, otu_ranked).}
+\item{core_result}{A list object returned by \code{\link{identify_core}},
+containing at minimum:
+\itemize{
+\item \code{otu_table}: A data frame with ASV/OTUs as rows and samples
+as columns.
+\item \code{metadata}: A data frame with samples as rows and grouping
+variables as columns.
+\item \code{otu_ranked}: A data frame with ranked taxa containing:
+\itemize{
+\item \code{otu}: A column with taxa names.
+\item \code{rank}: A column with the rank for each taxon.
+}
+\item \code{elbow_core}: Character vector of OTU IDs identified as core
+using the elbow method.
+\item \code{increase_core}: Character vector of OTU IDs identified as core
+using the increase method.
+}}
 
 \item{core_set}{Which core set to plot: "elbow" (default) or "increase".}
 
@@ -22,7 +37,8 @@ otu_table, metadata, otu_ranked).}
 A ggplot2 object that can be further customized.
 }
 \description{
-Creates a bar plot showing core OTU occupancy patterns across a grouping variable.
+Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
+a grouping variable.
 }
 \examples{
 \dontrun{
