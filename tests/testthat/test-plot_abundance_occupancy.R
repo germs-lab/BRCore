@@ -2,7 +2,7 @@
 test_that("plot_abundance_occupancy returns a ggplot and builds", {
     testthat::skip_if_not_installed("ggplot2")
     
-    occupancy_abundance <- data.frame(
+    abundance_occupancy <- data.frame(
         otu = paste0("OTU", 1:10),
         otu_occ = round(runif(10, min = 0.05, max = 1), 8),
         otu_rel = round(runif(10, min = 0.0002, max = 0.05), 8),
@@ -12,7 +12,7 @@ test_that("plot_abundance_occupancy returns a ggplot and builds", {
     increase_core <- c("OTU1", "OTU4", "OTU7")
     
     core_result_example <- list(
-        occupancy_abundance = occupancy_abundance,
+        abundance_occupancy = abundance_occupancy,
         increase_core = "incrase"
     )
     

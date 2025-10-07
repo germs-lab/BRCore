@@ -24,7 +24,7 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
     expect_true(is.list(res))
     expect_true(all(c("bray_curtis_ranked",
                       "otu_ranked",
-                      "occupancy_abundance",
+                      "abundance_occupancy",
                       "elbow",
                       "bc_increase") %in% names(res)))
     
@@ -43,15 +43,15 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
     expect_true(is.numeric(res$otu_ranked$rank))
     expect_gt(nrow(res$otu_ranked), 0)
     
-    # occupancy_abundance
-    expect_true(is.data.frame(res$occupancy_abundance))
-    expect_true(all(c("otu", "otu_occ", "otu_rel") %in% names(res$occupancy_abundance)))
-    expect_true(is.numeric(res$occupancy_abundance$otu_occ))
-    expect_true(is.numeric(res$occupancy_abundance$otu_rel))
-    expect_true(all(res$occupancy_abundance$otu_occ >= 0 & res$occupancy_abundance$otu_occ <= 1))
-    expect_true(all(is.finite(res$occupancy_abundance$otu_rel) & res$occupancy_abundance$otu_rel >= 0))
+    # abundance occupancy
+    expect_true(is.data.frame(res$abundance_occupancy))
+    expect_true(all(c("otu", "otu_occ", "otu_rel") %in% names(res$abundance_occupancy)))
+    expect_true(is.numeric(res$abundance_occupancy$otu_occ))
+    expect_true(is.numeric(res$abundance_occupancy$otu_rel))
+    expect_true(all(res$abundance_occupancy$otu_occ >= 0 & res$abundance_occupancy$otu_occ <= 1))
+    expect_true(all(is.finite(res$abundance_occupancy$otu_rel) & res$abundance_occupancy$otu_rel >= 0))
     # same OTU universe (ignoring order)
-    expect_true(setequal(res$occupancy_abundance$otu, res$otu_ranked$otu))
+    expect_true(setequal(res$abundance_occupancy$otu, res$otu_ranked$otu))
     
     # elbow & bc_increase are length-1 integers/numerics within bounds
     expect_length(as.integer(res$elbow), 1)

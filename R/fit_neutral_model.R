@@ -50,7 +50,7 @@
 #' switchgrass_core_fit <- fit_neutral_model(
 #'     otu_table = t(switchgrass_core$otu_table),
 #'     core_set = switchgrass_core$increase_core,
-#'     abundance_occupancy = switchgrass_core$occupancy_abundance
+#'     abundance_occupancy = switchgrass_core$abundance_occupancy
 #'     )
 #' 
 #' str(switchgrass_core_fit)
@@ -63,7 +63,9 @@
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
 #' @export
-fit_neutral_model <- function(otu_table, core_set, abundance_occupancy){
+fit_neutral_model <- function(otu_table, 
+                              core_set, 
+                              abundance_occupancy){
 
     #source("../PAPER_Shade_CurrOpinMicro/script/sncm.fit.R")
     
@@ -81,9 +83,11 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy){
         cli::cli_abort("`abundance_occupancy` must contain a column named {.field otu} to join predictions.")
     }
     
-    #------ add membership ------
-    occ_abun <- abundance_occupancy %>% 
-        dplyr::mutate(membership = ifelse(otu %in% core_set, "core", "NA"))
+    # ------ add membership (plot-friendly labels) ------
+    occ_abun <- abundance_occupancy %>%
+        dplyr::mutate(
+            membership = ifelse(.data$otu %in% core_taxa, "Core", "Not core")
+        )
     
     #------ fit model ------
     obs.np <- sncm.fit(spp, core_taxa, stats = FALSE, pool = NULL)

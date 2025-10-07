@@ -66,7 +66,7 @@ plot_abundance_occupancy <- function(core_result,
     }
     
     # Prepare data frame with membership classification
-    whole_df <- core_result$occupancy_abundance %>%
+    whole_df <- core_result$abundance_occupancy %>%
         dplyr::mutate(membership = base::ifelse(otu %in% core_otus, "Core", "Not core")) %>%
         dplyr::mutate(membership = base::as.factor(membership))
     
@@ -95,12 +95,21 @@ plot_abundance_occupancy <- function(core_result,
             legend.position = c(0.98, 0.02),
             legend.justification = c("right", "bottom"),
             legend.background = ggplot2::element_rect(fill = ggplot2::alpha("white", 0.7), color = NA),
-            legend.key.height = grid::unit(0.2, "cm"),
-            legend.key.width = grid::unit(0.3, "cm"),
+            legend.key.height = grid::unit(0.4, "cm"),
+            legend.key.width = grid::unit(0.4, "cm"),
             legend.title = ggplot2::element_blank(),
-            legend.text = ggplot2::element_text(size = 8)
+            legend.text = ggplot2::element_text(size = 9)
         ) +
-        ggplot2::labs(title = "Abundance-Occupancy curve", x = "Log10(mean abundance)", y = "Occupancy")
+        ggplot2::labs(title = "Abundance-Occupancy curve", 
+                      x = "Log10(mean abundance)", 
+                      y = "Occupancy")
+    
+    # change legend shape to avoid confusion with the scatter points.
+    p <- p + guides(
+        fill = guide_legend(
+            override.aes = list(shape = 22, size = 5, colour = NA, stroke = 0)
+        )
+    )
     
     return(p)
     

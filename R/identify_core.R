@@ -23,7 +23,7 @@
 #'   across sample pairs (`MeanBC`) at each cumulative `rank`, normalized proportion
 #'   (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric (`fo_diff`).
 #'   \item \code{otu_ranked} tibble with ranked OTU/ASVs .
-#'   \item \code{occupancy_abundance} tibble with OTU/ASVs names, occupancy 
+#'   \item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy 
 #'      (`otu_occ`), and mean relative abundance (`otu_rel`).
 #'   \item \code{priority_var} character, the variable used for prioritizing the core.   
 #'   \item \code{elbow} core set identified by elbow method (integer).
@@ -189,28 +189,31 @@ identify_core <- function(physeq_obj,
             .groups = "drop"
         )
     
-    #otu_ranked <- occ_abun %>%
-    #    dplyr::left_join(PresenceSum, by = "otu") %>%
-    #    dplyr::transmute(otu, rank = .data$Index) %>%
-    #    dplyr::arrange(dplyr::desc(.data$rank))
-    
-    # scale mean relative abundance to [0,1] for blending
-    rng <- range(occ_abun$otu_rel, na.rm = TRUE)
-    rel_scaled <- if (rng[2] > rng[1]) (occ_abun$otu_rel - rng[1]) / (rng[2] - rng[1]) 
-    else rep(0, nrow(occ_abun))
+    # ------------------- weight in abundance ----------------------------------
+    if (abundance_weight < 0 | abundance_weight > 1) {
+        cli::cli_abort("abundance_weight must be between 0 and 1")
+    }
     
     otu_ranked <- occ_abun %>%
-        dplyr::mutate(rel_scaled = rel_scaled) %>%
-        dplyr::left_join(PresenceSum, by = "otu") %>%
-        dplyr::mutate(score = (1 - abundance_weight) * .data$Index +
-                          abundance_weight * .data$rel_scaled) %>%
-        dplyr::transmute(
-            otu,
-            rank       = .data$score,     # used for ordering downstream
-            Index      = .data$Index,     # keep for transparency
-            rel_scaled = .data$rel_scaled # keep for transparency
-        ) %>%
-        dplyr::arrange(dplyr::desc(.data$rank))
+        dplyr::left_join(PresenceSum, by = 'otu')
+    
+    if (abundance_weight == 0) {
+        # No abundance weighting - use Index directly
+        otu_ranked <- otu_ranked %>%
+            dplyr::mutate(rank = Index) %>%
+            dplyr::arrange(dplyr::desc(rank))
+    } else {
+        otu_ranked <- otu_ranked %>%
+            dplyr::mutate(
+                occ_norm = otu_occ / base::max(otu_occ, na.rm = TRUE),
+                abun_norm = otu_rel / base::max(otu_rel, na.rm = TRUE),
+                spatial_weight = (abundance_weight * abun_norm) + ((1 - abundance_weight) * occ_norm),
+                rank = spatial_weight * Index
+            ) %>%
+            dplyr::arrange(dplyr::desc(rank), dplyr::desc(Index), otu) %>%
+            dplyr::select(otu, rank, Index, spatial_weight, occ_norm, abun_norm, otu_occ, otu_rel)
+    }
+    
     
     # --------------------------- BC accumulation ------------------------------
     # cumulative BC across samples while adding taxa in rank order
@@ -309,21 +312,25 @@ identify_core <- function(physeq_obj,
     out <- list(
         bray_curtis_ranked  = BC_ranked,
         otu_ranked          = otu_ranked,
-        occupancy_abundance = occ_abun,
+        abundance_occupancy = occ_abun,
         priority_var        = data_var,
+        abundance_weight    = abundance_weight,
         elbow               = as.integer(elbow),
         bc_increase         = as.integer(lastCall),
         increase_value      = increase_value,
-        abundance_weight    = abundance_weight,
         elbow_core          = elbow_core,
         increase_core       = increase_core,
         otu_table           = otu,
         metadata            = map,
         taxonomy            = taxa
     )
+    
     class(out) <- c("identify_core_result", class(out))
     
     cli::cli_alert_success("Analysis complete!")
     
     out
 }
+
+
+

@@ -34,7 +34,7 @@ A list with:
 across sample pairs (\code{MeanBC}) at each cumulative \code{rank}, normalized proportion
 (\code{proportionBC}), the multiplicative \code{IncreaseBC}, and the elbow metric (\code{fo_diff}).
 \item \code{otu_ranked} tibble with ranked OTU/ASVs .
-\item \code{occupancy_abundance} tibble with OTU/ASVs names, occupancy
+\item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy
 (\code{otu_occ}), and mean relative abundance (\code{otu_rel}).
 \item \code{priority_var} character, the variable used for prioritizing the core.
 \item \code{elbow} core set identified by elbow method (integer).
