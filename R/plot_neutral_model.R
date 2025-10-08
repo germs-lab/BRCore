@@ -53,27 +53,37 @@
 plot_neutral_model <- function(fit_result){
     
     # Export dataframes for plotting and annotations
-    obs1 <- as.data.frame(fit_result$model_prediction) %>%
-        dplyr::filter(!is.na(p))
-    
+    obs1 <- as.data.frame(fit_result$model_prediction)
     obs2 <- as.data.frame(fit_result$goodness_of_fit)
+    
+    # pre-split - now handling all 6 combinations
+    pts_notcore_as    <- dplyr::filter(obs1, membership == "Not core", fit_class == "As predicted")
+    pts_notcore_above <- dplyr::filter(obs1, membership == "Not core", fit_class == "Above prediction")
+    pts_notcore_below <- dplyr::filter(obs1, membership == "Not core", fit_class == "Below prediction")
+    pts_core_as       <- dplyr::filter(obs1, membership == "Core", fit_class == "As predicted")
+    pts_core_above    <- dplyr::filter(obs1, membership == "Core", fit_class == "Above prediction")
+    pts_core_below    <- dplyr::filter(obs1, membership == "Core", fit_class == "Below prediction")
+    
+    # safe combine - all "Not core" groups get the same label for legend grouping
+    all_pts <- dplyr::bind_rows(
+        dplyr::mutate(pts_notcore_as,    grp = "Not core"),
+        dplyr::mutate(pts_notcore_above, grp = "Not core"),
+        dplyr::mutate(pts_notcore_below, grp = "Not core"),
+        dplyr::mutate(pts_core_as,       grp = "Core (as predicted)"),
+        dplyr::mutate(pts_core_above,    grp = "Core (above prediction)"),
+        dplyr::mutate(pts_core_below,    grp = "Core (below prediction)")
+    )
+    
+    # if still empty, bail nicely
+    if (nrow(all_pts) == 0) {
+        cli::cli_abort("Nothing to plot: no rows in model_prediction after filtering (check p>0 and membership/fit_class).")
+    }
+    
+    print(all_pts)
     
     # Extract R2 and m (works for column- or rowname-shaped tables)
     R2 <- if ("Rsqr" %in% names(obs2)) obs2$Rsqr[1] else suppressWarnings(as.numeric(obs2["Rsqr", 1]))
     mV <- if ("m"    %in% names(obs2)) obs2$m[1]    else suppressWarnings(as.numeric(obs2["m",    1]))
-    
-    # Pre-split points
-    pts_bg         <- obs1[is.na(obs1$membership) | obs1$fit_class == "As predicted", , drop = FALSE]
-    pts_core_as    <- obs1[obs1$membership == "core" & obs1$fit_class == "As predicted", , drop = FALSE]
-    pts_core_above <- obs1[obs1$membership == "core" & obs1$fit_class == "Above prediction", , drop = FALSE]
-    pts_core_below <- obs1[obs1$membership == "core" & obs1$fit_class == "Below prediction", , drop = FALSE]
-    
-    all_pts <- rbind(
-        transform(pts_bg,         grp = "Not core (as predicted)"),
-        transform(pts_core_as,    grp = "Core (as predicted)"),
-        transform(pts_core_above, grp = "Core (above prediction)"),
-        transform(pts_core_below, grp = "Core (below prediction)")
-    )
     
     # Compute a spot just ABOVE the legend (bottom-right)
     xr <- range(log10(all_pts$otu_rel), na.rm = TRUE); dx <- diff(xr)
@@ -81,17 +91,17 @@ plot_neutral_model <- function(fit_result){
     box_x <- xr[1] + 0.95 * dx
     box_y <- yr[1] + 0.12 * dy   # raise/lower if you want different spacing
     
-    ggplot2::ggplot(all_pts, ggplot2::aes(x = log10(otu_rel), y = otu_occ, fill = grp)) +
+    p <- ggplot2::ggplot(all_pts, ggplot2::aes(x = log10(otu_rel), y = otu_occ, fill = grp)) +
         ggplot2::geom_point(shape = 21, size = 1.5, alpha = 0.9,
                             ggplot2::aes(color = after_scale(fill))) +
         ggplot2::scale_fill_manual(
             values = c(
-                "Not core (as predicted)"  = "grey",
+                "Not core"                 = "grey",
                 "Core (as predicted)"      = "#CC2D35",
                 "Core (above prediction)"  = "#0072B2",
                 "Core (below prediction)"  = "#7FB800"
             ),
-            breaks = c("Not core (as predicted)", "Core (as predicted)",
+            breaks = c("Not core", "Core (as predicted)",
                        "Core (above prediction)", "Core (below prediction)")
         ) +
         # Keep lines but remove their legends
@@ -115,7 +125,7 @@ plot_neutral_model <- function(fit_result){
             legend.background    = ggplot2::element_rect(fill = ggplot2::alpha("white", 0.7), color = NA),
             legend.key.height    = grid::unit(0.2, "cm"),
             legend.key.width     = grid::unit(0.3, "cm"),
-            legend.title = ggplot2::element_blank(),
+            legend.title         = ggplot2::element_blank(),
             legend.text          = ggplot2::element_text(size = 8)
         ) +
         # White box with two lines: R^2 on top, m below (above the legend)
@@ -126,9 +136,20 @@ plot_neutral_model <- function(fit_result){
                 ",italic(m)==",       sprintf("%.3f", mV), ")"
             ),
             parse = TRUE, hjust = 1, vjust = 0, size = 3,
-            fill = "white", alpha = 0.9, lineheight = 1.05
+            fill = "white", alpha = 0.9, lineheight = 1.05,
+            label.size = 0  # This removes the border
         ) +
         ggplot2::labs(title = "Neutral model",
                       x = "Log10(mean abundance)",
                       y = "Occupancy")
+    # change legend shape to avoid confusion with the scatter points.
+    p <- p + guides(
+        fill = guide_legend(
+            override.aes = list(shape = 22, size = 4, colour = NA, stroke = 0)
+        )
+    )
+    
+    return(p)
+    
 }
+

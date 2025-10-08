@@ -6,7 +6,7 @@ test_that("plot_neutral_model returns a ggplot and builds", {
         model_prediction = data.frame(
             otu_rel    = c(1e-4, 5e-4, 1e-3, 2e-3, 1e-2),
             otu_occ    = c(0.10, 0.20, 0.40, 0.60, 0.80),
-            membership = c(NA, "core", "core", NA, "core"),
+            membership = c("Not core", "core", "core", "Not core", "core"),
             fit_class  = c("As predicted","Above prediction",
                            "Below prediction","As predicted","As predicted"),
             p          = c(1e-4, 5e-4, 1e-3, 2e-3, 1e-2),

@@ -40,10 +40,15 @@
 #'}
 #'
 #' @export
-do_phyloseq <- function(physeq, otu_rare) {
+do_phyloseq <- function(physeq, 
+                        otu_rare) {
     # Get sample names from the original phyloseq object and rarefied otu_table
+    #otu_rare <- t(otu_rare)
+    
     physeq_samples <- sample_names(physeq)
+    print(physeq_samples)
     otu_rare_samples <- rownames(otu_rare)
+    print(otu_rare_samples)
     
     # Check for samples removed due to rarefaction
     if (!all(physeq_samples %in% otu_rare_samples)) {
@@ -58,10 +63,10 @@ do_phyloseq <- function(physeq, otu_rare) {
     # Create list of components for the new phyloseq object
     phyloseq_components <- list(
         phyloseq::otu_table(
-            otu_rare %>%
+            t(otu_rare) %>%
                 as.matrix() %>%
                 as.data.frame(),
-            taxa_are_rows = FALSE
+            taxa_are_rows = TRUE
         ),
         phyloseq::sample_data(physeq)
     )
@@ -83,6 +88,8 @@ do_phyloseq <- function(physeq, otu_rare) {
     new_phyloseq <- do.call(phyloseq::phyloseq, phyloseq_components) %>%
         phyloseq::prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
         phyloseq::prune_samples(sample_sums(x = .) > 0, x = .)
+    
+    cli::cli_alert_success("Analysis complete!")
     
     return(new_phyloseq)
 }
