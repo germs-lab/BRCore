@@ -74,7 +74,7 @@ fit_neutral_model <- function(otu_table,
         cli::cli_abort("`otu_table` must be a matrix or data.frame (samples x taxa).")
     }
     
-    spp <- as.matrix(otu_table)
+    spp <- as.matrix(t(otu_table))
     
     core_taxa <- as.character(if (is.null(core_set)) character() else core_set)
     if (!length(core_taxa)) cli::cli_abort("`core_set` must be a non-empty character vector of ASV/OTU IDs.")
