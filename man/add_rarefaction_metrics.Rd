@@ -35,16 +35,16 @@ are from OTUs that appear only once.
 # From an object class "phyloseq" with added alpha metrics
 
 data("bcse", package = "BRCore")
-
-bcse_metrics <- add_rare_stats(data=bcse)
+bcse_metrics <- add_rarefaction_metrics(data=bcse)
 phyloseq::sample_data(bcse_metrics)
 
 # From a class "data.frame" count table object
-data(test_otutable)
-test_otutable_stats <- add_rare_stats(data=test_otutable)
-test_otutable_stats[
-  tail(seq_len(nrow(test_otutable_stats)), 10),
-  tail(seq_len(ncol(test_otutable_stats)), 20)
+
+bcse_otutable <- as.data.frame(as(phyloseq::otu_table(bcse), "matrix"))
+test_otutable_metrics <- add_rarefaction_metrics(data = bcse_otutable)
+test_otutable_metrics[
+  tail(seq_len(nrow(test_otutable_metrics)), 10),
+  tail(seq_len(ncol(test_otutable_metrics)), 20)
   ]
 }
 \dontshow{\}) # examplesIf}

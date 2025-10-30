@@ -20,9 +20,12 @@ Imports:
     ggplot2,
     Hmisc,
     magrittr,
+    scales,
     minpack.lm,
     parallel,
     ggsci,
+    ggpubr,
+    ggrepel,
     parallelly,
     phyloseq,
     rlang,
@@ -31,7 +34,6 @@ Imports:
     tidyr,
     vegan
 Suggests:
-    ggrepel,
     here,
     knitr,
     rmarkdown,

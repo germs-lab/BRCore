@@ -24,16 +24,16 @@
 #' # From an object class "phyloseq" with added alpha metrics
 #' 
 #' data("bcse", package = "BRCore")
-#' 
-#' bcse_metrics <- add_rare_stats(data=bcse)
+#' bcse_metrics <- add_rarefaction_metrics(data=bcse)
 #' phyloseq::sample_data(bcse_metrics)
 #'
 #' # From a class "data.frame" count table object
-#' data(test_otutable)
-#' test_otutable_stats <- add_rare_stats(data=test_otutable)
-#' test_otutable_stats[
-#'   tail(seq_len(nrow(test_otutable_stats)), 10),
-#'   tail(seq_len(ncol(test_otutable_stats)), 20)
+#' 
+#' bcse_otutable <- as.data.frame(as(phyloseq::otu_table(bcse), "matrix"))
+#' test_otutable_metrics <- add_rarefaction_metrics(data = bcse_otutable)
+#' test_otutable_metrics[
+#'   tail(seq_len(nrow(test_otutable_metrics)), 10),
+#'   tail(seq_len(ncol(test_otutable_metrics)), 20)
 #'   ]
 #'}
 #'
@@ -70,12 +70,12 @@ add_rarefaction_metrics <- function(data) {
         tidyr::pivot_longer(-otu_id, names_to = "sample_id", values_to = "seq_num") %>%
         dplyr::group_by(sample_id) %>%
         dplyr::summarize(
-            read_num = sum(seq_num),
-            singlton_num = sum(seq_num == 1),
-            goods_cov = 100 * (1 - singlton_num / read_num)
+            read_num     = sum(.data$seq_num),
+            singlton_num = sum(.data$seq_num == 1),
+            goods_cov    = 100 * (1 - .data$singlton_num / .data$read_num)
         ) %>%
         dplyr::mutate(
-            outlier = ifelse(find_outlier(log10(read_num)), read_num, NA)
+            outlier = ifelse(find_outlier(log10(.data$read_num)), .data$read_num, NA)
         ) %>%
         dplyr::ungroup()
     
