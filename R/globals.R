@@ -6,7 +6,9 @@ utils::globalVariables(
         "abun_norm", "occ_norm", "spatial_weight",
         "otu", "membership", "otu_rel", "otu_occ", "fill",
         "rank_num", "proportionBC", "relabun",
-        "pred.upr", "pred.lwr", "grp", "fit_class"
+        "pred.upr", "pred.lwr", "grp", "fit_class",
+        "otu_id", "seq_num", "singlton_num",
+        "read_num", "goods_cov", "outlier"
     )
 )
 

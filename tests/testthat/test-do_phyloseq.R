@@ -1,22 +1,22 @@
 test_that("phyloseq object correctly created", {
-    # Load expected
-    #load(here::here("tests/testthat/testdata/test_phyloseq.rda"))
-    load(testthat::test_path("testdata", "test_phyloseq.rda"))
+    skip_if_not_installed("phyloseq")
+    
+    data("bcse", package = "BRCore")
     
     otu_table_rare <-
         multi_rarefy(
-            physeq = test_phyloseq,
+            physeq = bcse,
             depth_level = 200,
             num_iter = 3,
             threads = 1,
             set_seed = 123
         )
     
-    test_phyloseq_rare <- do_phyloseq(test_phyloseq, otu_table_rare)
-    read_counts <- sample_sums(test_phyloseq_rare)
+    test_bcse_rare <- do_phyloseq(bcse, otu_table_rare)
+    read_counts <- sample_sums(test_bcse_rare)
     
     
-    expect_true(class(test_phyloseq_rare) == "phyloseq")
+    expect_true(class(test_bcse_rare) == "phyloseq")
     
     expect_true(is.numeric(read_counts))
     expect_true(length(read_counts) > 0)

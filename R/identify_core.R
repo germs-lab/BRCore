@@ -168,24 +168,23 @@ identify_core <- function(physeq_obj,
     occ_abun <- data.frame(otu_occ = otu_occ, otu_rel = otu_rel) %>%
         tibble::rownames_to_column("otu")
     
-    # presence summary by grouping variable
-    PresenceSum <- data.frame(otu = base::as.factor(rownames(otu)), otu, check.names = FALSE) %>%
-        tidyr::pivot_longer(
-            cols = -otu, names_to = "sample_id", values_to = "abun"
-        ) %>%
+    #------------------------ PresenceSum (original) ----------------
+
+    PresenceSum <- data.frame(otu = as.factor(rownames(otu)), otu, check.names = FALSE) %>%
+        tidyr::gather(sample_id, abun, -otu) %>%
         dplyr::left_join(map, by = "sample_id") %>%
-        dplyr::group_by(.data$otu, .data[[data_var]]) %>%
+        dplyr::group_by(otu, .data[[data_var]]) %>%
         dplyr::summarise(
-            time_freq = sum(.data$abun > 0) / dplyr::n(), # frequency within each group
-            coreTime  = as.integer(time_freq == 1),
+            time_freq = sum(abun > 0) / length(abun),   # frequency within date
+            coreTime  = ifelse(time_freq == 1, 1, 0),  # 1 if occupancy=1 at that date
             .groups   = "drop"
         ) %>%
-        dplyr::group_by(.data$otu) %>%
+        dplyr::group_by(otu) %>%
         dplyr::summarise(
-            sumF  = sum(.data$time_freq),
-            sumG  = sum(.data$coreTime),
-            nS    = dplyr::n(),                         # number of groups/levels
-            Index = (sumF + sumG) / nS,
+            sumF  = sum(time_freq),
+            sumG  = sum(coreTime),
+            nS    = 2L * length(.data[[data_var]]),         # K per original
+            Index = (sumF + sumG) / nS,                # can be up to 2 (original behavior)
             .groups = "drop"
         )
     
@@ -214,6 +213,7 @@ identify_core <- function(physeq_obj,
             dplyr::select(otu, rank, Index, spatial_weight, occ_norm, abun_norm, otu_occ, otu_rel)
     }
     
+    otu_ranked_ordered <- otu_ranked$otu
     
     # --------------------------- BC accumulation ------------------------------
     # cumulative BC across samples while adding taxa in rank order
@@ -296,17 +296,20 @@ identify_core <- function(physeq_obj,
     lastCall <- if (length(valid_increases)) utils::tail(valid_increases, 1) else 1
     
     # ------------------------- identified core sets ---------------------------
-    elbow_core <- otu_ranked %>%
-        tibble::rownames_to_column("otu_order") %>%
-        dplyr::mutate(otu_order = as.numeric(.data$otu_order)) %>%
-        dplyr::filter(.data$otu_order <= elbow) %>%
-        dplyr::pull(.data$otu)
+    #elbow_core <- otu_ranked %>%
+    #    tibble::rownames_to_column("otu_order") %>%
+    #    dplyr::mutate(otu_order = as.numeric(.data$otu_order)) %>%
+    #    dplyr::filter(.data$otu_order <= elbow) %>%
+    #    dplyr::pull(.data$otu)
     
-    increase_core <- otu_ranked %>%
-        tibble::rownames_to_column("otu_order") %>%
-        dplyr::mutate(otu_order = as.numeric(.data$otu_order)) %>%
-        dplyr::filter(.data$otu_order <= lastCall) %>%
-        dplyr::pull(.data$otu)
+    #increase_core <- otu_ranked %>%
+    #    tibble::rownames_to_column("otu_order") %>%
+    #    dplyr::mutate(otu_order = as.numeric(.data$otu_order)) %>%
+    #    dplyr::filter(.data$otu_order <= lastCall) %>%
+    #    dplyr::pull(.data$otu)
+    
+    elbow_core    <- otu_ranked_ordered[seq_len(elbow)]
+    increase_core <- otu_ranked_ordered[seq_len(lastCall)]
     
     # ------------------------------ return ------------------------------------
     out <- list(

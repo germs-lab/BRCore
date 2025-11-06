@@ -19,7 +19,7 @@ test_that("GlobalPatterns pipeline -> fit_neutral_model basic structure", {
     )
     
     switchgrass_core_fit <- fit_neutral_model(
-        otu_table           = t(switchgrass_core$otu_table),
+        otu_table           = switchgrass_core$otu_table,
         core_set            = switchgrass_core$increase_core,
         abundance_occupancy = switchgrass_core$abundance_occupancy
     )
