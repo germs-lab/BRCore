@@ -56,7 +56,8 @@ plot_rarefaction_metrics <- function(data) {
             ggplot2::geom_histogram(binwidth = 5000, fill = "firebrick", color = "white") +
             ggplot2::scale_x_continuous(labels = scales::comma) +
             ggplot2::scale_y_continuous(labels = scales::comma) +
-            ggplot2::theme_bw() +
+            ggplot2::theme_classic() +
+            ggplot2::theme(panel.grid.major.y = element_line(color = "grey", linetype = "dashed", linewidth = 0.5)) +
             ggplot2::labs(title = "Histogram", x = "Sequence reads", y = "Sample counts"),
         
         # Plot b - Lower 25% histogram
@@ -65,20 +66,23 @@ plot_rarefaction_metrics <- function(data) {
             ggplot2::coord_cartesian(xlim = c(0, readno_q1)) +
             ggplot2::scale_x_continuous(labels = scales::comma) +
             ggplot2::scale_y_continuous(labels = scales::comma) +
-            ggplot2::theme_bw() +
+            ggplot2::theme_classic() +
+            ggplot2::theme(panel.grid.major.y = element_line(color = "grey", linetype = "dashed", linewidth = 0.5)) +
             ggplot2::labs(title = "Histogram (Lower 25%)", x = "Sequence reads", y = "Sample counts"),
         
         # Plot c - Good's Coverage
         ggplot2::ggplot(sample_df, ggplot2::aes(x = read_num, y = goods_cov)) +
-            ggplot2::geom_point(shape = 19, color = "firebrick", size = 2) +
+            ggplot2::geom_point(shape = 19, color = "firebrick", size = 1) +
             ggplot2::scale_x_continuous(labels = scales::comma) +
-            ggplot2::theme_bw() +
+            ggplot2::theme_classic() +
+            ggplot2::theme(panel.grid.major.y = element_line(color = "grey", linetype = "dashed", linewidth = 0.5)) +
             ggplot2::labs(title = "Good's Coverage", x = "Sequence reads", y = "Good's coverage %"),
         
         # Plot d - Log10 jitter
         ggplot2::ggplot(sample_df, ggplot2::aes(x = 1, y = read_num)) +
-            ggplot2::geom_jitter(shape = 19, color = "firebrick", width = 0.2, size = 2) +
-            ggplot2::theme_bw() +
+            ggplot2::geom_jitter(shape = 19, color = "firebrick", width = 0.2, size = 1) +
+            ggplot2::theme_classic() +
+            ggplot2::theme(panel.grid.major.y = element_line(color = "grey", linetype = "dashed", linewidth = 0.5)) +
             ggplot2::scale_y_log10(labels = scales::comma) +
             ggplot2::labs(title = "Log10 jitter", x = "Data set", y = "Sequence reads"),
         
@@ -90,7 +94,8 @@ plot_rarefaction_metrics <- function(data) {
                 mapping = ggplot2::aes(x = 1, y = read_num, label = outlier),
                 max.overlaps = 15, size = 3
             ) +
-            ggplot2::theme_bw() +
+            ggplot2::theme_classic() +
+            ggplot2::theme(panel.grid.major.y = element_line(color = "grey", linetype = "dashed", linewidth = 0.5)) +
             ggplot2::scale_y_log10(labels = scales::comma) +
             ggplot2::labs(title = "Log10 boxplot", x = "Data set", y = "Sequence reads"),
         
@@ -100,7 +105,8 @@ plot_rarefaction_metrics <- function(data) {
             ggplot2::ggplot(temp_df, ggplot2::aes(x = 1:nrow(temp_df), y = read_num)) +
                 ggplot2::geom_bar(stat = "identity", fill = "firebrick", color = NA) +
                 ggplot2::scale_y_continuous(labels = scales::comma) +
-                ggplot2::theme_bw() +
+                ggplot2::theme_classic() +
+                ggplot2::theme(panel.grid.major.y = element_line(color = "grey", linetype = "dashed", linewidth = 0.5)) +
                 ggplot2::labs(title = "Ranked samples", x = "Samples", y = "Sequence reads")
         },
         

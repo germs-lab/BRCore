@@ -79,7 +79,7 @@ plot_neutral_model <- function(fit_result){
         cli::cli_abort("Nothing to plot: no rows in model_prediction after filtering (check p>0 and membership/fit_class).")
     }
     
-    print(all_pts)
+    #print(all_pts)
     
     # Extract R2 and m (works for column- or rowname-shaped tables)
     R2 <- if ("Rsqr" %in% names(obs2)) obs2$Rsqr[1] else suppressWarnings(as.numeric(obs2["Rsqr", 1]))
@@ -136,8 +136,8 @@ plot_neutral_model <- function(fit_result){
                 ",italic(m)==",       sprintf("%.3f", mV), ")"
             ),
             parse = TRUE, hjust = 1, vjust = 0, size = 3,
-            fill = "white", alpha = 0.9, lineheight = 1.05,
-            label.size = 0  # This removes the border
+            fill = "white", alpha = 0.9, lineheight = 1.05
+            #label.size = 0  # This removes the border
         ) +
         ggplot2::labs(title = "Neutral model",
                       x = "Log10(mean abundance)",

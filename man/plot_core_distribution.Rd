@@ -7,7 +7,8 @@
 plot_core_distribution(
   core_result,
   core_set = "elbow",
-  group_var = "sampling_date"
+  group_var = "sampling_date",
+  plot_type = c("bar", "line", "heatmap")
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ using the increase method.
 \item{core_set}{Which core set to plot: "elbow" (default) or "increase".}
 
 \item{group_var}{Metadata column for bar coloring. Default: "sampling_date".}
+
+\item{plot_type}{Allow to select between 3 different plot types: \code{bar} plot, \code{line} plot, or \code{heatmap}.}
 }
 \value{
 A ggplot2 object that can be further customized.
@@ -54,8 +57,8 @@ switchgrass_core <- identify_core(
 
 plot_core_distribution(core_result = switchgrass_core,
                        core_set = "increase",
-                       group_var = "sampling_date")
-
+                       group_var = "sampling_date",
+                       plot_type  = "bar")
 }
 
 }
