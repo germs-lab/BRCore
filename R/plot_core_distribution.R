@@ -123,11 +123,9 @@ plot_core_distribution <- function(core_result,
             ggplot2::scale_x_discrete(limits = rev(levels(plotDF$otu))) +
             ggplot2::theme_classic() +
             ggplot2::theme(
-                plot.title       = ggplot2::element_text(
-                    hjust = 0.5, size = 12, face = "bold"
-                ),
-                plot.subtitle    = ggplot2::element_text(hjust = 0.5, size = 9),
-                axis.text        = ggplot2::element_text(size = 6),
+                plot.title        = ggplot2::element_text(hjust = 0.5, size = 12, face = "bold"),
+                plot.subtitle     = ggplot2::element_text(hjust = 0.5, size = 9),
+                axis.text         = ggplot2::element_text(size = 6),
                 legend.key.height = grid::unit(0.4, "cm"),
                 legend.key.width  = grid::unit(0.4, "cm"),
                 legend.title      = ggplot2::element_blank(),
@@ -162,7 +160,7 @@ plot_core_distribution <- function(core_result,
             ggplot2::theme(
                 plot.title        = ggplot2::element_text(hjust = 0.5, size = 12, face = "bold"),
                 legend.position   = "none",
-                axis.ticks.x      = element_line(),
+                axis.ticks.x      = ggplot2::element_line(),
                 axis.text.y       = ggplot2::element_text(size = 8),
                 axis.text.x       = ggplot2::element_text(angle = 45, size = 6, vjust = 1, hjust = 1)
             ) +
@@ -192,7 +190,7 @@ plot_core_distribution <- function(core_result,
                 legend.key.width  = grid::unit(0.4, "cm"),
                 legend.title      = ggplot2::element_text(size = 8, face = "bold"),
                 legend.text       = ggplot2::element_text(size = 8),
-                axis.ticks.x      = element_line(),
+                axis.ticks.x      = ggplot2::element_line(),
                 axis.text.y       = ggplot2::element_text(size = 6),
                 axis.text.x       = ggplot2::element_text(angle = 33, vjust = 1, hjust = 1)
             ) +

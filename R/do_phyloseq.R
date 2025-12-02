@@ -43,17 +43,23 @@
 do_phyloseq <- function(physeq, 
                         otu_rare) {
     
+    # sample names from original phyloseq object
     physeq_samples <- sample_names(physeq)
+    cli::cli_inform("Sample names from the original phyloseq object (otu_table):")
     print(physeq_samples)
+    
     # reorder rarefied OTU table to match
     otu_rare_ord <- otu_rare[physeq_samples, , drop = FALSE]
+    
+    # sample names from rarefied OTU table (after reordering)
     otu_rare_samples <- rownames(otu_rare_ord)
+    cli::cli_inform("Sample names in the rarefied OTU table (data.frame) after reordering to match phyloseq:")
     print(otu_rare_samples)
     
     if (identical(physeq_samples, otu_rare_samples)) {
         cli::cli_alert_success("Phyloseq object and rarefied otu_tables sample names are identical.")
     } else {
-        cli::cli_alert_danger("Phyloseq object and rarefied otu_tables sample names are NOT identical. Check below samples removed by rarefaction.")
+        cli::cli_alert_warning("Phyloseq object and rarefied otu_tables sample names are NOT identical. Check below samples removed by rarefaction.")
     }
     
     # Check for samples removed due to rarefaction
