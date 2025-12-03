@@ -180,7 +180,7 @@ plot_core_distribution <- function(core_result,
                 fill = time_freq
             )
         ) +
-            ggplot2::geom_tile(color = "white", size = 0.5) +
+            ggplot2::geom_tile(color = "white", linewidth = 0.5) +
             # viridis if you want:
             # viridis::scale_fill_viridis(option = "plasma", name = "Occupancy") +
             ggplot2::theme_classic() +
