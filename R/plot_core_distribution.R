@@ -23,7 +23,7 @@
 #' 
 #' @param core_set Which core set to plot: "elbow" (default) or "increase".
 #' @param group_var Metadata column for bar coloring. Default: "sampling_date".
-#' @param plot_type Allow to select between 3 different plot types: `bar` plot, `line` plot, or `heatmap`.
+#' @param plot_type Allows selection of 3 different plot types: `bar`, `line`, or `heatmap`.
 #'
 #' @return A ggplot2 object that can be further customized.
 #'
