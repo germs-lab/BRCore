@@ -68,12 +68,13 @@
 #' and \pkg{vegan}.
 #'
 #' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data tax_table
-#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last
+#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last select
 #' @importFrom tidyr pivot_longer gather
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang ensym as_name .data
 #' @importFrom vegan decostand
 #' @importFrom cli cli_text cli_warn cli_abort cli_alert_success cli_alert_info
+#' @importFrom utils combn tail
 #'
 #' @examplesIf requireNamespace("phyloseq", quietly = TRUE)
 #' \donttest{
@@ -325,7 +326,7 @@ identify_core <- function(
     BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
     # elbow by forward-backward slope difference
-    fo_difference <- function(pos) {
+    elbow_slope_difference <- function(pos) {
         left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
         right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
             max(1, (nrow(BC_ranked) - pos))
@@ -333,7 +334,7 @@ identify_core <- function(
     }
     BC_ranked$elbow_slope_diffs <- vapply(
         seq_len(nrow(BC_ranked)),
-        fo_difference,
+        elbow_slope_difference,
         numeric(1)
     )
 
