@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_abundance_occupancy.R
 \name{plot_abundance_occupancy}
 \alias{plot_abundance_occupancy}
-\title{Plot Abundance-Occupancy Curve and Displays the Core Taxa}
+\title{Plot Abundance-Occupancy Curve and Display the Core Taxa}
 \usage{
 plot_abundance_occupancy(core_result, core_set = "elbow")
 }
@@ -13,9 +13,9 @@ containing at minimum:
 \item \code{occupancy_abundance}: A data frame with columns \code{otu},
 \code{otu_rel} (mean relative abundance), and \code{otu_occ} (occupancy).
 \item \code{elbow_core}: Character vector of OTU IDs identified as core
-using the elbow method.
+using the "elbow" method.
 \item \code{increase_core}: Character vector of OTU IDs identified as core
-using the increase method.
+using the "increase" method.
 }}
 
 \item{core_set}{Character string specifying which core set to highlight.

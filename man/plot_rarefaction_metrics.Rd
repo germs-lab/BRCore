@@ -11,7 +11,7 @@ plot_rarefaction_metrics(data)
 \code{read_num}, \code{goods_cov}, and \code{outlier}.}
 }
 \value{
-A \code{ggpubr::ggarrange} object with six plots.
+A \code{ggarrange} object with six plots.
 }
 \description{
 This function creates a 6-panel diagnostic plot showing sequencing depth,
