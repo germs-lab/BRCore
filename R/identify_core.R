@@ -243,7 +243,7 @@ identify_core <- function(
     # BC accumulation ---------------------------------
     # cumulative BC across samples while adding taxa in rank order
     # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
-    sample_pairs <- combn(ncol(otu), 2)
+    sample_pairs <- utils::combn(ncol(otu), 2)
     pair_labels <- apply(sample_pairs, 2, function(ix) {
         paste(colnames(otu)[ix], collapse = " - ")
     })
@@ -344,7 +344,7 @@ identify_core <- function(
     valid_increases <- which(BC_ranked$IncreaseBC >= thr)
 
     lastCall <- if (length(valid_increases)) {
-        tail(valid_increases, 1)
+        utils::tail(valid_increases, 1)
     } else {
         1
     }

@@ -25,19 +25,19 @@
 #'
 #' data("bcse", package = "BRCore")
 #' bcse_metrics <- add_rarefaction_metrics(data=bcse)
-#' sample_data(bcse_metrics)
+#' phyloseq::sample_data(bcse_metrics)
 #'
 #' # From a class "data.frame" count table object
 #'
 #' bcse_otutable <- as.data.frame(as(otu_table(bcse), "matrix"))
 #' test_otutable_metrics <- add_rarefaction_metrics(data = bcse_otutable)
 #' test_otutable_metrics[
-#'   tail(seq_len(nrow(test_otutable_metrics)), 10),
-#'   tail(seq_len(ncol(test_otutable_metrics)), 20)
+#'   utils::tail(seq_len(nrow(test_otutable_metrics)), 10),
+#'   utils::tail(seq_len(ncol(test_otutable_metrics)), 20)
 #'   ]
 #'}
 #'
-#' @importFrom phyloseq otu_table sample_data
+#' @importFrom phyloseq otu_table sample_data sample_data<- taxa_are_rows
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom dplyr group_by summarize mutate ungroup left_join
 #' @importFrom tidyr pivot_longer
@@ -65,51 +65,51 @@ add_rarefaction_metrics <- function(data) {
     }
 
     # Compute metrics
-    df_stats <- otu_df %>%
-        rownames_to_column("otu_id") %>%
+    df_stats <- otu_df |>
+        rownames_to_column("otu_id") |>
         pivot_longer(
             -otu_id,
             names_to = "sample_id",
             values_to = "seq_num"
-        ) %>%
-        group_by(sample_id) %>%
+        ) |>
+        group_by(sample_id) |>
         summarize(
             read_num = sum(.data$seq_num),
             singlton_num = sum(.data$seq_num == 1),
             goods_cov = 100 * (1 - .data$singlton_num / .data$read_num)
-        ) %>%
+        ) |>
         mutate(
             outlier = ifelse(
                 find_outlier(log10(.data$read_num)),
                 .data$read_num,
                 NA
             )
-        ) %>%
+        ) |>
         ungroup()
 
     # Append to sample metadata or return updated data.frame
     if (inherits(data, "phyloseq")) {
-        sample_df <- sample_data(data) %>%
-            as.matrix() %>%
-            as.data.frame() %>%
+        sample_df <- sample_data(data) |>
+            as.matrix() |>
+            as.data.frame() |>
             rownames_to_column("sample_id")
 
         sample_df_updated <- left_join(
             sample_df,
             df_stats,
             by = "sample_id"
-        ) %>%
-            #mutate(read_num = read_num.y) %>%
-            #select(-read_num.x, -read_num.y) %>%
-            as.data.frame() %>%
+        ) |>
+            #mutate(read_num = read_num.y) |>
+            #select(-read_num.x, -read_num.y) |>
+            as.data.frame() |>
             column_to_rownames("sample_id")
 
         sample_data(data) <- sample_df_updated
         return(data)
     } else {
-        data_out <- data %>%
-            rownames_to_column("sample_id") %>%
-            left_join(df_stats, by = "sample_id") %>%
+        data_out <- data |>
+            rownames_to_column("sample_id") |>
+            left_join(df_stats, by = "sample_id") |>
             column_to_rownames("sample_id")
 
         return(data_out)
