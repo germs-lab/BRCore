@@ -67,6 +67,7 @@
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
 #' and \pkg{vegan}.
 #'
+#' @import phyloseq
 #' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data tax_table
 #' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last select
 #' @importFrom tidyr pivot_longer gather
