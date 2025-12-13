@@ -183,7 +183,7 @@ plot_rarefaction_metrics <- function(data) {
         labels = c("a", "b", "c", "d", "e", "f")
     )
 
-    # Success message, cool that outplot the time
+    # Display success message
     cli::cli_alert_success(
         "Rarefaction diagnostic plots generated successfully"
     )
