@@ -43,7 +43,7 @@ switchgrass_core <- identify_core(
   increase_value = 0.02,
   seed           = 092825
 )
- 
+
 switchgrass_core_fit <- fit_neutral_model(
     otu_table = switchgrass_core$otu_table,
     core_set = switchgrass_core$increase_core,
@@ -52,7 +52,7 @@ switchgrass_core_fit <- fit_neutral_model(
 
 str(switchgrass_core_fit)
 switchgrass_core_fit$goodness_of_fit
-switchgrass_core_fit$model_prediction \%>\% head()
+switchgrass_core_fit$model_prediction |> head()
 }
 
 }

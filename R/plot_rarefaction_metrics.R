@@ -9,7 +9,10 @@
 #'
 #' @return A `ggarrange` object with six plots.
 #'
-#' @importFrom ggplot2 ggplot aes geom_histogram geom_point geom_jitter geom_boxplot geom_bar theme_bw theme labs coord_cartesian scale_y_log10 scale_x_continuous scale_y_continuous theme_classic element_line
+#' @importFrom ggplot2 ggplot aes geom_histogram geom_point geom_jitter
+#' @importFrom ggplot2 geom_boxplot geom_bar theme_bw theme labs
+#' @importFrom ggplot2 scale_y_log10 scale_x_continuous scale_y_continuous
+#' @importFrom ggplot2 theme_classic element_line coord_cartesian
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggpubr ggarrange
 #' @importFrom tibble rownames_to_column as_tibble

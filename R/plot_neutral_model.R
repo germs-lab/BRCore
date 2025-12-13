@@ -45,7 +45,8 @@
 #'
 #' @importFrom dplyr filter bind_rows mutate
 #' @importFrom ggplot2 ggplot aes geom_point geom_line labs theme_classic theme
-#'   element_text element_blank annotate scale_fill_manual guides guide_legend
+#' @importFrom ggplot2 element_text element_rect element_blank annotate scale_fill_manual
+#' @importFrom ggplot2 after_scale guides guide_legend
 #' @importFrom grid unit
 #' @importFrom cli cli_abort
 

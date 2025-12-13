@@ -17,13 +17,14 @@
 #'   represent the average sequence counts calculated across all iterations.
 #'   Samples with less than `depth_level` sequences are discarded.
 #'
-#' @import phyloseq
-#' @import vegan
-#' @import dplyr
-#' @import tibble
 #' @importFrom parallelly availableCores
 #' @importFrom parallel makeCluster stopCluster clusterExport parLapply
-#' @importFrom dplyr %>% 
+#' @importFrom dplyr  bind_rows group_by summarise across everything filter
+#' @importFrom dplyr where
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom phyloseq otu_table
+#' @importFrom vegan rrarefy
+#' @importFrom cli cli_text cli_warn
 #'
 #' @examples
 #' \donttest{
@@ -44,59 +45,59 @@
 #' }
 #'
 #' @export
-multi_rarefy <- function(physeq,
-                         depth_level,
-                         num_iter = 100,
-                         threads = get_available_cores(),
-                         set_seed = NULL) {
-    
+multi_rarefy <- function(
+    physeq,
+    depth_level,
+    num_iter = 100,
+    threads = get_available_cores(),
+    set_seed = NULL
+) {
     cli::cli_text("\nSeed used: {set_seed}\n")
-    
+
     if (is.null(set_seed)) {
         cli::cli_warn("No seed was set. Results may not be reproducible.")
     } else {
         set.seed(set_seed)
     }
-  
-    
+
     # Check object class
     if (!inherits(physeq, "phyloseq")) {
         stop("Input must be a phyloseq object, not a data.frame")
     }
-    
+
     dataframe <- as.data.frame(
-        as.matrix(t(phyloseq::otu_table(physeq, taxa_are_rows = TRUE)))
+        as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
     )
-    
+
     # Parallel setup
-    threads <- min(threads, parallelly::availableCores())
-    cl <- parallel::makeCluster(threads)
-    on.exit(parallel::stopCluster(cl), add = TRUE)
-    
+    threads <- min(threads, availableCores())
+    cl <- makeCluster(threads)
+    on.exit(stopCluster(cl), add = TRUE)
+
     # Export needed objects/packages to workers
-    parallel::clusterExport(
+    clusterExport(
         cl,
         varlist = c("dataframe", "depth_level"),
         envir = environment()
     )
-    
+
     # Run rarefactions in parallel
-    com_iter <- parallel::parLapply(cl, 1:num_iter, function(i) {
+    com_iter <- parLapply(cl, 1:num_iter, function(i) {
         set.seed(set_seed + i) # each worker gets a different but reproducible seed
-        df <- vegan::rrarefy(dataframe, sample = depth_level)
+        df <- rrarefy(dataframe, sample = depth_level)
         df <- as.data.frame(df)
-        tibble::rownames_to_column(df, "sample_id")
+        rownames_to_column(df, "sample_id")
     })
-    
+
     # Aggregate results
-    mean_data <- dplyr::bind_rows(com_iter) %>%
-        dplyr::group_by(sample_id) %>%
-        dplyr::summarise(dplyr::across(dplyr::everything(), mean), .groups = "drop") %>%
-        dplyr::filter(rowSums(dplyr::across(dplyr::where(is.numeric))) >= depth_level) %>%
-        tibble::column_to_rownames("sample_id")
-    
+    mean_data <- bind_rows(com_iter) |>
+        group_by(sample_id) |>
+        summarise(across(everything(), mean), .groups = "drop") |>
+        filter(rowSums(across(where(is.numeric))) >= depth_level) |>
+        column_to_rownames("sample_id")
+
     # Remove ASVs/OTUs with zero total abundance using base R
     mean_data <- mean_data[, colSums(mean_data) > 0]
-    
+
     return(mean_data)
 }

@@ -48,7 +48,13 @@
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr filter left_join group_by summarise n
-#' @importFrom ggplot2 ggplot aes geom_bar coord_flip scale_x_discrete theme_classic theme element_text element_line element_blank labs geom_line geom_point facet_wrap scale_y_continuous geom_tile
+#' @importFrom ggplot2 ggplot aes geom_bar coord_flip scale_x_discrete
+#' @importFrom ggplot2 theme_classic theme element_text element_line
+#' @importFrom ggplot2 element_blank labs geom_line geom_point facet_wrap
+#' @importFrom ggplot2 scale_y_continuous geom_tile
+#' @importFrom ggsci scale_fill_npg
+#' @importFrom vegan decostand
+#' @importFrom grid unit
 #'
 #' @export
 plot_core_distribution <- function(
@@ -73,7 +79,7 @@ plot_core_distribution <- function(
     }
 
     # Calculate relative abundance
-    otu_relabun <- vegan::decostand(
+    otu_relabun <- decostand(
         as.data.frame(core_result$otu_table),
         method = "total",
         MARGIN = 2
@@ -139,8 +145,8 @@ plot_core_distribution <- function(
                 ),
                 plot.subtitle = element_text(hjust = 0.5, size = 9),
                 axis.text = element_text(size = 6),
-                legend.key.height = grid::unit(0.4, "cm"),
-                legend.key.width = grid::unit(0.4, "cm"),
+                legend.key.height = unit(0.4, "cm"),
+                legend.key.width = unit(0.4, "cm"),
                 legend.title = element_blank(),
                 legend.text = element_text(size = 8)
             ) +
@@ -149,7 +155,7 @@ plot_core_distribution <- function(
                 x = "Ranked ASV/OTUs",
                 y = "Occupancy"
             ) +
-            ggsci::scale_fill_npg()
+            scale_fill_npg()
     } else if (plot_type == "line") {
         group_levels <- length(levels(factor(plotDF[[group_var]])))
 

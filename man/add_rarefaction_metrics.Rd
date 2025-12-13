@@ -40,7 +40,7 @@ phyloseq::sample_data(bcse_metrics)
 
 # From a class "data.frame" count table object
 
-bcse_otutable <- as.data.frame(as(otu_table(bcse), "matrix"))
+bcse_otutable <- as.data.frame(as(phyloseq::otu_table(bcse), "matrix"))
 test_otutable_metrics <- add_rarefaction_metrics(data = bcse_otutable)
 test_otutable_metrics[
   utils::tail(seq_len(nrow(test_otutable_metrics)), 10),

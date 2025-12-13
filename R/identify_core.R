@@ -7,10 +7,10 @@
 #' "elbow" method implementing the method developed by Shade
 #' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 #'
-#' @param physeq_obj A `phyloseq` object with at least`otu_table` and `sample_data`.
+#' @param physeq_obj A `phyloseq` object with at least `otu_table` and `sample_data`.
 #' @param priority_var The column name in the `sample_data` (e.g. "sampling_date",
 #' "site") that is used for prioritizing the core microbiome.
-#' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated ans returned as \code{elbow_core} (see below for details)
+#' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
 #' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
 #'   abundance in the ranking score. `0` (default) uses occupancy/composite
 #'   only. `1` ranks purely by abundance. Values in between blend the two
@@ -326,7 +326,7 @@ identify_core <- function(
     BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
     # elbow by forward-backward slope difference
-    elbow_slope_difference <- function(pos) {
+    elbow_slope_differences <- function(pos) {
         left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
         right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
             max(1, (nrow(BC_ranked) - pos))

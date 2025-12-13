@@ -13,12 +13,12 @@ identify_core(
 )
 }
 \arguments{
-\item{physeq_obj}{A \code{phyloseq} object with at least\code{otu_table} and \code{sample_data}.}
+\item{physeq_obj}{A \code{phyloseq} object with at least \code{otu_table} and \code{sample_data}.}
 
 \item{priority_var}{The column name in the \code{sample_data} (e.g. "sampling_date",
 "site") that is used for prioritizing the core microbiome.}
 
-\item{increase_value}{Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated ans returned as \code{elbow_core} (see below for details)}
+\item{increase_value}{Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).}
 
 \item{abundance_weight}{Numeric in \verb{[0,1]}; how much to weight mean relative
 abundance in the ranking score. \code{0} (default) uses occupancy/composite
