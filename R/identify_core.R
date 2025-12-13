@@ -334,7 +334,7 @@ identify_core <- function(
     }
     BC_ranked$elbow_slope_diffs <- vapply(
         seq_len(nrow(BC_ranked)),
-        elbow_slope_difference,
+        elbow_slope_differences,
         numeric(1)
     )
 

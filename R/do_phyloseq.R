@@ -7,7 +7,9 @@
 #'
 #' @return A `phyloseq` object.
 #'
-#' @importFrom phyloseq otu_table sample_data tax_table phy_tree refseq phyloseq prune_taxa prune_samples
+#' @importFrom phyloseq otu_table sample_data tax_table phy_tree refseq
+#' @importFrom phyloseq phyloseq sample_names prune_taxa prune_samples
+#' @importFrom phyloseq sample_sums taxa_sums
 #' @importFrom cli cli_inform cli_alert_success cli_alert_warning
 #' @importFrom magrittr %>%
 #'

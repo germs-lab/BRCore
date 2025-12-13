@@ -27,7 +27,7 @@ test_that("plot_core_distribution returns a ggplot and builds", {
         abundance = rowSums(otu_table)
     ) |>
         dplyr::arrange(desc(abundance)) |>
-        mutate(rank = row_number())
+        dplyr::mutate(rank = dplyr::row_number())
 
     core_result_example <- list(
         otu_table = otu_table,
