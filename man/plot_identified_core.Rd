@@ -36,8 +36,9 @@ The function converts \code{rank} to integers and zooms the x-axis to the first
 observed \code{proportionBC} range to avoid overlap.
 }
 \examples{
-\dontshow{if (requireNamespace("phyloseq", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
+library(phyloseq)
+library(BRCore)
 # Example with the package switchgrass dataset
 data("switchgrass", package = "BRCore")
 
@@ -57,7 +58,7 @@ plot_identified_core(
   increase_value = res$increase_value
  )
 }
-\dontshow{\}) # examplesIf}
+
 }
 \seealso{
 \link[=identify_core]{identify_core()}

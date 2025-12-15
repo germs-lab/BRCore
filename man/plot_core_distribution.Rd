@@ -34,7 +34,7 @@ using the increase method.
 
 \item{group_var}{Metadata column for bar coloring. Default: "sampling_date".}
 
-\item{plot_type}{Allow to select between 3 different plot types: \code{bar} plot, \code{line} plot, or \code{heatmap}.}
+\item{plot_type}{Allows selection of 3 different plot types: \code{bar}, \code{line}, or \code{heatmap}.}
 }
 \value{
 A ggplot2 object that can be further customized.
@@ -44,13 +44,15 @@ Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
 a grouping variable.
 }
 \examples{
-\dontrun{
+\donttest{
+library(phyloseq)
+library(BRCore)
 # Generate an object from identify_core and then plot
 data("switchgrass", package = "BRCore")
 
 switchgrass_core <- identify_core(
   physeq_obj = switchgrass,
-  priority_var = "sampling_date",  
+  priority_var = "sampling_date",
   increase_value = 0.02,
   abundance_weight = 0,
   seed = 1234)
