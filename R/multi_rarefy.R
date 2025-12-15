@@ -29,17 +29,17 @@
 #' @examples
 #' \donttest{
 #' library(phyloseq)
-#' data(GlobalPatterns, package = "phyloseq")
+#' library(BRCore)
+#' data("bcse", package = "BRCore")
 #'
 #' # Example rarefaction (single iteration, single core to keep examples fast)
-#' otu_table_rare <-
-#'     multi_rarefy(
-#'         physeq = GlobalPatterns,
-#'         depth_level = 200,
-#'         num_iter = 3,
-#'         threads = 1,
-#'         set_seed = 123
-#'     )
+#' otu_table_rare <- multi_rarefy(
+#'    physeq = bcse,
+#'    depth_level = 1000,
+#'    num_iter = 100,
+#'    threads = 2,
+#'    set_seed = 7642
+#')
 #'
 #' rowSums(otu_table_rare)
 #' }

@@ -29,7 +29,9 @@
 #' @seealso \code{\link{plot_core_distribution}} and \code{\link{identify_core}}
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' library(phyloseq)
+#' library(BRCore)
 #' # Generate an object from `identify_core()` and then plot
 #'
 #' data("switchgrass", package = "BRCore")
@@ -39,7 +41,7 @@
 #'   priority_var = "sampling_date",
 #'   increase_value = 0.02,
 #'   abundance_weight = 0,
-#'   seed = 1234)
+#'   seed = 1234
 #' )
 #'
 #' plot_abundance_occupancy(core_result = switchgrass_core,

@@ -28,7 +28,9 @@
 #' @return A ggplot2 object that can be further customized.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' library(phyloseq)
+#' library(BRCore)
 #' # Generate an object from identify_core and then plot
 #' data("switchgrass", package = "BRCore")
 #'

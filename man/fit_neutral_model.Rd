@@ -34,6 +34,8 @@ model predictions.
 }
 \examples{
 \donttest{
+library(phyloseq)
+library(BRCore)
 # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
 data("switchgrass", package = "BRCore")
 

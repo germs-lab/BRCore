@@ -44,7 +44,9 @@ Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
 a grouping variable.
 }
 \examples{
-\dontrun{
+\donttest{
+library(phyloseq)
+library(BRCore)
 # Generate an object from identify_core and then plot
 data("switchgrass", package = "BRCore")
 

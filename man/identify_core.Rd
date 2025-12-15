@@ -84,8 +84,9 @@ and \pkg{vegan}.
 }
 
 \examples{
-\dontshow{if (requireNamespace("phyloseq", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
+library(phyloseq)
+library(BRCore)
 # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
 data("switchgrass", package = "BRCore")
 
@@ -99,7 +100,7 @@ res <- identify_core(
 # Inspect results
  str(res)
 }
-\dontshow{\}) # examplesIf}
+
 }
 \references{
 Shade A, Stopnisek N (2019) Abundance-occupancy

@@ -37,6 +37,8 @@
 #'
 #' @examples
 #' \donttest{
+#' library(phyloseq)
+#' library(BRCore)
 #' # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
 #' data("switchgrass", package = "BRCore")
 #'
@@ -66,7 +68,7 @@
 fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
     #source("../PAPER_Shade_CurrOpinMicro/script/sncm.fit.R")
 
-    #------ input checks ------
+    # input checks ----
     if (!is.matrix(otu_table) && !is.data.frame(otu_table)) {
         cli::cli_abort(
             "`otu_table` must be a matrix or data.frame (samples x taxa)."
@@ -88,13 +90,13 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
         )
     }
 
-    # ------ add membership (plot-friendly labels) ------
+    # add membership (plot-friendly labels) ----
     occ_abun <- abundance_occupancy |>
         dplyr::mutate(
             membership = ifelse(.data$otu %in% core_taxa, "Core", "Not core")
         )
 
-    #------ fit model ------
+    # fit model ----
     obs.np <- sncm.fit(spp, core_taxa, stats = FALSE, pool = NULL)
     sta.np <- sncm.fit(spp, core_taxa, stats = TRUE, pool = NULL)
 
@@ -105,7 +107,7 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
     }
     obs_tbl <- tibble::as_tibble(obs.np, rownames = "otu")
 
-    #------ ASV/OTUs in/out prediction intervals ------
+    # ASV/OTUs in/out prediction intervals ----
     obs_tbl$fit_class <- "As predicted"
     obs_tbl[
         which(obs_tbl$freq < obs_tbl$pred.lwr),
@@ -118,7 +120,7 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
     obs_tbl[which(is.na(obs_tbl$freq)), "fit_class"] <- "NA"
     fit_table <- as.data.frame(dplyr::left_join(occ_abun, obs_tbl, by = 'otu'))
 
-    #------ compute above/below proportions ------
+    # compute above/below proportions ----
     sta.np$above.pred <- sum(obs_tbl$freq > (obs_tbl$pred.upr), na.rm = TRUE) /
         sta.np$Richness
     sta.np$below.pred <- sum(obs_tbl$freq < (obs_tbl$pred.lwr), na.rm = TRUE) /
@@ -126,7 +128,7 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
     fit_res <- as.data.frame(sta.np)
     #colnames(fit_res) <- "statistics"
 
-    #------ return ------
+    # return ----
     out <- list(
         goodness_of_fit = fit_res,
         model_prediction = fit_table

@@ -16,6 +16,7 @@
 #' @examples
 #' \donttest{
 #' library(phyloseq)
+#' library(BRCore)
 #' data(GlobalPatterns, package = "phyloseq")
 #'
 #' # Perform multiple rarefaction
@@ -33,14 +34,14 @@
 #'
 #' # Recreate the phyloseq object and check
 #' rarefied_GlobalPatterns<-
-#'     do_phyloseq(physeq = GlobalPatterns,
+#'     update_otu_table(physeq = GlobalPatterns,
 #'                 otu_rare = otu_table_rare )
 #'
-#' phyloseq::sample_sums(rarefied_GlobalPatterns)
+#' sample_sums(rarefied_GlobalPatterns)
 #'}
 #'
 #' @export
-do_phyloseq <- function(physeq, otu_rare) {
+update_otu_table <- function(physeq, otu_rare) {
     # sample names from original phyloseq object
     physeq_samples <- sample_names(physeq)
     cli::cli_inform(

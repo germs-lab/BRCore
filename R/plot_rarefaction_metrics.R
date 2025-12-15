@@ -9,6 +9,25 @@
 #'
 #' @return A `ggarrange` object with six plots.
 #'
+#' @examples
+#' \donttest{
+#' library(phyloseq)
+#' library(BRCore)
+#'
+#' data("bcse", package = "BRCore")
+#'
+#' # Add rarefaction metrics to the phyloseq object
+#' bcse_metrics <- add_rarefaction_metrics(bcse)
+#'
+#' # Plot the rarefaction diagnostics
+#' plot_rarefaction_metrics(bcse_metrics)
+#'
+#' # You can also pass a data frame directly if you have
+#' # pre-computed read_num, goods_cov, and outlier columns
+#' sample_data_df <- data.frame(sample_data(bcse_metrics))
+#' plot_rarefaction_metrics(sample_data_df)
+#' }
+#'
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_point geom_jitter
 #' @importFrom ggplot2 geom_boxplot geom_bar theme_bw theme labs
 #' @importFrom ggplot2 scale_y_log10 scale_x_continuous scale_y_continuous

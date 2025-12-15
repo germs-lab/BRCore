@@ -38,7 +38,9 @@ scale for abundance to better visualize the full range of abundances typically
 found in microbiome data.
 }
 \examples{
-\dontrun{
+\donttest{
+library(phyloseq)
+library(BRCore)
 # Generate an object from `identify_core()` and then plot
 
 data("switchgrass", package = "BRCore")
@@ -48,7 +50,7 @@ switchgrass_core <- identify_core(
   priority_var = "sampling_date",
   increase_value = 0.02,
   abundance_weight = 0,
-  seed = 1234)
+  seed = 1234
 )
 
 plot_abundance_occupancy(core_result = switchgrass_core,

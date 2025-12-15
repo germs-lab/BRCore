@@ -76,8 +76,10 @@
 #' @importFrom cli cli_text cli_warn cli_abort cli_alert_success cli_alert_info
 #' @importFrom utils combn tail
 #'
-#' @examplesIf requireNamespace("phyloseq", quietly = TRUE)
+#' @examples
 #' \donttest{
+#' library(phyloseq)
+#' library(BRCore)
 #' # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
 #' data("switchgrass", package = "BRCore")
 #'

@@ -21,8 +21,10 @@
 #'
 #' @seealso \link[=identify_core]{identify_core()}
 #'
-#' @examplesIf requireNamespace("phyloseq", quietly = TRUE)
+#' @examples
 #' \donttest{
+#' library(phyloseq)
+#' library(BRCore)
 #' # Example with the package switchgrass dataset
 #' data("switchgrass", package = "BRCore")
 #'

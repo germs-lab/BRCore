@@ -18,3 +18,23 @@ This function creates a 6-panel diagnostic plot showing sequencing depth,
 Good's coverage, and outlier behavior based on a data frame or a
 \code{phyloseq} object with rare stats already added via \code{add_rare_stats()}.
 }
+\examples{
+\donttest{
+library(phyloseq)
+library(BRCore)
+
+data("bcse", package = "BRCore")
+
+# Add rarefaction metrics to the phyloseq object
+bcse_metrics <- add_rarefaction_metrics(bcse)
+
+# Plot the rarefaction diagnostics
+plot_rarefaction_metrics(bcse_metrics)
+
+# You can also pass a data frame directly if you have
+# pre-computed read_num, goods_cov, and outlier columns
+sample_data_df <- data.frame(sample_data(bcse_metrics))
+plot_rarefaction_metrics(sample_data_df)
+}
+
+}
