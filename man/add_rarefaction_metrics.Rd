@@ -30,22 +30,23 @@ and \code{N} is the total number of individuals in the sample. For example, a Go
 are from OTUs that appear only once.
 }
 \examples{
-\dontshow{if (requireNamespace("phyloseq", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
+library(phyloseq)
+library(BRCore)
 # From an object class "phyloseq" with added alpha metrics
 
 data("bcse", package = "BRCore")
 bcse_metrics <- add_rarefaction_metrics(data=bcse)
-phyloseq::sample_data(bcse_metrics)
+sample_data(bcse_metrics)
 
 # From a class "data.frame" count table object
 
-bcse_otutable <- as.data.frame(as(phyloseq::otu_table(bcse), "matrix"))
+bcse_otutable <- as.data.frame(as(otu_table(bcse), "matrix"))
 test_otutable_metrics <- add_rarefaction_metrics(data = bcse_otutable)
 test_otutable_metrics[
-  tail(seq_len(nrow(test_otutable_metrics)), 10),
-  tail(seq_len(ncol(test_otutable_metrics)), 20)
+  utils::tail(seq_len(nrow(test_otutable_metrics)), 10),
+  utils::tail(seq_len(ncol(test_otutable_metrics)), 20)
   ]
 }
-\dontshow{\}) # examplesIf}
+
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_abundance_occupancy.R
 \name{plot_abundance_occupancy}
 \alias{plot_abundance_occupancy}
-\title{Plot Abundance-Occupancy Curve and Displays the Core Taxa}
+\title{Plot Abundance-Occupancy Curve and Display the Core Taxa}
 \usage{
 plot_abundance_occupancy(core_result, core_set = "elbow")
 }
@@ -13,9 +13,9 @@ containing at minimum:
 \item \code{occupancy_abundance}: A data frame with columns \code{otu},
 \code{otu_rel} (mean relative abundance), and \code{otu_occ} (occupancy).
 \item \code{elbow_core}: Character vector of OTU IDs identified as core
-using the elbow method.
+using the "elbow" method.
 \item \code{increase_core}: Character vector of OTU IDs identified as core
-using the increase method.
+using the "increase" method.
 }}
 
 \item{core_set}{Character string specifying which core set to highlight.
@@ -38,7 +38,9 @@ scale for abundance to better visualize the full range of abundances typically
 found in microbiome data.
 }
 \examples{
-\dontrun{
+\donttest{
+library(phyloseq)
+library(BRCore)
 # Generate an object from `identify_core()` and then plot
 
 data("switchgrass", package = "BRCore")
@@ -48,7 +50,7 @@ switchgrass_core <- identify_core(
   priority_var = "sampling_date",
   increase_value = 0.02,
   abundance_weight = 0,
-  seed = 1234)
+  seed = 1234
 )
 
 plot_abundance_occupancy(core_result = switchgrass_core,
