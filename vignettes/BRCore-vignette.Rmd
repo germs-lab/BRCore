@@ -135,7 +135,7 @@ calculated before.
 
 ```{r replace otu table, echo=TRUE}
 bcse_rare <-
-    do_phyloseq(physeq = bcse, 
+    update_otu_table(physeq = bcse, 
                 otu_rare = bcse_rarefied_otutable)
 
 print(bcse_rare)
