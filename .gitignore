@@ -38,11 +38,3 @@ renv/
 renv.lock
 /doc/
 /Meta/
-
-### Mock analysis ###
-mock_analysis.R
-
-### Tests ###
-tests/benchmarks/switchgrass_core.rds
-tests/benchmarks/mimulus_core.rds
-tests/benchmarks/bean_core.rds
