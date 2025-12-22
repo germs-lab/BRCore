@@ -1,0 +1,437 @@
+---
+title: "Introduction to BRCore"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to BRCore}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+link-citations: true
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 5,
+  fig.path = "images/"
+)
+```
+
+```{css, echo=FALSE}
+.note {
+  background-color: #e7f3fe;
+  border-left: 6px solid #2196F3;
+  padding: 10px;
+  margin: 15px 0;
+}
+```
+
+# Load R libraries
+
+```{r setup, echo=TRUE}
+library(BRCore)
+
+if (requireNamespace("phyloseq", quietly = TRUE)) {
+  library(phyloseq)
+} else {
+  message("Package 'phyloseq' not installed; some examples will be skipped.")
+}
+
+if (requireNamespace("tidyverse", quietly = TRUE)) {
+  library(tidyverse)
+} else {
+  message(
+    "Package 'tidyverse' not installed; some code chunks will be skipped or use base R."
+  )
+}
+
+if (requireNamespace("viridis", quietly = TRUE)) {
+  library(viridis)
+} else {
+  message(
+    "Package 'viridis' not installed; some code chunks will be skipped or use base R."
+  )
+}
+```
+
+The `BRCore` R package comes with a few datasets. Three 16S datasets: `switchgrass`, 
+`mimulus`, and `bean`, from @Shade2019Abundance; a 16S dataset, called `bcse`, from leaves 
+of ten different cropping systems in the the Bioenergy Crop Research Experiment 
+from @Haan2023Contrasting. Here we are going to use `bcse` since it is not rarefied 
+in contrast of the other three.
+
+```{r load bcse, echo=TRUE}
+data("bcse", package = "BRCore")
+str(bcse)
+```
+
+# Preprocessing
+
+We are not going to talk about the importance of rarefaction as it is not the goal
+of this vignette, but if you are interested you should read @Schloss2024Rarefaction, 
+@Schloss2024Waste, @Hong2022Rarefy, and @Weiss2017Normalization as a start.
+
+In `BRCore`, to identified the ideal rarefaction cutoff we can plot a simple series 
+of visuals to guide us in the decision. As we all know, we can estimate how well
+a DNA sample will sequence, but there are always some samples that fail to sequence 
+(or sequence badly) and some others that will sequence "too well" for reasons that 
+are outside our control or by chance.
+
+In the end we will need to decide how many samples we are accepting to discard and
+how much diversity we want to retain. To do that we can use some help form these plots
+below.
+
+```{r calculate metrics, echo=TRUE}
+bcse_metrics <- add_rarefaction_metrics(data = bcse)
+bcse_metrics
+```
+
+```{r fig1_plot_metrics, echo=TRUE, fig.width=6, fig.height=4}
+rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
+print(rarefaction_plot)
+```
+
+**Figure 1** Rarefaction metrics. a-b, histograms of samples. c, Good's coverage per
+total number of sequences in a sample. d-e, log10 of sequences in a sample. f, 
+samples ranked by sequence reads in a sample.
+
+<div class="note">
+**Note:** The Good's coverage" is a statistics used in ecology that estimates the proportion
+of species in a community that are represented in a sample, based on the number of 
+species encountered and the total number of individuals sampled. Essentially, it 
+quantifies how well a sample represents the overall diversity of a population or 
+ecosystem. Good's coverage is calculated as \(1-(n1/N)\), where \(n1\) is the number
+of unique ASV/OTUs (i.e. speacies) found only once, and \(N\) is the total number of 
+sequence reads (i.e. individuals); a high percentage (e.g., >95%) means most reads
+are from common taxa, suggesting sufficient sampling, while low coverage indicates 
+many rare, potentially missed, taxa. 
+</div>
+
+# Perform mutiple rarefaction
+
+The best way to rarefy your data is to use the multiple rarefaction approach. Originally
+developed by Sanders in 1968 it has been adopted widely in ecology research. 
+
+```{r rarefy bcse, echo=TRUE}
+bcse_rarefied_otutable <-
+  multi_rarefy(
+    physeq = bcse,
+    depth_level = 1000,
+    num_iter = 100,
+    threads = 8,
+    set_seed = 7642
+  )
+```
+
+We can then inspect that everything looks good before going further.
+
+```{r verify success rarefaction, echo=TRUE}
+rowSums(bcse_rarefied_otutable)
+bcse_rarefied_otutable[1:10, 1:10]
+```
+
+### Recreate a phyloseq object with rarefied `otu_table()` 
+
+We can then use the `do_phyloseq()` function to replace the `otu_table()` with the 
+rarefied table you just created. Or, you can create a new object with rarefied table
+calculated before.
+
+```{r replace otu table, echo=TRUE}
+bcse_rare <-
+  update_otu_table(physeq = bcse, otu_rare = bcse_rarefied_otutable)
+
+print(bcse_rare)
+sample_sums(bcse_rare)
+```
+
+# Core analysis
+
+### Identify the core ASV/OTUs set
+
+We can now identify how many core ASV/OTUs are present in our dataset across a 
+variable we want to use to calculate the core, in this case is "Crop". The resulted
+object will contain several metrics for the core set of ASV/OTUs calculated across
+the variable `Crop`.
+
+```{r identify core microbiome, echo=TRUE}
+bcse_rare_core <- identify_core(
+  physeq_obj = bcse_rare,
+  priority_var = "Crop",
+  increase_value = 0.02,
+  abundance_weight = 0,
+  seed = 2134
+)
+```
+
+### *How the is the core identified?*
+
+As shown by @Shade2019Abundance, an interesting way explore the abundance and 
+occupancy inclusion thresholds used to define the core microbiome is to evaluate how 
+well the resulting core membership captures the overarching patterns of beta 
+diversity found in the complete dataset. This approach treats the core microbiome
+as a representative subset that should preserve the main ecological relationships 
+and sample-to-sample differences observed when using all taxa. By measuring how 
+closely the beta diversity patterns calculated from core taxa alone match those 
+from the full dataset, researchers can objectively assess whether their chosen 
+thresholds produce a meaningful and informative core that maintains the essential 
+structural information of the microbial community while reducing complexity.
+
+To identify the optimal point where increasing the core inclusion threshold provides
+diminishing returns in explanatory value, we offer two automated methods. 
+
+* The first is a more stringent `elbow` approach that finds the bend in the 
+abundance-occupancy curve where adding more taxa yields progressively smaller 
+improvements. This method calculates the first-order difference (numerical 
+differentiation) by assigning a score to each potential cutoff point, splitting
+the curve into two parts, and finding the point that maximizes the difference 
+in average rates of change between these parts. 
+
+* The second method uses a final percent `increase` threshold in beta-diversity 
+(we recommend 2% or more), which continues adding taxa until improvements fall 
+below this percentage. 
+
+Both methods measure improvement using Bray-Curtis similarity through the 
+equation `C = 1 - (BC_core/BC_all)`, where `C` represents the contribution of 
+ranked taxa to total similarity, `BC_core` is the Bray-Curtis similarity using 
+only core taxa, and `BC_all` uses the complete dataset. 
+
+The cumulative explanatory value of adding each next-ranked taxon can be plotted
+using the plot_bc_increase function, with the red line indicating the elbow 
+method cutoff and colored lines showing the 2% threshold cutoff. These approaches
+eliminate the need for subjective threshold setting by automatically identifying
+natural breakpoints where additional taxa provide marginal returns in explanatory
+power.
+
+The output is a list of 13 named items.
+
+```{r check the identified core, echo=TRUE}
+str(bcse_rare_core)
+```
+
+### Visualize the abundance-occupncy distribtuion and the core ASV/OTUs set
+
+As you can see, all the objects needed for the plot were outputted in the list 
+obtained from `identify_core()`
+
+```{r plot identified core bcse, echo=TRUE}
+bcse_identified_core <- plot_identified_core(
+  bray_curtis_ranked = bcse_rare_core$bray_curtis_ranked,
+  elbow = bcse_rare_core$elbow,
+  lastCall = bcse_rare_core$bc_increase,
+  increase_value = bcse_rare_core$increase_value
+)
+```
+
+```{r fig2_identified_core, echo=TRUE, fig.width=5, fig.height=3.5}
+print(bcse_identified_core)
+```
+
+**Figure 2** Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. 
+
+### Visualize the abundance-occupancy curve 
+
+We can also then have a quick look about how abundance and how frequent the identified
+core set is compare to all other taxa in the community using the last 2% increase 
+in Bray-Curtis similarity of the ranked ASV/OTUs.
+
+```{r plot abundance occupany and increase core set, echo=TRUE}
+plot_abund_occ_increase <- plot_abundance_occupancy(
+  core_result = bcse_rare_core,
+  core_set = "increase"
+)
+```
+
+```{r fig3_plot_increase, echo=TRUE, fig.width=4, fig.height=4}
+print(plot_abund_occ_increase)
+```
+
+**Figure 3** Abundance-occupancy distribution and last 2% increase core set. 
+
+We can also visualize the core set detected with the `elbow` method.
+
+```{r plot abundance occupany and elbow core set, echo=TRUE}
+plot_abund_occ_elbow <- plot_abundance_occupancy(
+  core_result = bcse_rare_core,
+  core_set = "elbow"
+)
+```
+
+```{r fig_4_plot_elbow, echo=TRUE, fig.width=4, fig.height=4}
+plot_abund_occ_elbow +
+  scale_fill_manual(values = c("darkgreen", "grey"))
+```
+
+**Figure 4** Abundance-occupancy distribution and last elbow core set. 
+
+### Visualzie the core set acorss the variable used for detecting the core
+
+This can be achieved using the `plot_core_distribution()` function.
+Three visualization methods are implemented. Using the `plot_type` argument, you 
+can switch between a bar plot, a line plot or heatmap. Each visualization has 
+its advantages and disadvantages depending on how many levels the variable used 
+for detecting the core has. For example, for up to 5 levels I would use bar or 
+line plot, otherwise I would use heatmaps. This is subjective and you can 
+build your own plotting function since you have all the data you need 
+in `bcse_rare_core`.
+
+See the different figures below:
+
+```{r plot_type bar, echo=TRUE}
+plot_core_dist_bar <- plot_core_distribution(
+  core_result = bcse_rare_core,
+  core_set = "increase",
+  group_var = "Crop",
+  plot_type = "bar"
+)
+```
+
+```{r fig5_plot_type_bar, echo=TRUE}
+print(plot_core_dist_bar)
+```
+
+**Figure 5** A bar plot won't work here, way too many variable levels.
+
+```{r plot_type line, echo=TRUE, fig.width=4, fig.height=8}
+plot_core_dist_line <- plot_core_distribution(
+  core_result = bcse_rare_core,
+  core_set = "increase",
+  group_var = "Crop",
+  plot_type = "line"
+)
+```
+
+```{r fig6_plot_type_line, echo=TRUE}
+print(plot_core_dist_line)
+```
+
+**Figure 6** A line plot may be a little better.
+
+```{r recode Crop for ease of plotting, echo=TRUE}
+bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
+  mutate(
+    Crop = recode(
+      Crop,
+      "Corn" = "Corn",
+      "Sorghum" = "Sorghum",
+      "Continuous Sorghum" = "Sorghum + cover crop",
+      "Miscanthus" = "Miscanthus",
+      "New Switchgrass" = "Establishing switchgrass",
+      "Switchgrass" = "Mature switchgrass",
+      "Early Succession" = "Successional vegetation",
+      "Native Grasses" = "Native grass mix",
+      "Prairie" = "Reconstructed prairie",
+      "Poplar" = "Poplar"
+    ),
+    Crop = factor(
+      Crop,
+      levels = c(
+        "Corn",
+        "Sorghum",
+        "Sorghum + cover crop",
+        "Miscanthus",
+        "Establishing switchgrass",
+        "Mature switchgrass",
+        "Successional vegetation",
+        "Native grass mix",
+        "Reconstructed prairie",
+        "Poplar"
+      )
+    )
+  )
+```
+
+```{r plot_type heatmap, echo=TRUE, fig.width=5, fig.height=5}
+plot_core_dist_heatmap <- plot_core_distribution(
+  core_result = bcse_rare_core,
+  core_set = "increase",
+  group_var = "Crop",
+  plot_type = "heatmap"
+) +
+  viridis::scale_fill_viridis(option = "plasma", name = "Occupancy")
+```
+
+```{r fig7_plot_type_heatmap, echo=TRUE}
+print(plot_core_dist_heatmap)
+```
+
+**Figure 7** A heatmap, is definitely more compact and shows well enough the average 
+occupancy across samples in each variable level.
+
+# Fitting Neutral Model 
+
+In ecology and evolution a neutral model is a model that generate patterns assuming 
+random chance and functional equivalence among species (ASV/OTUs) or individuals 
+rather than specific deterministic factors, for example, selection or niches 
+(There is a vast literature about this, that we can not cover here). 
+In practice, neutral models are a specific case of Null models [@Gotelli2006Null] 
+and the act as null hypotheses to test if observed real-world patterns (e.g., species abundance, 
+genetic diversity) significantly deviate from what random processes would predict,
+and can help scientists to identify the influence of actual ecological or 
+evolutionary forces. 
+
+The work of @Sloan2006Quantifying and @Burns2015Contribution were among the first to 
+apply these type of models to microbiome data. In `BRCore`, we implemented user 
+friendly functions to fit and visualize neutral models in microbiome data, without 
+compromising the original conceptual or mathematical framework developed by 
+the abovementioned authors.
+
+First, we fit the neutral model 
+
+```{r fit neutral model, echo=TRUE}
+bcse_rare_core_neutral_fit <- fit_neutral_model(
+  otu_table = bcse_rare_core$otu_table,
+  core_set = bcse_rare_core$increase_core,
+  abundance_occupancy = bcse_rare_core$abundance_occupancy
+)
+```
+
+What we get is
+
+```{r neutral fit result, echo=TRUE}
+str(bcse_rare_core_neutral_fit)
+```
+
+### Plot the neutral model and the core set 
+
+```{r plot neutral model, echo=TRUE}
+plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
+```
+
+```{r fig8_plot_neutral_fit, echo=TRUE, fig.width=5, fig.height=6}
+print(plot_bcse_neutral_fit)
+```
+
+**Figure 8** Neutral model of abundance-occupancy distributions for the `bcse` 
+dataset. *R*^2^ is a standard r-square statistics of goodness of fit
+(*R*^2^ = 1 − SS~err~/SS~total~) while *m* is the immigration parameter and 
+represents the probability that a given individual in a sample originated from 
+the meta community rather than from the local community.
+
+In Figure 8 we can see that the neutral model does not fit well: the *R*^2^ is 
+quite low, and we can visually see that most of the ASV/OTUs (not just the core, 
+all taxa are considered here) are above the model prediction. Additionally, the 
+estimated immigration paramater m = 0.63 tells that strong mixing from the 
+meta community occur, the local community is dominated by immigration.
+
+<div class="note">
+**Note:** 
+As a rule of thumb, when: 
+As a rule of thumb, the migration parameter (<em>m</em>) can be interpreted as follows:  
+<ul>
+  <li><strong>Very low</strong> (<em>m</em> ≈ 0–0.05): strong dispersal limitation; 
+  local history dominates community assembly.</li>
+  <li><strong>Moderate</strong> (<em>m</em> ≈ 0.1–0.3): partial connectivity among 
+  sites; both dispersal and local structure influence community composition.</li>
+  <li><strong>High</strong> (<em>m</em> ≥ 0.4, as in our case): high dispersal 
+  rates and strong mixing from the regional source pool.</li>
+</ul>
+</div>
+
+# Session info
+```{r session info, echo=TRUE}
+sessionInfo()
+```
+
+# References
