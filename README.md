@@ -1,5 +1,7 @@
 # BRCore
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
@@ -19,14 +21,14 @@ BRCore provides tools for:
 
 Install the development version of BRCore from GitHub with:
 
-```r
+``` r
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
 ```
 
 ## Quick Start
 
-```r
+``` r
 library(BRCore)
 library(phyloseq)
 
@@ -72,6 +74,6 @@ plot_neutral_model(bcse_neutral)
 
 For detailed documentation and examples, see the package vignette:
 
-```r
+``` r
 vignette("BRCore-vignette", package = "BRCore")
 ```
