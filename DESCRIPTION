@@ -34,6 +34,9 @@ Imports:
     tidyr,
     vegan
 Suggests:
+    tidyverse,
+    devtools,
+    viridis,
     here,
     knitr,
     rmarkdown,

@@ -252,6 +252,10 @@ identify_core <- function(
     })
 
     # start with the first ranked OTU
+    cli::cli_alert_info(
+        "Ranking OTUs based on BC dissimilarity, starting at {Sys.time()}"
+    )
+
     start_idx <- match(otu_ranked$otu[1], rownames(otu))
     start_matrix <- matrix(
         otu[start_idx, ],
@@ -270,6 +274,14 @@ identify_core <- function(
     )
 
     if (nrow(otu_ranked) > 1) {
+        progressbar_calc_bc <- cli::cli_progress_bar(
+            name = "Calculating BC rankings",
+            total = nrow(otu_ranked) - 1,
+            format = "{cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+            .auto_close = TRUE,
+            .envir = parent.frame()
+        )
+
         for (i in 2:nrow(otu_ranked)) {
             add_idx <- match(otu_ranked$otu[i], rownames(otu))
             add_matrix <- matrix(
@@ -367,7 +379,13 @@ identify_core <- function(
     #    pull(.data$otu)
 
     elbow_core <- otu_ranked_ordered[seq_len(elbow)]
+    cli::cli_alert_success(
+        "Elbow method identified {.val {length(elbow_core)}} core OTUs"
+    )
     increase_core <- otu_ranked_ordered[seq_len(lastCall)]
+    cli::cli_alert_success(
+        "% increase method identified {.val {length(increase_core)}} core OTUs"
+    )
 
     # return ---------------------------------
     out <- list(
