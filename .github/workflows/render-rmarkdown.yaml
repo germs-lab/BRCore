@@ -19,11 +19,11 @@ jobs:
     concurrency:
       group: rmarkdown-${{ github.event_name != 'pull_request' || github.run_id }}
     env:
-      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
-      
+
     steps:
       - name: Showing GH context refs
         shell: bash
@@ -32,27 +32,26 @@ jobs:
           echo github.ref: ${{ github.ref }}
           echo github.ref_name: ${{ github.ref_name }}
           echo github.base.ref: ${{ github.base_ref }}
-          
+
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
-          
+
       - name: Check for RMarkdown files
         id: check_rmd
         shell: bash
         run: |
-            if find . -name "*.Rmd" | grep -q .; then
-                echo "has_rmd=true" >> $GITHUB_OUTPUT
-               echo "Found RMarkdown files in repository"
-            else
-                echo "has_rmd=false" >> $GITHUB_OUTPUT
-                echo "No RMarkdown files found in repository"
-            fi
+          if find . -maxdepth 1 -name "*.Rmd" | grep -q .; then
+              echo "has_rmd=true" >> $GITHUB_OUTPUT
+             echo "Found RMarkdown files in repository"
+          else
+              echo "has_rmd=false" >> $GITHUB_OUTPUT
+              echo "No RMarkdown files found in repository"
+          fi
 
       - name: Install Dependencies on Linux
-        if: runner.os == 'Linux'
         if: runner.os == 'Linux' && steps.check_rmd.outputs.has_rmd == 'true'
         run: |
           sudo apt-get update -y && sudo apt-get install -y libcurl4-openssl-dev libpng-dev libtiff-dev 
@@ -62,7 +61,7 @@ jobs:
         if: steps.check_rmd.outputs.has_rmd == 'true'
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: 'latest'
+          r-version: "latest"
 
       - name: Setup Pandoc
         if: steps.check_rmd.outputs.has_rmd == 'true'
@@ -100,8 +99,8 @@ jobs:
           else
             echo "No Markdown files to commit."
           fi
-          
+
       - name: Skip message
-      if: steps.check_rmd.outputs.has_rmd == 'false'
-      shell: bash
-      run: echo "No RMarkdown files found - skipping render workflow"
+        if: steps.check_rmd.outputs.has_rmd == 'false'
+        shell: bash
+        run: echo "No RMarkdown files found - skipping render workflow"
