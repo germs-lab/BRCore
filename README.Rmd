@@ -7,158 +7,85 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
 # BRCore
 
 <!-- badges: start -->
-
 [![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
-
 <!-- badges: end -->
 
-The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of tools to process and analyze microbial data from Bioenergy Research Centers. ***This is still an experimental package***.
+The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of tools to process and analyze microbial data from Bioenergy Research Centers.
+
+## Features
+
+BRCore provides tools for:
+
+- **Rarefaction analysis**: Calculate pre-rarefaction metrics (`add_rarefaction_metrics()`) and perform multiple rarefaction (`multi_rarefy()`)
+- **Core microbiome identification**: Identify core microbial taxa using abundance-occupancy distributions (`identify_core()`)
+- **Neutral model fitting**: Fit and visualize neutral community models (`fit_neutral_model()`, `plot_neutral_model()`)
+- **Visualization**: Plot rarefaction diagnostics, abundance-occupancy curves, and core distributions (`plot_rarefaction_metrics()`, `plot_abundance_occupancy()`, `plot_core_distribution()`, `plot_identified_core()`)
 
 ## Installation
 
-Install the development version of `BRCore` from GitHub with:
+Install the development version of BRCore from GitHub with:
 
 ```{r}
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
 ```
 
-## Step 1: Load Required Libraries and Data
+## Quick Start
 
 ```{r}
-library(phyloseq)
 library(BRCore)
+library(phyloseq)
 
-# Load the esophagus dataset
-data(esophagus, package = "phyloseq")
-```
+# Load example data
+data("bcse", package = "BRCore")
 
-## Step 2: Create Phyloseq Object
+# Add rarefaction metrics
+bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
-```{r}
-# Get the taxa names from the esophagus dataset
-taxa_names <- taxa_names(esophagus)
-
-# Define realistic taxonomy levels
-  kingdoms <- c("Bacteria", "Archaea")
-  phyla <- c(
-    "Firmicutes",
-    "Bacteroidetes",
-    "Proteobacteria",
-    "Actinobacteria",
-    "Euryarchaeota"
-  )
-  classes <- c(
-    "Clostridia",
-    "Bacteroidia",
-    "Gammaproteobacteria",
-    "Actinobacteria",
-    "Methanobacteria"
-  )
-  orders <- c(
-    "Clostridiales",
-    "Bacteroidales",
-    "Enterobacterales",
-    "Bifidobacteriales",
-    "Methanobacteriales"
-  )
-  families <- c(
-    "Lachnospiraceae",
-    "Bacteroidaceae",
-    "Enterobacteriaceae",
-    "Bifidobacteriaceae",
-    "Methanobacteriaceae"
-  )
-  genera <- c("Blautia",
-              "Bacteroides",
-              "Escherichia",
-              "Bifidobacterium",
-              "Methanobrevibacter")
-  species <- c(
-    "Blautia producta",
-    "Bacteroides fragilis",
-    "Escherichia coli",
-    "Bifidobacterium longum",
-    "Methanobrevibacter smithii"
-  )
-  
-  # Create a mock taxonomy table
-  set.seed(8998); mock_taxonomy_table <- matrix(
-    c(
-      sample(kingdoms, length(taxa_names), replace = TRUE),
-      sample(phyla, length(taxa_names), replace = TRUE),
-      sample(classes, length(taxa_names), replace = TRUE),
-      sample(orders, length(taxa_names), replace = TRUE),
-      sample(families, length(taxa_names), replace = TRUE),
-      sample(genera, length(taxa_names), replace = TRUE),
-      sample(species, length(taxa_names), replace = TRUE)
-    ),
-    nrow = length(taxa_names),
-    ncol = 7,
-    dimnames = list(
-      taxa_names,
-      c(
-        "Kingdom",
-        "Phylum",
-        "Class",
-        "Order",
-        "Family",
-        "Genus",
-        "Species"
-      )
-    )
-  )
-
-# Convert to a taxonomy table object
-tax_table <- tax_table(mock_taxonomy_table)
-
-# Add sample metadata to the esophagus dataset
-sample_data <- data.frame(
-  Sample = sample_names(esophagus),
-  Group = sample(c("A", "B"), nsamples(esophagus), replace = TRUE), # Random groups
-  row.names = sample_names(esophagus)
+# Perform multiple rarefaction
+bcse_rarefied <- multi_rarefy(
+  physeq = bcse,
+  depth_level = 1000,
+  num_iter = 100,
+  threads = 4,
+  set_seed = 7642
 )
 
-# Add the taxonomy table and sample metadata to the esophagus dataset
-esophagus_with_tax <- merge_phyloseq(esophagus, tax_table, sample_data(sample_data))
-```
+# Update phyloseq object with rarefied data
+bcse_rare <- update_otu_table(physeq = bcse, otu_rare = bcse_rarefied)
 
-## Step 2: Run extract_core()
-
-```{r}
-# Extract core microbial taxa
-core_result <- extract_core(
-  physeq = esophagus_with_tax,
-  Var = "Group",  # Variable in sample metadata to group by
-  method = "increase",  # Method for core taxa selection
-  increase_value = 2  # Threshold for core taxa inclusion (2% contribution to Bray-Curtis dissimilarity)
+# Identify core microbiome
+bcse_core <- identify_core(
+  physeq_obj = bcse_rare,
+  priority_var = "Crop",
+  increase_value = 0.02,
+  seed = 2134
 )
 
-# View the results
-print(core_result)
+# Visualize abundance-occupancy distribution
+plot_abundance_occupancy(core_result = bcse_core, core_set = "increase")
+
+# Fit and plot neutral model
+bcse_neutral <- fit_neutral_model(
+  otu_table = bcse_core$otu_table,
+  core_set = bcse_core$increase_core,
+  abundance_occupancy = bcse_core$abundance_occupancy
+)
+plot_neutral_model(bcse_neutral)
 ```
 
-## Output
+## Documentation
 
-The `extract_core()` function returns a list containing the following elements:
+For detailed documentation and examples, see the package vignette:
 
--   **core_otus**: A vector of core OTUs identified based on the specified threshold.
-
--   **bray_curtis_ranked**: A data frame of Bray-Curtis dissimilarity rankings.
-
--   **otu_rankings**: A data frame of OTU rankings based on occupancy and abundance.
-
--   **occupancy_abundance**: A data frame of occupancy and abundance values for each OTU.
-
--   **otu_table**: The OTU table used for analysis.
-
--   **sample_metadata**: The sample metadata used for analysis.
-
--   **taxonomy_table**: The taxonomy table used for analysis.
+```{r}
+vignette("BRCore-vignette", package = "BRCore")
+```
