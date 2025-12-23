@@ -4,10 +4,10 @@ Version: 1.0.0
 Authors@R: c(
     person("Bolívar", "Aponte Rolón", email = "bolaponte@pm.me", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2544-4551")),
-    person("Gian Maria Niccolo", "Benucci", role = c("aut", "cre")),
+    person("Gian Maria Niccolo", "Benucci", role = c("aut")),
     person("Brandon", "Kristy", role = "aut"),
     person("Ashley", "Shade", role = "aut"),
-    person("Nejc", "Stopnisek", role = "aut")
+    person("Nejc", "Stopnisek", role = "aut"),
     person("Adina", "Howe", role = "ctb")
   )
 Description: BRCore implements Shade and Stopnisek’s previously introduced workflow for core microbiome identification by using abundance-occupancy distributions and defines a microbial core based on its contribution to beta diversity (i.e. Bray-Curtis similarity) when compared to the entire dataset using a prioritizing variable used for occurrence detection. Functions leverage phyloseq objects and produce publication-ready figures, enabling reproducible microbiome analysis for bioenergy research.

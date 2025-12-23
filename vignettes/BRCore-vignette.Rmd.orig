@@ -13,8 +13,8 @@ link-citations: true
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width = 6,
-  fig.height = 5,
+  fig.width = 7,
+  fig.height = 6,
   fig.path = "images/"
 )
 ```
@@ -58,7 +58,7 @@ if (requireNamespace("viridis", quietly = TRUE)) {
 
 The `BRCore` R package comes with a few datasets. Three 16S datasets: `switchgrass`, 
 `mimulus`, and `bean`, from @Shade2019Abundance; a 16S dataset, called `bcse`, from leaves 
-of ten different cropping systems in the the Bioenergy Crop Research Experiment 
+of ten different cropping systems in the Bioenergy Crop Research Experiment 
 from @Haan2023Contrasting. Here we are going to use `bcse` since it is not rarefied 
 in contrast of the other three.
 
@@ -88,7 +88,7 @@ bcse_metrics <- add_rarefaction_metrics(data = bcse)
 bcse_metrics
 ```
 
-```{r fig1_plot_metrics, echo=TRUE, fig.width=6, fig.height=4}
+```{r fig1_plot_metrics, echo=TRUE, fig.width=7, fig.height=6}
 rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 print(rarefaction_plot)
 ```
@@ -103,7 +103,7 @@ of species in a community that are represented in a sample, based on the number 
 species encountered and the total number of individuals sampled. Essentially, it 
 quantifies how well a sample represents the overall diversity of a population or 
 ecosystem. Good's coverage is calculated as \(1-(n1/N)\), where \(n1\) is the number
-of unique ASV/OTUs (i.e. speacies) found only once, and \(N\) is the total number of 
+of unique ASV/OTUs (i.e. species) found only once, and \(N\) is the total number of 
 sequence reads (i.e. individuals); a high percentage (e.g., >95%) means most reads
 are from common taxa, suggesting sufficient sampling, while low coverage indicates 
 many rare, potentially missed, taxa. 
@@ -210,7 +210,7 @@ The output is a list of 13 named items.
 str(bcse_rare_core)
 ```
 
-### Visualize the abundance-occupncy distribtuion and the core ASV/OTUs set
+### Visualize the abundance-occupancy distribution and the core ASV/OTUs set
 
 As you can see, all the objects needed for the plot were outputted in the list 
 obtained from `identify_core()`
@@ -224,7 +224,7 @@ bcse_identified_core <- plot_identified_core(
 )
 ```
 
-```{r fig2_identified_core, echo=TRUE, fig.width=5, fig.height=3.5}
+```{r fig2_identified_core, echo=TRUE, fig.width=7, fig.height=6}
 print(bcse_identified_core)
 ```
 
@@ -243,7 +243,7 @@ plot_abund_occ_increase <- plot_abundance_occupancy(
 )
 ```
 
-```{r fig3_plot_increase, echo=TRUE, fig.width=4, fig.height=4}
+```{r fig3_plot_increase, echo=TRUE, fig.width=7, fig.height=6}
 print(plot_abund_occ_increase)
 ```
 
@@ -258,14 +258,14 @@ plot_abund_occ_elbow <- plot_abundance_occupancy(
 )
 ```
 
-```{r fig_4_plot_elbow, echo=TRUE, fig.width=4, fig.height=4}
+```{r fig_4_plot_elbow, echo=TRUE, fig.width=7, fig.height=6}
 plot_abund_occ_elbow +
   scale_fill_manual(values = c("darkgreen", "grey"))
 ```
 
 **Figure 4** Abundance-occupancy distribution and last elbow core set. 
 
-### Visualzie the core set acorss the variable used for detecting the core
+### Visualize the core set across the variable used for detecting the core
 
 This can be achieved using the `plot_core_distribution()` function.
 Three visualization methods are implemented. Using the `plot_type` argument, you 
@@ -293,7 +293,7 @@ print(plot_core_dist_bar)
 
 **Figure 5** A bar plot won't work here, way too many variable levels.
 
-```{r plot_type line, echo=TRUE, fig.width=4, fig.height=8}
+```{r plot_type line, echo=TRUE, fig.width=7, fig.height=6}
 plot_core_dist_line <- plot_core_distribution(
   core_result = bcse_rare_core,
   core_set = "increase",
@@ -342,7 +342,7 @@ bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
   )
 ```
 
-```{r plot_type heatmap, echo=TRUE, fig.width=5, fig.height=5}
+```{r plot_type heatmap, echo=TRUE, fig.width=7, fig.height=6}
 plot_core_dist_heatmap <- plot_core_distribution(
   core_result = bcse_rare_core,
   core_set = "increase",
@@ -399,7 +399,7 @@ str(bcse_rare_core_neutral_fit)
 plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
 ```
 
-```{r fig8_plot_neutral_fit, echo=TRUE, fig.width=5, fig.height=6}
+```{r fig8_plot_neutral_fit, echo=TRUE, fig.width=7, fig.height=6}
 print(plot_bcse_neutral_fit)
 ```
 
