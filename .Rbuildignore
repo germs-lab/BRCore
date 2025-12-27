@@ -6,6 +6,4 @@
 ^LICENSE\.md$
 ^doc$
 ^Meta$
-^mock_analysis\.R$
-^extract_core_benchmark_results_by_size\.rds$
 ^README\.Rmd$

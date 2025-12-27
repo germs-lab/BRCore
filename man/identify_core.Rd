@@ -13,12 +13,12 @@ identify_core(
 )
 }
 \arguments{
-\item{physeq_obj}{A \code{phyloseq} object with at least\code{otu_table} and \code{sample_data}.}
+\item{physeq_obj}{A \code{phyloseq} object with at least \code{otu_table} and \code{sample_data}.}
 
 \item{priority_var}{The column name in the \code{sample_data} (e.g. "sampling_date",
-"site") that is used for propritizing the core microbiome.}
+"site") that is used for prioritizing the core microbiome.}
 
-\item{increase_value}{Increase value (numeric, scalar) used in the calculation (default 0.02).}
+\item{increase_value}{Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).}
 
 \item{abundance_weight}{Numeric in \verb{[0,1]}; how much to weight mean relative
 abundance in the ranking score. \code{0} (default) uses occupancy/composite
@@ -32,10 +32,11 @@ A list with:
 \itemize{
 \item \code{bray_curtis_ranked} tibble with \code{rank}, mean Bray-Curtis similarity
 across sample pairs (\code{MeanBC}) at each cumulative \code{rank}, normalized proportion
-(\code{proportionBC}), the multiplicative \code{IncreaseBC}, and the elbow metric (\code{fo_diff}).
+(\code{proportionBC}), the multiplicative \code{IncreaseBC}, and the elbow metric (\code{elbow_slope_diffs}).
 \item \code{otu_ranked} tibble with ranked OTU/ASVs .
-\item \code{occupancy_abundance} tibble with OTU/ASVs names, occupancy
+\item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy
 (\code{otu_occ}), and mean relative abundance (\code{otu_rel}).
+\item \code{priority_var} character, the variable used for prioritizing the core.
 \item \code{elbow} core set identified by elbow method (integer).
 \item \code{bc_increase} core set identified by last \% BC-increase (integer).
 \item \code{increase_value} increase value (numeric, scalar) used in the calculation (e.g. 0.02).
@@ -49,8 +50,8 @@ across sample pairs (\code{MeanBC}) at each cumulative \code{rank}, normalized p
 \description{
 This function identifies core microbial taxa based on abundance-occupancy
 distributions and their contributions to Bray-Curtis similarity between
-biological samples. Core taxa are selected using either the "increase" or
-"elbow" method. This function implements the method developed by Shade
+biological samples. Core taxa are selected using either a "last \% increase" or
+"elbow" method implementing the method developed by Shade
 and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 }
 \details{
@@ -83,8 +84,9 @@ and \pkg{vegan}.
 }
 
 \examples{
-\dontshow{if (requireNamespace("phyloseq", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
+library(phyloseq)
+library(BRCore)
 # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
 data("switchgrass", package = "BRCore")
 
@@ -98,7 +100,7 @@ res <- identify_core(
 # Inspect results
  str(res)
 }
-\dontshow{\}) # examplesIf}
+
 }
 \references{
 Shade A, Stopnisek N (2019) Abundance-occupancy

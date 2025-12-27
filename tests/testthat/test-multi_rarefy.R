@@ -1,11 +1,12 @@
 test_that("Test if parallel rarefaction works correctly", {
-    # Load data
-    load(testthat::test_path("testdata", "test_phyloseq.rda"))
+    skip_if_not_installed("phyloseq")
+    
+    data("bcse", package = "BRCore")
     
     otu_table_rare <-
         multi_rarefy(
-            physeq = test_phyloseq,
-            depth_level = 300,
+            physeq = bcse,
+            depth_level = 3000,
             num_iter = 3,
             threads = 1,
             set_seed = 123
