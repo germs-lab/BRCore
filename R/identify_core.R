@@ -207,10 +207,6 @@ identify_core <- function(
     otu_ranked <- occ_abun |>
         left_join(PresenceSum, by = 'otu')
 
-    if (abundance_weight < 0 | abundance_weight > 1) {
-        cli::cli_abort("abundance_weight must be between 0 and 1")
-    }
-
     rank_method <- if (abundance_weight > 0) {
         paste0("Index + abundance (weight = ", abundance_weight, ")")
     } else {
@@ -224,7 +220,7 @@ identify_core <- function(
             arrange(desc(rank))
 
         cli::cli_alert_info(
-            "Ranked by {rank_method})."
+            "Ranked by {rank_method}."
         )
     } else {
         otu_ranked <- otu_ranked |>
