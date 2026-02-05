@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-BRCore implements Shade and Stopnisek’s previously introduced workflow for core microbiome identification by using abundance-occupancy distributions and defines a microbial core based on its contribution to beta diversity (i.e. Bray-Curtis similarity) when compared to the entire dataset using a prioritizing variable used for occurrence detection. Functions leverage phyloseq objects and produce publication-ready figures, enabling reproducible microbiome analysis.
+BRCore provides a framework for identification and interpretation of ecologically relevant microbiomes across time and space, enhancing reproducibility in microbiome data analysis.
 
 ## Features
 
