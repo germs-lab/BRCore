@@ -1,6 +1,6 @@
 # tests/testthat/test-plot_neutral_model.R
 test_that("plot_neutral_model returns a ggplot and builds", {
-    testthat::skip_if_not_installed("ggplot2")
+    skip_if_not_installed("ggplot2")
 
     fit_result <- list(
         model_prediction = data.frame(
@@ -23,6 +23,6 @@ test_that("plot_neutral_model returns a ggplot and builds", {
     )
 
     p <- plot_neutral_model(fit_result)
-    testthat::expect_s3_class(p, "ggplot")
-    testthat::expect_silent(ggplot2::ggplot_build(p))
+    expect_s3_class(p, "ggplot")
+    expect_silent(ggplot2::ggplot_build(p))
 })

@@ -1,7 +1,7 @@
 # tests/testthat/test-plot_identified_core.R
 test_that("plot_identified_core returns a ggplot and builds", {
-    testthat::skip_if_not_installed("ggplot2")
-    testthat::skip_if_not(
+    skip_if_not_installed("ggplot2")
+    skip_if_not(
         exists("plot_identified_core"),
         "plot_identified_core() not found"
     )
@@ -21,6 +21,6 @@ test_that("plot_identified_core returns a ggplot and builds", {
         lastCall = lastCall
     )
 
-    testthat::expect_s3_class(p, "ggplot")
-    testthat::expect_silent(ggplot2::ggplot_build(p)) # renders without error
+    expect_s3_class(p, "ggplot")
+    expect_silent(ggplot2::ggplot_build(p)) # renders without error
 })

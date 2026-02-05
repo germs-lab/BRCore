@@ -139,8 +139,14 @@ bcse_metrics
 ``` r
 rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Processing 50 samples
-#> ℹ Generating rarefaction diagnostic plots                                         ✔ Rarefaction diagnostic plots generated successfully
-#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [813ms]
+#> 
+ℹ Generating rarefaction diagnostic plots
+
+                                         
+✔ Rarefaction diagnostic plots generated successfully
+#> ℹ Generating rarefaction diagnostic plots
+
+✔ Generating rarefaction diagnostic plots [813ms]
 print(rarefaction_plot)
 ```
 
@@ -437,7 +443,7 @@ plot_abund_occ_elbow +
 #> Adding another scale for fill, which will replace the existing scale.
 ```
 
-![plot of chunk fig_4_plot_elbow](images/fig_4_plot_elbow-1.png)
+![plot of chunk fig4_plot_elbow](images/fig4_plot_elbow-1.png)
 
 **Figure 4** Abundance-occupancy distribution and last elbow core set. 
 
