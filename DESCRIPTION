@@ -11,7 +11,7 @@ Authors@R: c(
     person("Nejc", "Stopnisek", role = "aut"),
     person("Adina", "Howe", role = "ctb")
   )
-Description: BRCore provides a framework for identification and interpretation of ecologically relevant microbiomes across time and space, enhancing reproducibility in microbiome data analysis.
+Description: BRCore provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

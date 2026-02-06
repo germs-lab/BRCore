@@ -1,29 +1,60 @@
-# BRCore
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# BRCore
+
 <!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)[![](https://www.r-pkg.org/badges/version/BRCore)](https://www.r-pkg.org/badges/version/BRCore)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/BRCore)](https://cran.r-project.org/package=BRCore)
+[![Codecov test
+coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.codecov.io/gh/germs-lab/BRCore)
 [![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
-The goal of BRCore is to aid the analysis of the [Inter BRC Microbiome project](https://github.com/germs-lab/interbrc-core-analysis) by providing a set of tools to process and analyze microbial data from Bioenergy Research Centers.
+BRCore provides a unified framework for identification and ecological
+interpretation of core microbiomes across time and space, enhancing
+robustness and reproducibility in microbiome data analysis.
 
 ## Features
 
 BRCore provides tools for:
 
-- **Rarefaction analysis**: Calculate pre-rarefaction metrics (`add_rarefaction_metrics()`) and perform multiple rarefaction (`multi_rarefy()`)
-- **Core microbiome identification**: Identify core microbial taxa using abundance-occupancy distributions (`identify_core()`)
-- **Neutral model fitting**: Fit and visualize neutral community models (`fit_neutral_model()`, `plot_neutral_model()`)
-- **Visualization**: Plot rarefaction diagnostics, abundance-occupancy curves, and core distributions (`plot_rarefaction_metrics()`, `plot_abundance_occupancy()`, `plot_core_distribution()`, `plot_identified_core()`)
+- **Rarefaction analysis**: Calculate pre-rarefaction metrics
+  (`add_rarefaction_metrics()`) and perform multiple rarefaction
+  (`multi_rarefy()`)
+- **Core microbiome identification**: Identify core microbial taxa using
+  abundance-occupancy distributions (`identify_core()`)
+- **Neutral model fitting**: Fit and visualize neutral community models
+  (`fit_neutral_model()`, `plot_neutral_model()`)
+- **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
+  curves, and core distributions (`plot_rarefaction_metrics()`,
+  `plot_abundance_occupancy()`, `plot_core_distribution()`,
+  `plot_identified_core()`)
 
 ## Installation
+
+For stable releases, use:
+
+``` r
+install.packages("BRCore")
+```
 
 Install the development version of BRCore from GitHub with:
 
 ``` r
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
+
+# For the latest development version with vignettes, use:
+# install.packages("devtools")
+devtools::install_github("germs-lab/BRCore", build_vignettes = TRUE)
+
+# or using remotes
+# install.packages("remotes")
+remotes::install_github("germs-lab/BRCore", build_vignettes = TRUE)
 ```
 
 ## Quick Start

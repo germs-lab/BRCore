@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-BRCore provides a framework for identification and interpretation of ecologically relevant microbiomes across time and space, enhancing reproducibility in microbiome data analysis.
+BRCore provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 
 ## Features
 
