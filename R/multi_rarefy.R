@@ -19,13 +19,14 @@
 #'
 #' @details
 #' To ensure reproducibility across different operating systems (macOS, Linux, Windows),
-#' this function explicitly sets the RNG algorithm to "Mersenne-Twister" before setting
-#' the seed. For parallel execution, it uses \code{parallel::clusterSetRNGStream()} which
-#' provides independent random number streams for each worker based on the L'Ecuyer-CMRG
-#' algorithm, ensuring reproducible results regardless of the number of threads used.
+#' this function explicitly sets the RNG algorithm to "Mersenne-Twister" with "Inversion"
+#' normal kind and "Rejection" sample kind before setting the seed. For parallel execution,
+#' each iteration is assigned a pre-computed seed derived from the main seed, ensuring that
+#' results are identical regardless of which worker processes which iteration. This approach
+#' guarantees cross-platform reproducibility and thread-count independence.
 #'
 #' @importFrom parallelly availableCores
-#' @importFrom parallel makeCluster stopCluster clusterExport parLapply clusterSetRNGStream
+#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
 #' @importFrom dplyr  bind_rows group_by summarise across everything filter
 #' @importFrom dplyr where
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -61,6 +62,9 @@ multi_rarefy <- function(
 ) {
     cli::cli_text("\nSeed used: {set_seed}\n")
 
+    # Pre-generate iteration-specific seeds for cross-platform reproducibility
+    # Each iteration gets its own deterministic seed regardless of which worker runs it
+    iteration_seeds <- NULL
     if (is.null(set_seed)) {
         cli::cli_warn("No seed was set. Results may not be reproducible.")
     } else {
@@ -72,6 +76,10 @@ multi_rarefy <- function(
         # Mersenne-Twister is the most widely used and well-tested algorithm
         RNGkind("Mersenne-Twister", "Inversion", "Rejection")
         set.seed(set_seed)
+        
+        # Pre-generate seeds for each iteration
+        # This ensures each iteration uses the same seed regardless of worker assignment
+        iteration_seeds <- sample.int(.Machine$integer.max, num_iter)
     }
 
     # Check object class
@@ -91,20 +99,18 @@ multi_rarefy <- function(
     # Export needed objects/packages to workers
     clusterExport(
         cl,
-        varlist = c("dataframe", "depth_level"),
+        varlist = c("dataframe", "depth_level", "iteration_seeds"),
         envir = environment()
     )
 
-    # Set reproducible RNG streams for parallel workers
-    # This uses L'Ecuyer-CMRG algorithm for independent streams per worker
-    if (!is.null(set_seed)) {
-        clusterSetRNGStream(cl, iseed = set_seed)
-    }
-
-    # Run rarefactions in parallel
+    # Run rarefactions in parallel with per-iteration seeds
     com_iter <- parLapply(cl, 1:num_iter, function(i) {
-        # RNG stream is already set by clusterSetRNGStream
-        # Each iteration automatically gets independent random numbers
+        # Set iteration-specific seed for cross-platform reproducibility
+        # Each iteration uses its pre-assigned seed regardless of which worker runs it
+        if (!is.null(iteration_seeds)) {
+            RNGkind("Mersenne-Twister", "Inversion", "Rejection")
+            set.seed(iteration_seeds[i])
+        }
         df <- rrarefy(dataframe, sample = depth_level)
         df <- as.data.frame(df)
         rownames_to_column(df, "sample_id")

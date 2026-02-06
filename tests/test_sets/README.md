@@ -27,7 +27,18 @@ The test suite in `test-vignette-workflow.R` compares fresh workflow executions 
 
 ## Regenerating Reference Data
 
-To regenerate `test_vignette_data.rda` (e.g., after breaking changes):
+After making changes to `multi_rarefy()` or other functions that affect the vignette workflow outputs, the reference data must be regenerated to match the new implementation.
+
+### Using the regeneration script
+
+```bash
+cd BRCore
+Rscript tests/test_sets/regenerate_test_data.R
+```
+
+### Manual regeneration
+
+Alternatively, run the complete vignette workflow:
 
 ```r
 # Run the complete vignette workflow
