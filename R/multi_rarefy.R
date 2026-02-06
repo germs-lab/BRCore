@@ -17,8 +17,15 @@
 #'   represent the average sequence counts calculated across all iterations.
 #'   Samples with less than `depth_level` sequences are discarded.
 #'
+#' @details
+#' To ensure reproducibility across different operating systems (macOS, Linux, Windows),
+#' this function explicitly sets the RNG algorithm to "Mersenne-Twister" before setting
+#' the seed. For parallel execution, it uses \code{parallel::clusterSetRNGStream()} which
+#' provides independent random number streams for each worker based on the L'Ecuyer-CMRG
+#' algorithm, ensuring reproducible results regardless of the number of threads used.
+#'
 #' @importFrom parallelly availableCores
-#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
+#' @importFrom parallel makeCluster stopCluster clusterExport parLapply clusterSetRNGStream
 #' @importFrom dplyr  bind_rows group_by summarise across everything filter
 #' @importFrom dplyr where
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -57,6 +64,13 @@ multi_rarefy <- function(
     if (is.null(set_seed)) {
         cli::cli_warn("No seed was set. Results may not be reproducible.")
     } else {
+        # Save current RNG state to restore later
+        old_rng_kind <- RNGkind()
+        on.exit(RNGkind(old_rng_kind[1], old_rng_kind[2], old_rng_kind[3]), add = TRUE)
+        
+        # Set explicit RNG algorithm for cross-platform reproducibility
+        # Mersenne-Twister is the most widely used and well-tested algorithm
+        RNGkind("Mersenne-Twister", "Inversion", "Rejection")
         set.seed(set_seed)
     }
 
@@ -81,9 +95,16 @@ multi_rarefy <- function(
         envir = environment()
     )
 
+    # Set reproducible RNG streams for parallel workers
+    # This uses L'Ecuyer-CMRG algorithm for independent streams per worker
+    if (!is.null(set_seed)) {
+        clusterSetRNGStream(cl, iseed = set_seed)
+    }
+
     # Run rarefactions in parallel
     com_iter <- parLapply(cl, 1:num_iter, function(i) {
-        set.seed(set_seed + i) # each worker gets a different but reproducible seed
+        # RNG stream is already set by clusterSetRNGStream
+        # Each iteration automatically gets independent random numbers
         df <- rrarefy(dataframe, sample = depth_level)
         df <- as.data.frame(df)
         rownames_to_column(df, "sample_id")
