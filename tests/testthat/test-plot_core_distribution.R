@@ -1,6 +1,6 @@
 # tests/testthat/test-plot_core_distribution.R
 test_that("plot_core_distribution returns a ggplot and builds", {
-    testthat::skip_if_not_installed("ggplot2")
+    skip_if_not_installed("ggplot2")
 
     # Create a matrix of random counts
     otu_table <- base::as.data.frame(
@@ -42,6 +42,6 @@ test_that("plot_core_distribution returns a ggplot and builds", {
         group_var = "time"
     )
 
-    testthat::expect_s3_class(p, "ggplot")
-    testthat::expect_silent(ggplot2::ggplot_build(p))
+    expect_s3_class(p, "ggplot")
+    expect_silent(ggplot2::ggplot_build(p))
 })

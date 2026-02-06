@@ -62,7 +62,7 @@
 plot_core_distribution <- function(
     core_result,
     core_set = "elbow",
-    group_var = "sampling_date",
+    group_var = "Crop",
     plot_type = c("bar", "line", "heatmap")
 ) {
     # match plot_type
@@ -70,7 +70,7 @@ plot_core_distribution <- function(
 
     # Validate core_set argument
     if (!core_set %in% c("elbow", "increase")) {
-        stop("core_set must be either 'elbow' or 'increase'")
+        cli::cli_abort("core_set must be either 'elbow' or 'increase'")
     }
 
     # Select appropriate core OTU set
@@ -95,8 +95,16 @@ plot_core_distribution <- function(
     }
 
     # Validate required columns
+    if (is.null(group_var)) {
+        cli::cli_abort("group_var must be specified.")
+    }
     if (!group_var %in% colnames(map)) {
-        stop(paste("Missing required column", group_var, "in metadata"))
+        cli::cli_abort(paste0(
+            "Missing required column '",
+            group_var,
+            "' in metadata. Available columns: ",
+            paste(colnames(map), collapse = ", ")
+        ))
     }
 
     otu_ranked <- core_result$otu_ranked
