@@ -28,13 +28,13 @@ cat("Plotting rarefaction metrics...\n")
 test_rarefaction_plot <- plot_rarefaction_metrics(test_bcse_metrics)
 
 # Step 4: Multiple rarefaction
-# Use single thread for reproducibility
+# Use single thread for consistency with test expectations
 cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(
   physeq = bcse,
   depth_level = 1000,
   num_iter = 100,
-  threads = 1,  # Single thread for maximum reproducibility
+  threads = 1,  # Single thread for consistency with CI test configuration
   set_seed = 7642
 )
 
