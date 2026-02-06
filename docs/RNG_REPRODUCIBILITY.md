@@ -19,9 +19,21 @@ The `multi_rarefy()` function was producing different results on macOS vs Linux 
 - No guarantee of independent streams across workers
 
 ### 3. Potential BLAS Library Differences
+
 - Matrix operations (e.g., `as.matrix()`) might use different BLAS libraries
-- Different BLAS implementations (OpenBLAS, MKR, Apple Accelerate) could theoretically affect floating-point operations
+- Different BLAS implementations (OpenBLAS, MKL, Apple Accelerate) could theoretically affect floating-point operations
 - However, for the rarefaction use case, this is less likely to be the primary issue
+
+**Analysis:**
+- The `vegan::rrarefy()` function performs discrete random sampling without replacement
+- While matrix operations are used for data transformation, they don't involve floating-point arithmetic that would be affected by BLAS
+- The primary source of cross-platform differences is the RNG algorithm, not BLAS
+- If BLAS differences were the issue, we would see small numerical differences, not completely different random samples
+
+**Mitigation (if needed in future):**
+- Session info can be checked with `sessionInfo()` to see BLAS/LAPACK versions
+- For critical reproducibility, users can build R with a specific BLAS library
+- Our RNG fix addresses the more likely and impactful source of variation
 
 ## Solution Implemented
 
@@ -126,6 +138,22 @@ on.exit(RNGkind(old_rng_kind[1], old_rng_kind[2], old_rng_kind[3]), add = TRUE)
 ## References
 
 1. R Documentation: `?RNGkind`, `?clusterSetRNGStream`
-2. [ranger issue #533](https://github.com/imbs-hl/ranger/issues/533) - Similar cross-platform RNG issues
+2. [ranger issue #533](https://github.com/imbs-hl/ranger/issues/533) - Similar cross-platform RNG issues demonstrating same seed producing different results on macOS vs Windows
 3. [Parallel RNG in R](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf)
 4. L'Ecuyer, P. (1999). Good parameters and implementations for combined multiple recursive random number generators. Operations Research, 47, 159-164.
+5. [StackOverflow: Same seed, different OS, different random numbers in R](https://stackoverflow.com/questions/48626086/same-seed-different-os-different-random-numbers-in-r)
+6. [Setting a seed in R when using parallel simulation](https://irudnyts.github.io/setting-a-seed-in-r-when-using-parallel-simulation/) - Best practices for parallel RNG
+
+## Additional Context
+
+### Related GitHub Issues
+- germs-lab/BRCore#77 - Initial test submission attempts highlighting cross-platform issues
+- germs-lab/BRCore#70 - Vignette rendering issues addressed by pre-rendering
+- germs-lab/BRCore#72 - Follow-up to vignette rendering
+- [CI run 21726145618](https://github.com/germs-lab/BRCore/actions/runs/21726145618) - Example failures due to RNG differences
+
+### Key Learnings
+1. **Never rely on default RNG algorithms** - Always specify explicitly for cross-platform work
+2. **Use proper parallel RNG tools** - `clusterSetRNGStream()` over manual seed offsetting
+3. **Test on multiple platforms** - CI should include macOS, Linux, and Windows when possible
+4. **Document RNG choices** - Future maintainers need to understand why specific algorithms were chosen
