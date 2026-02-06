@@ -148,10 +148,12 @@ This was insufficient because:
 
 ## Expected Outcomes
 
-1. **Cross-Platform Reproducibility**: Same seed produces identical results on same platform
+1. **Cross-Platform Reproducibility**: Same seed produces identical results across macOS, Linux, and Windows (assuming same R version with compatible RNG implementation)
 2. **Thread Independence**: Results are the same regardless of number of threads used
 3. **Test Stability**: Vignette workflow tests pass consistently on all platforms
 4. **User Confidence**: Scientists can trust that their analyses are reproducible
+
+**Note**: Cross-platform reproducibility depends on R using the same Mersenne-Twister implementation. R's MT implementation is portable, but very old R versions or custom builds might differ. For guaranteed reproducibility, use R >= 3.6 which standardized the sample() algorithm.
 
 ## References
 

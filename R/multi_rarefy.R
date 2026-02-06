@@ -97,6 +97,7 @@ multi_rarefy <- function(
     on.exit(stopCluster(cl), add = TRUE)
 
     # Export needed objects/packages to workers
+    # Note: iteration_seeds may be NULL when set_seed is NULL, which is handled in worker logic
     clusterExport(
         cl,
         varlist = c("dataframe", "depth_level", "iteration_seeds"),
