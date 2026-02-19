@@ -17,13 +17,6 @@
 #'   represent the average sequence counts calculated across all iterations.
 #'   Samples with less than `depth_level` sequences are discarded.
 #'
-#' @details
-#' To ensure reproducibility across different operating systems (macOS, Linux, Windows),
-#' this function explicitly sets the RNG algorithm to "Mersenne-Twister" with "Inversion"
-#' normal kind and "Rejection" sample kind before setting the seed. For parallel execution,
-#' each iteration is assigned a pre-computed seed derived from the main seed, ensuring that
-#' results are identical regardless of which worker processes which iteration. This approach
-#' guarantees cross-platform reproducibility and thread-count independence.
 #'
 #' @importFrom parallelly availableCores
 #' @importFrom parallel makeCluster stopCluster clusterExport parLapply
@@ -62,24 +55,10 @@ multi_rarefy <- function(
 ) {
     cli::cli_text("\nSeed used: {set_seed}\n")
 
-    # Pre-generate iteration-specific seeds for cross-platform reproducibility
-    # Each iteration gets its own deterministic seed regardless of which worker runs it
-    iteration_seeds <- NULL
     if (is.null(set_seed)) {
         cli::cli_warn("No seed was set. Results may not be reproducible.")
     } else {
-        # Save current RNG state to restore later
-        old_rng_kind <- RNGkind()
-        on.exit(RNGkind(old_rng_kind[1], old_rng_kind[2], old_rng_kind[3]), add = TRUE)
-        
-        # Set explicit RNG algorithm for cross-platform reproducibility
-        # Mersenne-Twister is the most widely used and well-tested algorithm
-        RNGkind("Mersenne-Twister", "Inversion", "Rejection")
         set.seed(set_seed)
-        
-        # Pre-generate seeds for each iteration
-        # This ensures each iteration uses the same seed regardless of worker assignment
-        iteration_seeds <- sample.int(.Machine$integer.max, num_iter)
     }
 
     # Check object class
@@ -91,6 +70,80 @@ multi_rarefy <- function(
         as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
     )
 
+    ### debug ###
+
+    printAndReturn <- function(x) {
+        print("\n--- rowSums dplyr::across ---\n")
+        print(x)
+        print("\n--- before rounding ---\n")
+        print(depth_level)
+        print(class(x))
+        print("\n--- x >= depth_level? ---\n")
+        print(x >= depth_level)
+        print("\n--- x formatted ---\n")
+        print(format(x, nsmall = 20))
+        print("\n--- x as integer?---\n")
+        print(as.integer(x))
+        print(as.integer(depth_level))
+        print(as.integer(x) >= as.integer(depth_level))
+
+        print("\n--- After rounding ---\n")
+        y <- round(x)
+        print(depth_level)
+        print(class(y))
+        print("\n--- y >= depth_level? ---\n")
+        print(y >= depth_level)
+        print("\n--- y formatted ---\n")
+        print(format(y, nsmall = 20))
+        print("\n--- y as integer?---\n")
+        print(as.integer(y))
+        print(as.integer(depth_level))
+        print(as.integer(y) >= as.integer(depth_level))
+
+        x
+    }
+
+    cat("taxa_are_rows(physeq):", phyloseq::taxa_are_rows(physeq), "\n")
+    cat("otu_mat dim:", paste(dim(dataframe), collapse = " x "), "\n")
+    cat(
+        "nsamples:",
+        phyloseq::nsamples(physeq),
+        " ntaxa:",
+        phyloseq::ntaxa(physeq),
+        "\n"
+    )
+
+    # what you currently build:
+    #dataframe <- as.data.frame(as.matrix(t(phyloseq::otu_table(physeq, taxa_are_rows = TRUE))))
+    cat("dataframe dim:", paste(dim(dataframe), collapse = " x "), "\n")
+    cat(
+        "dataframe rownames head:",
+        paste(head(rownames(dataframe)), collapse = ", "),
+        "\n"
+    )
+    cat(
+        "dataframe colnames head:",
+        paste(head(colnames(dataframe)), collapse = ", "),
+        "\n"
+    )
+
+    # sanity: do rows look like samples?
+    cat(
+        "Rows match sample_names?:",
+        all(rownames(dataframe) %in% phyloseq::sample_names(physeq)),
+        "\n"
+    )
+    cat(
+        "Cols match taxa_names?:",
+        all(colnames(dataframe) %in% phyloseq::taxa_names(physeq)),
+        "\n"
+    )
+
+    # critical: row totals vs sample sums
+    print(summary(rowSums(dataframe)))
+
+    ### end debug ###
+
     # Parallel setup
     threads <- min(threads, availableCores())
     cl <- makeCluster(threads)
@@ -100,28 +153,25 @@ multi_rarefy <- function(
     # Note: iteration_seeds may be NULL when set_seed is NULL, which is handled in worker logic
     clusterExport(
         cl,
-        varlist = c("dataframe", "depth_level", "iteration_seeds"),
+        varlist = c("dataframe", "depth_level"),
         envir = environment()
     )
 
-    # Run rarefactions in parallel with per-iteration seeds
+    # Run rarefactions in parallel
     com_iter <- parLapply(cl, 1:num_iter, function(i) {
-        # Set iteration-specific seed for cross-platform reproducibility
-        # Each iteration uses its pre-assigned seed regardless of which worker runs it
-        if (!is.null(iteration_seeds)) {
-            RNGkind("Mersenne-Twister", "Inversion", "Rejection")
-            set.seed(iteration_seeds[i])
-        }
+        set.seed(set_seed + i) # each worker gets a different but reproducible seed
         df <- rrarefy(dataframe, sample = depth_level)
         df <- as.data.frame(df)
         rownames_to_column(df, "sample_id")
     })
-
     # Aggregate results
     mean_data <- bind_rows(com_iter) |>
         group_by(sample_id) |>
         summarise(across(everything(), mean), .groups = "drop") |>
-        filter(rowSums(across(where(is.numeric))) >= depth_level) |>
+        filter(
+            printAndReturn(round(rowSums(across(where(is.numeric))))) >=
+                depth_level
+        ) |>
         column_to_rownames("sample_id")
 
     # Remove ASVs/OTUs with zero total abundance using base R
