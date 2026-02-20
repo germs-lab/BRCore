@@ -55,17 +55,28 @@ multi_rarefy <- function(
     set_seed = NULL
 ) {
     # Input validation ----
-    cli::cli_text("\nSeed used: {set_seed}\n")
+    cli::cli_h1("Multiple Rarefaction")
+    cli::cli_h2("Input Validation")
 
-    if (is.null(set_seed)) {
-        cli::cli_warn("No seed was set. Results may not be reproducible.")
-    } else {
-        set.seed(set_seed)
+    if (!requireNamespace("phyloseq", quietly = TRUE)) {
+        cli::cli_alert_danger(
+            "The 'phyloseq' package is required but not installed."
+        )
+        stop("Please install 'phyloseq' to use this function.")
     }
 
-    # Check object class
     if (!inherits(physeq, "phyloseq")) {
-        stop("Input must be a phyloseq object, not a data.frame")
+        cli::cli_alert_danger(
+            "Input must be a phyloseq object, not a {.cls {class(physeq)}}"
+        )
+        stop("Input must be a phyloseq object")
+    }
+
+    if (is.null(set_seed)) {
+        cli::cli_alert_warning("No seed set. Results may not be reproducible.")
+    } else {
+        cli::cli_alert_info("Seed: {.val {set_seed}}")
+        set.seed(set_seed)
     }
 
     # Prepare data ----
@@ -73,77 +84,33 @@ multi_rarefy <- function(
         as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
     )
 
-    ### debug ###########################################
-
-    printAndReturn <- function(x) {
-        print("\n--- rowSums dplyr::across ---\n")
-        print(x)
-        print("\n--- before rounding ---\n")
-        print(depth_level)
-        print(class(x))
-        print("\n--- x >= depth_level? ---\n")
-        print(x >= depth_level)
-        print("\n--- x formatted ---\n")
-        print(format(x, nsmall = 20))
-        print("\n--- x as integer?---\n")
-        print(as.integer(x))
-        print(as.integer(depth_level))
-        print(as.integer(x) >= as.integer(depth_level))
-
-        print("\n--- After rounding ---\n")
-        y <- round(x)
-        print(depth_level)
-        print(class(y))
-        print("\n--- y >= depth_level? ---\n")
-        print(y >= depth_level)
-        print("\n--- y formatted ---\n")
-        print(format(y, nsmall = 20))
-        print("\n--- y as integer?---\n")
-        print(as.integer(y))
-        print(as.integer(depth_level))
-        print(as.integer(y) >= as.integer(depth_level))
-
-        x
-    }
-
-    cat("taxa_are_rows(physeq):", phyloseq::taxa_are_rows(physeq), "\n")
-    cat("otu_mat dim:", paste(dim(dataframe), collapse = " x "), "\n")
-    cat(
-        "nsamples:",
-        phyloseq::nsamples(physeq),
-        " ntaxa:",
-        phyloseq::ntaxa(physeq),
-        "\n"
+    # Input parameter checks ----
+    cli::cli_alert_info(
+        "Input: {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
     )
+    cli::cli_alert_info("Rarefaction depth: {.val {depth_level}}")
+    cli::cli_alert_info("Iterations: {.val {num_iter}}")
 
-    # what you currently build:
-    #dataframe <- as.data.frame(as.matrix(t(phyloseq::otu_table(physeq, taxa_are_rows = TRUE))))
-    cat("dataframe dim:", paste(dim(dataframe), collapse = " x "), "\n")
-    cat(
-        "dataframe rownames head:",
-        paste(head(rownames(dataframe)), collapse = ", "),
-        "\n"
-    )
-    cat(
-        "dataframe colnames head:",
-        paste(head(colnames(dataframe)), collapse = ", "),
-        "\n"
-    )
+    cli::cli_alert_info("taxa_are_rows: {phyloseq::taxa_are_rows(physeq)}")
 
-    # sanity: do rows look like samples?
-    cat(
-        "Rows match sample_names?:",
-        all(rownames(dataframe) %in% phyloseq::sample_names(physeq)),
-        "\n"
+    cli::cli_alert_info(
+        "OTU matrix/df dim: {paste(dim(dataframe), collapse = ' x ')}"
     )
-    cat(
-        "Cols match taxa_names?:",
-        all(colnames(dataframe) %in% phyloseq::taxa_names(physeq)),
-        "\n"
+    cli::cli_alert_info(
+        "OTU matrix/df rownames head: {paste(head(rownames(dataframe)), collapse = ', ')}"
     )
-
-    # critical: row totals vs sample sums
-    print(summary(rowSums(dataframe)))
+    cli::cli_alert_info(
+        "OTU matrix/df colnames head: {paste(head(colnames(dataframe)), collapse = ', ')}"
+    )
+    cli::cli_alert_info(
+        "Rows match sample_names: {all(rownames(dataframe) %in% phyloseq::sample_names(physeq))}"
+    )
+    cli::cli_alert_info(
+        "Cols match taxa_names: {all(colnames(dataframe) %in% phyloseq::taxa_names(physeq))}"
+    )
+    cli::cli_alert_info(
+        "Row sums summary: Min={min(rowSums(dataframe))}, Max={max(rowSums(dataframe))}, Median={median(rowSums(dataframe))}"
+    )
 
     ### end debug #######################################
 
@@ -160,6 +127,8 @@ multi_rarefy <- function(
     )
 
     # Run rarefactions in parallel ----
+    cli::cli_alert_info("Running rarefaction...")
+
     com_iter <- parLapply(cl, 1:num_iter, function(i) {
         set.seed(set_seed + i) # each worker gets a different but reproducible seed
         df <- .single_rarefy(dataframe, sample = depth_level)
@@ -168,17 +137,46 @@ multi_rarefy <- function(
     })
 
     # Aggregate results ----
+    n_samples_before <- nrow(dataframe)
+
     mean_data <- bind_rows(com_iter) |>
         group_by(sample_id) |>
         summarise(across(everything(), mean), .groups = "drop") |>
         filter(
-            printAndReturn(round(rowSums(across(where(is.numeric))))) >=
-                depth_level
+            round(rowSums(across(where(is.numeric)))) >= depth_level
         ) |>
         column_to_rownames("sample_id")
 
     # Remove ASVs/OTUs with zero total abundance
+    n_taxa_before <- ncol(mean_data)
     mean_data <- mean_data[, colSums(mean_data) > 0]
+    n_taxa_after <- ncol(mean_data)
+
+    # Report results ---
+    n_samples_after <- nrow(mean_data)
+    n_samples_removed <- n_samples_before - n_samples_after
+    n_taxa_removed <- n_taxa_before - n_taxa_after
+
+    cli::cli_h2("Rarefaction Results")
+    if (n_samples_removed > 0) {
+        cli::cli_alert_warning(
+            "{.val {n_samples_removed}} sample{?s} removed (depth < {.val {depth_level}})"
+        )
+        removed_samples <- setdiff(rownames(dataframe), rownames(mean_data))
+        cli::cli_alert_warning(
+            "Samples removed: {.val {paste(removed_samples, collapse = ', ')}}"
+        )
+    }
+
+    if (n_taxa_removed > 0) {
+        cli::cli_alert_info(
+            "{.val {n_taxa_removed}} taxa removed (zero abundance)"
+        )
+    }
+
+    cli::cli_alert_success(
+        "Output: {.val {nrow(mean_data)}} samples x {.val {ncol(mean_data)}} taxa"
+    )
 
     return(mean_data)
 }
