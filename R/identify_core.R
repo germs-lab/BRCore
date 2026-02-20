@@ -105,12 +105,6 @@ identify_core <- function(
     if (is.null(seed)) {
         cli::cli_warn("No seed was set. Results may not be reproducible.")
     } else {
-        # Save current RNG state to restore later
-        old_rng_kind <- RNGkind()
-        on.exit(RNGkind(old_rng_kind[1], old_rng_kind[2], old_rng_kind[3]), add = TRUE)
-        
-        # Set explicit RNG algorithm for cross-platform reproducibility
-        RNGkind("Mersenne-Twister", "Inversion", "Rejection")
         set.seed(seed)
     }
 
