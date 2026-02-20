@@ -26,6 +26,7 @@
 #' @importFrom phyloseq otu_table
 #' @importFrom vegan rrarefy
 #' @importFrom cli cli_text cli_warn
+#' @importFrom utils head
 #'
 #' @examples
 #' \donttest{
@@ -53,6 +54,7 @@ multi_rarefy <- function(
     threads = get_available_cores(),
     set_seed = NULL
 ) {
+    # Input validation ----
     cli::cli_text("\nSeed used: {set_seed}\n")
 
     if (is.null(set_seed)) {
@@ -66,11 +68,12 @@ multi_rarefy <- function(
         stop("Input must be a phyloseq object, not a data.frame")
     }
 
+    # Prepare data ----
     dataframe <- as.data.frame(
         as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
     )
 
-    ### debug ###
+    ### debug ###########################################
 
     printAndReturn <- function(x) {
         print("\n--- rowSums dplyr::across ---\n")
@@ -142,29 +145,29 @@ multi_rarefy <- function(
     # critical: row totals vs sample sums
     print(summary(rowSums(dataframe)))
 
-    ### end debug ###
+    ### end debug #######################################
 
-    # Parallel setup
+    # Parallel setup ----
     threads <- min(threads, availableCores())
     cl <- makeCluster(threads)
     on.exit(stopCluster(cl), add = TRUE)
 
     # Export needed objects/packages to workers
-    # Note: iteration_seeds may be NULL when set_seed is NULL, which is handled in worker logic
     clusterExport(
         cl,
-        varlist = c("dataframe", "depth_level"),
+        varlist = c("dataframe", "depth_level", ".single_rarefy", "set_seed"),
         envir = environment()
     )
 
-    # Run rarefactions in parallel
+    # Run rarefactions in parallel ----
     com_iter <- parLapply(cl, 1:num_iter, function(i) {
         set.seed(set_seed + i) # each worker gets a different but reproducible seed
-        df <- rrarefy(dataframe, sample = depth_level)
+        df <- .single_rarefy(dataframe, sample = depth_level)
         df <- as.data.frame(df)
         rownames_to_column(df, "sample_id")
     })
-    # Aggregate results
+
+    # Aggregate results ----
     mean_data <- bind_rows(com_iter) |>
         group_by(sample_id) |>
         summarise(across(everything(), mean), .groups = "drop") |>
@@ -174,8 +177,40 @@ multi_rarefy <- function(
         ) |>
         column_to_rownames("sample_id")
 
-    # Remove ASVs/OTUs with zero total abundance using base R
+    # Remove ASVs/OTUs with zero total abundance
     mean_data <- mean_data[, colSums(mean_data) > 0]
 
     return(mean_data)
+}
+
+
+#' Single rarefaction iteration
+#'
+#' @param x A matrix with samples as rows and taxa as columns.
+#' @param sample_size The number of sequences to sample.
+#'
+#' @return A matrix with rarefied counts.
+#'
+#' @noRd
+#' @keywords internal
+.single_rarefy <- function(x, sample_size) {
+    x <- as.matrix(x)
+
+    out <- t(apply(x, 1, function(row) {
+        total <- sum(row)
+        if (total < sample_size) {
+            return(rep(NA_integer_, length(row)))
+        }
+
+        sampled <- sample(
+            rep(seq_along(row), times = row),
+            size = sample_size,
+            replace = FALSE
+        )
+        tabulate(sampled, nbins = length(row))
+    }))
+
+    colnames(out) <- colnames(x)
+    rownames(out) <- rownames(x)
+    out
 }
