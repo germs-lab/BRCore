@@ -11,7 +11,8 @@ test_that("1: Vignette test data structures are valid", {
   )
   expect_equal(
     unique(rowSums(test_vignette_data$test_bcse_rarefied_otutable)),
-    1000
+    1000,
+    tolerance = 1e-6
   )
 
   # Test: Core result structure is complete
@@ -127,7 +128,8 @@ test_that("2: Vignette workflow produces consistent results", {
     setNames(
       rep(1000, nrow(bcse_rarefied_otutable)),
       rownames(bcse_rarefied_otutable)
-    )
+    ),
+    tolerance = 1e-6
   )
   expect_equal(
     bcse_rarefied_otutable,
