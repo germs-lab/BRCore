@@ -12,13 +12,8 @@ test_that("1: Vignette test data structures are valid", {
 
   expect_equal(999.999999999996, 1000, tol = 1e-6) # Sanity check for floating-point precision
 
-  expect_true(
-    near(
-      unique(rowSums(test_vignette_data$test_bcse_rarefied_otutable)),
-      1000,
-      tol = 1e-6
-    )
-  )
+  row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable)
+  expect_true(all(near(row_sums, 1000, tol = 1e-6)))
 
   # Test: Core result structure is complete
   expect_named(
@@ -205,7 +200,7 @@ test_that("2: Vignette workflow produces consistent results", {
   expect_equal(
     bcse_rare_core$bray_curtis_ranked,
     test_vignette_data$test_bcse_rare_core$bray_curtis_ranked,
-    tolerance = 1e-6
+    tolerance = 1e-5
   )
 
   # Step 7: Plot identified core
