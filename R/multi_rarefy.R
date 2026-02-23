@@ -105,6 +105,14 @@ multi_rarefy <- function(
 
     ### end debug #######################################
 
+    # --- Generate iteration-specific seeds deterministically ---
+    if (!is.null(set_seed)) {
+        set.seed(set_seed)
+        iteration_seeds <- sample.int(.Machine$integer.max, num_iter)
+    } else {
+        iteration_seeds <- rep(NA_integer_, num_iter)
+    }
+
     # Parallel setup ----
     threads <- min(threads, availableCores())
     cl <- makeCluster(threads)
@@ -113,7 +121,12 @@ multi_rarefy <- function(
     # Export needed objects/packages to workers
     clusterExport(
         cl,
-        varlist = c("dataframe", "depth_level", ".single_rarefy", "set_seed"),
+        varlist = c(
+            "dataframe",
+            "depth_level",
+            ".single_rarefy",
+            "iteration_seeds"
+        ),
         envir = environment()
     )
 
@@ -121,7 +134,9 @@ multi_rarefy <- function(
     cli::cli_alert_info("Running rarefaction...")
 
     com_iter <- parLapply(cl, 1:num_iter, function(i) {
-        set.seed(set_seed + i) # each worker gets a different but reproducible seed
+        if (!is.na(iteration_seeds[i])) {
+            set.seed(iteration_seeds[i])
+        }
         df <- .single_rarefy(dataframe, sample_size = depth_level)
         df <- as.data.frame(df)
         rownames_to_column(df, "sample_id")
