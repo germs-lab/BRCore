@@ -200,7 +200,7 @@ test_that("2: Vignette workflow produces consistent results", {
   expect_equal(
     bcse_rare_core$bray_curtis_ranked,
     test_vignette_data$test_bcse_rare_core$bray_curtis_ranked,
-    tolerance = 1e-5
+    tolerance = 1e-6
   )
 
   # Step 7: Plot identified core
