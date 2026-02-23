@@ -135,6 +135,7 @@ multi_rarefy <- function(
         summarise(across(everything(), mean), .groups = "drop") |>
         filter(
             dplyr::near(
+                # We use near() to account for floating-point precision issues that can arise when averaging counts
                 rowSums(across(where(is.numeric))),
                 depth_level,
                 tol = 1e-6

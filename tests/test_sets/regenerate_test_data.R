@@ -8,7 +8,7 @@
 #
 # This will regenerate the reference data used by test-vignette-workflow.R
 
-library(BRCore)
+devtools::load_all()
 library(phyloseq)
 library(tidyverse)
 library(viridis)
