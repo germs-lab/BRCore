@@ -20,12 +20,11 @@
 #'
 #' @importFrom parallelly availableCores
 #' @importFrom parallel makeCluster stopCluster clusterExport parLapply
-#' @importFrom dplyr  bind_rows group_by summarise across everything filter
+#' @importFrom dplyr bind_rows group_by summarise across everything filter near
 #' @importFrom dplyr where
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom phyloseq otu_table
-#' @importFrom vegan rrarefy
-#' @importFrom cli cli_text cli_warn
+#' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning cli_alert_success cli_alert_danger
 #' @importFrom utils head
 #'
 #' @examples
@@ -47,7 +46,7 @@
 #' }
 #'
 #' @export
-multi_rarefy_old <- function(
+multi_rarefy <- function(
     physeq,
     depth_level,
     num_iter = 100,
@@ -86,7 +85,7 @@ multi_rarefy_old <- function(
 
     # Input parameter checks ----
     cli::cli_alert_info(
-        "Input: {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
+        "Input (matrix/df dim): {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
     )
     cli::cli_alert_info("Rarefaction depth: {.val {depth_level}}")
     cli::cli_alert_info("Iterations: {.val {num_iter}}")
@@ -94,20 +93,12 @@ multi_rarefy_old <- function(
     cli::cli_alert_info("taxa_are_rows: {phyloseq::taxa_are_rows(physeq)}")
 
     cli::cli_alert_info(
-        "OTU matrix/df dim: {paste(dim(dataframe), collapse = ' x ')}"
-    )
-    cli::cli_alert_info(
         "OTU matrix/df rownames head: {paste(head(rownames(dataframe)), collapse = ', ')}"
     )
     cli::cli_alert_info(
         "OTU matrix/df colnames head: {paste(head(colnames(dataframe)), collapse = ', ')}"
     )
-    cli::cli_alert_info(
-        "Rows match sample_names: {all(rownames(dataframe) %in% phyloseq::sample_names(physeq))}"
-    )
-    cli::cli_alert_info(
-        "Cols match taxa_names: {all(colnames(dataframe) %in% phyloseq::taxa_names(physeq))}"
-    )
+
     cli::cli_alert_info(
         "Row sums summary: Min={min(rowSums(dataframe))}, Max={max(rowSums(dataframe))}, Median={median(rowSums(dataframe))}"
     )
@@ -143,7 +134,12 @@ multi_rarefy_old <- function(
         group_by(sample_id) |>
         summarise(across(everything(), mean), .groups = "drop") |>
         filter(
-            round(rowSums(across(where(is.numeric)))) >= depth_level
+            dplyr::near(
+                rowSums(across(where(is.numeric))),
+                depth_level,
+                tol = 1e-6
+            ) |
+                rowSums(across(where(is.numeric))) >= depth_level
         ) |>
         column_to_rownames("sample_id")
 
@@ -211,174 +207,4 @@ multi_rarefy_old <- function(
     colnames(out) <- colnames(x)
     rownames(out) <- rownames(x)
     out
-}
-
-## CURRENT IMPLEMENTATION
-
-#' Run multiple rarefaction for microbiome count tables
-#'
-#' This function performs multiple rarefaction on a `phyloseq` object by randomly
-#' sub-sampling OTUs/ASVs within samples without replacement. The process is
-#' repeated for a specified number of iterations, and the results are averaged.
-#' Samples with fewer OTUs/ASVs than the specified `depth_level` are discarded.
-#'
-#' @param physeq A `phyloseq` object containing an OTU/ASV table.
-#' @param depth_level An integer specifying the sequencing depth (number of
-#'   OTUs/ASVs) to which samples should be rarefied.
-#' @param num_iter An integer specifying the number of iterations to perform
-#'   for rarefaction.
-#' @param threads Number of threads (default = 4).
-#' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
-#'
-#' @return A data frame with taxa as rows and samples as columns. The values
-#'   represent the average sequence counts calculated across all iterations.
-#'   Samples with less than `depth_level` sequences are discarded.
-#'
-#'
-#' @importFrom parallelly availableCores
-#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
-#' @importFrom dplyr bind_rows group_by summarise across everything filter near
-#' @importFrom dplyr where
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom phyloseq otu_table
-#' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning cli_alert_success cli_alert_danger
-#' @importFrom utils head
-#'
-#' @examples
-#' \donttest{
-#' library(phyloseq)
-#' library(BRCore)
-#' data("bcse", package = "BRCore")
-#'
-#' # Example rarefaction (single iteration, single core to keep examples fast)
-#' otu_table_rare <- multi_rarefy(
-#'    physeq = bcse,
-#'    depth_level = 1000,
-#'    num_iter = 100,
-#'    threads = 2,
-#'    set_seed = 7642
-#')
-#'
-#' rowSums(otu_table_rare)
-#' }
-#'
-#' @export
-multi_rarefy <- function(
-    physeq,
-    depth_level,
-    num_iter = 100,
-    threads = get_available_cores(),
-    set_seed = NULL
-) {
-    # Input validation ----
-    cli::cli_h1("Multiple Rarefaction")
-    cli::cli_h2("Input Validation")
-
-    if (!requireNamespace("phyloseq", quietly = TRUE)) {
-        cli::cli_alert_danger(
-            "The 'phyloseq' package is required but not installed."
-        )
-        stop("Please install 'phyloseq' to use this function.")
-    }
-
-    if (!inherits(physeq, "phyloseq")) {
-        cli::cli_alert_danger(
-            "Input must be a phyloseq object, not a {.cls {class(physeq)}}"
-        )
-        stop("Input must be a phyloseq object")
-    }
-
-    if (is.null(set_seed)) {
-        cli::cli_alert_warning("No seed set. Results may not be reproducible.")
-    } else {
-        cli::cli_alert_info("Seed: {.val {set_seed}}")
-        set.seed(set_seed)
-    }
-
-    # Prepare data ----
-    otu <- phyloseq::otu_table(physeq)
-    otu_mat <- as(otu, "matrix")
-
-    # Make it samples x taxa (always)
-    if (phyloseq::taxa_are_rows(otu)) {
-        otu_mat <- t(otu_mat)
-    }
-
-    dataframe <- as.data.frame(otu_mat, check.names = FALSE)
-
-    # Input parameter checks ----
-    cli::cli_alert_info(
-        "Input: {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
-    )
-    cli::cli_alert_info("Rarefaction depth: {.val {depth_level}}")
-    cli::cli_alert_info("Iterations: {.val {num_iter}}")
-
-    # Parallel setup ----
-    threads <- min(threads, availableCores())
-    cl <- makeCluster(threads)
-    on.exit(stopCluster(cl), add = TRUE)
-
-    clusterExport(
-        cl,
-        varlist = c("dataframe", "depth_level", ".single_rarefy", "set_seed"),
-        envir = environment()
-    )
-
-    # Run rarefactions in parallel ----
-    cli::cli_alert_info("Running rarefaction...")
-
-    com_iter <- parLapply(cl, 1:num_iter, function(i) {
-        set.seed(set_seed + i)
-        df <- .single_rarefy(dataframe, sample_size = depth_level)
-        df <- as.data.frame(df)
-        tibble::rownames_to_column(df, "sample_id")
-    })
-
-    # Aggregate results ----
-    n_samples_before <- nrow(dataframe)
-
-    mean_data <- bind_rows(com_iter) |>
-        group_by(sample_id) |>
-        summarise(across(everything(), mean), .groups = "drop") |>
-        filter(
-            dplyr::near(
-                rowSums(across(where(is.numeric))),
-                depth_level,
-                tol = .Machine$double.eps^0.5
-            ) | rowSums(across(where(is.numeric))) > depth_level
-        ) |>
-        column_to_rownames("sample_id")
-
-    # Remove ASVs/OTUs with zero total abundance
-    n_taxa_before <- ncol(mean_data)
-    mean_data <- mean_data[, colSums(mean_data) > 0]
-    n_taxa_after <- ncol(mean_data)
-
-    # Report results ----
-    n_samples_after <- nrow(mean_data)
-    n_samples_removed <- n_samples_before - n_samples_after
-    n_taxa_removed <- n_taxa_before - n_taxa_after
-
-    cli::cli_h2("Rarefaction Results")
-    if (n_samples_removed > 0) {
-        cli::cli_alert_warning(
-            "{.val {n_samples_removed}} sample{?s} removed (depth < {.val {depth_level}})"
-        )
-        removed_samples <- setdiff(rownames(dataframe), rownames(mean_data))
-        cli::cli_alert_warning(
-            "Samples removed: {.val {paste(removed_samples, collapse = ', ')}}"
-        )
-    }
-
-    if (n_taxa_removed > 0) {
-        cli::cli_alert_info(
-            "{.val {n_taxa_removed}} taxa removed (zero abundance)"
-        )
-    }
-
-    cli::cli_alert_success(
-        "Output: {.val {nrow(mean_data)}} samples x {.val {ncol(mean_data)}} taxa"
-    )
-
-    return(mean_data)
 }
