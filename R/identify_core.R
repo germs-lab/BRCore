@@ -118,8 +118,12 @@ identify_core <- function(
 
     # define arguments ---------------------------------
 
-    if (min(sample_sums(physeq_obj)) == max(sample_sums(physeq_obj))) {
-        nReads <- min(sample_sums(physeq_obj))
+    # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
+    min_sum <- min(sample_sums(physeq_obj))
+    max_sum <- max(sample_sums(physeq_obj))
+
+    if (abs(min_sum - max_sum) < 1e-6) {
+        nReads <- round(min_sum) # Use rounded value for display
         cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
     } else {
         stop("The otu_table() is not rarefied!")

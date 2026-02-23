@@ -17,8 +17,7 @@ test_that("1: Vignette test data structures are valid", {
       unique(rowSums(test_vignette_data$test_bcse_rarefied_otutable)),
       1000,
       tol = 1e-6
-    ),
-    1000
+    )
   )
 
   # Test: Core result structure is complete
