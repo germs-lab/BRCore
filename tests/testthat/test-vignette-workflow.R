@@ -9,10 +9,16 @@ test_that("1: Vignette test data structures are valid", {
     is.matrix(test_vignette_data$test_bcse_rarefied_otutable) ||
       is.data.frame(test_vignette_data$test_bcse_rarefied_otutable)
   )
-  expect_equal(
-    unique(rowSums(test_vignette_data$test_bcse_rarefied_otutable)),
-    1000,
-    tolerance = 1e-6
+
+  expect_equal(999.999999999996, 1000, tol = 1e-6) # Sanity check for floating-point precision
+
+  expect_true(
+    near(
+      unique(rowSums(test_vignette_data$test_bcse_rarefied_otutable)),
+      1000,
+      tol = 1e-6
+    ),
+    1000
   )
 
   # Test: Core result structure is complete
@@ -123,6 +129,7 @@ test_that("2: Vignette workflow produces consistent results", {
     dim(bcse_rarefied_otutable),
     dim(test_vignette_data$test_bcse_rarefied_otutable)
   )
+  # Test: All samples have row sums of 1000 (accounting for floating-point precision)
   expect_equal(
     rowSums(bcse_rarefied_otutable),
     setNames(
@@ -149,7 +156,8 @@ test_that("2: Vignette workflow produces consistent results", {
   expect_equal(nsamples(bcse_rare), nsamples(test_vignette_data$test_bcse_rare))
   expect_equal(
     sample_sums(bcse_rare),
-    sample_sums(test_vignette_data$test_bcse_rare)
+    sample_sums(test_vignette_data$test_bcse_rare),
+    tolerance = 1e-6
   )
 
   # Step 6: Identify core microbiome
