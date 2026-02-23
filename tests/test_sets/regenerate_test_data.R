@@ -2,7 +2,7 @@
 # Run this script after making changes to multi_rarefy() or other functions
 # that affect the vignette workflow outputs.
 #
-# Usage: 
+# Usage:
 #   cd BRCore
 #   Rscript tests/test_sets/regenerate_test_data.R
 #
@@ -34,7 +34,7 @@ test_bcse_rarefied_otutable <- multi_rarefy(
   physeq = bcse,
   depth_level = 1000,
   num_iter = 100,
-  threads = 1,  # Single thread for consistency with CI test configuration
+  threads = 1, # Single thread for consistency with CI test configuration
   set_seed = 7642
 )
 
@@ -147,7 +147,9 @@ test_bcse_rare_core_neutral_fit <- fit_neutral_model(
 
 # Step 12: Plot neutral model
 cat("Plotting neutral model...\n")
-test_plot_bcse_neutral_fit <- plot_neutral_model(test_bcse_rare_core_neutral_fit)
+test_plot_bcse_neutral_fit <- plot_neutral_model(
+  test_bcse_rare_core_neutral_fit
+)
 
 # Assemble the test data list
 cat("\nAssembling test data...\n")
