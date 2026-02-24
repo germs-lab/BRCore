@@ -1,6 +1,6 @@
 Package: BRCore
 Title: Provides a Set of Tools to Process and Analyze Microbial Data from Bioenergy Research Centers
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
     person("Bolívar", "Aponte Rolón", email = "bolaponte@pm.me", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2544-4551")),
