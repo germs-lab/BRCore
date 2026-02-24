@@ -101,20 +101,12 @@ test_that("2: Vignette workflow produces consistent results", {
   )
 
   # Step 4: Multiple rarefaction
-  # Use single thread on CI to ensure reproducibility
-  n_threads <- if (nzchar(Sys.getenv("CI"))) {
-    1
-  } else if (.Platform$OS.type == "windows") {
-    1
-  } else {
-    2
-  }
 
   bcse_rarefied_otutable <- multi_rarefy(
     physeq = bcse,
     depth_level = 1000,
     num_iter = 100,
-    threads = n_threads,
+    threads = get_available_cores(),
     set_seed = 7642
   )
 
@@ -261,20 +253,11 @@ test_that("3: Vignette core distribution plots are consistent", {
   library(tidyverse)
   library(viridis)
 
-  # Use single thread on CI to ensure reproducibility
-  n_threads <- if (nzchar(Sys.getenv("CI"))) {
-    1
-  } else if (.Platform$OS.type == "windows") {
-    1
-  } else {
-    2
-  }
-
   bcse_rarefied_otutable <- multi_rarefy(
     physeq = bcse,
     depth_level = 1000,
     num_iter = 100,
-    threads = n_threads,
+    threads = get_available_cores(),
     set_seed = 7642
   )
 
@@ -381,20 +364,11 @@ test_that("4: Vignette neutral model fitting is consistent", {
   library(phyloseq)
   library(tidyverse)
 
-  # Use single thread on CI to ensure reproducibility
-  n_threads <- if (nzchar(Sys.getenv("CI"))) {
-    1
-  } else if (.Platform$OS.type == "windows") {
-    1
-  } else {
-    2
-  }
-
   bcse_rarefied_otutable <- multi_rarefy(
     physeq = bcse,
     depth_level = 1000,
     num_iter = 100,
-    threads = n_threads,
+    threads = get_available_cores(),
     set_seed = 7642
   )
 
