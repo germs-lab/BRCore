@@ -71,11 +71,29 @@ multi_rarefy <- function(
         stop("Input must be a phyloseq object")
     }
 
+    if (!is.numeric(depth_level) || depth_level <= 0) {
+        cli::cli_alert_danger("depth_level must be a positive number")
+        stop("Invalid depth_level")
+    }
+
+    if (!is.numeric(num_iter) || num_iter <= 0) {
+        cli::cli_alert_danger("num_iter must be a positive integer")
+        stop("Invalid num_iter")
+    }
+
+    if (!is.numeric(threads) || threads <= 0) {
+        cli::cli_alert_danger("threads must be a positive integer")
+        stop("Invalid threads")
+    }
+
+    # Seed setup: iteration-specific seeds deterministically ---
     if (is.null(set_seed)) {
         cli::cli_alert_warning("No seed set. Results may not be reproducible.")
+        iteration_seeds <- rep(NA_integer_, num_iter)
     } else {
         cli::cli_alert_info("Seed: {.val {set_seed}}")
         set.seed(set_seed)
+        iteration_seeds <- sample.int(.Machine$integer.max, num_iter)
     }
 
     # Prepare data ----
@@ -102,16 +120,6 @@ multi_rarefy <- function(
     cli::cli_alert_info(
         "Row sums summary: Min={min(rowSums(dataframe))}, Max={max(rowSums(dataframe))}, Median={median(rowSums(dataframe))}"
     )
-
-    ### end debug #######################################
-
-    # --- Generate iteration-specific seeds deterministically ---
-    if (!is.null(set_seed)) {
-        set.seed(set_seed)
-        iteration_seeds <- sample.int(.Machine$integer.max, num_iter)
-    } else {
-        iteration_seeds <- rep(NA_integer_, num_iter)
-    }
 
     # Parallel setup ----
     threads <- min(threads, availableCores())
@@ -153,9 +161,8 @@ multi_rarefy <- function(
                 # We use near() to account for floating-point precision issues that can arise when averaging counts
                 rowSums(across(where(is.numeric))),
                 depth_level,
-                tol = 1e-6
-            ) |
-                rowSums(across(where(is.numeric))) >= depth_level
+                tol = 1e-6 # Accept values within ±0.5 of depth_level
+            )
         ) |>
         column_to_rownames("sample_id")
 
