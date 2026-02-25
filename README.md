@@ -1,7 +1,6 @@
+# BRCore
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-# BRCore
 
 <!-- badges: start -->
 
@@ -11,7 +10,6 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![Codecov test
 coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.codecov.io/gh/germs-lab/BRCore)
 [![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
-
 <!-- badges: end -->
 
 BRCore provides a unified framework for identification and ecological
