@@ -8,19 +8,15 @@
 #' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 #'
 #' @param physeq_obj A `phyloseq` object with at least `otu_table` and `sample_data`.
-#' @param priority_var The column name in the `sample_data` (e.g. "sampling_date",
-#' "site") that is used for prioritizing the core microbiome.
+#' @param priority_var The column name in the `sample_data` (e.g. "sampling_date", "site") that is used for prioritizing the core microbiome.
 #' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
-#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
-#'   abundance in the ranking score. `0` (default) uses occupancy/composite
-#'   only. `1` ranks purely by abundance. Values in between blend the two
-#'   (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
+#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative abundance in the ranking score. `0` (default) uses occupancy/composite only. `1` ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
+#' @param max_otus Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)
 #' @param seed Optional integer to set the RNG seed for reproducibility.
 #'
 #' @return A list with:
 #' \itemize{
-#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis similarity
-#'   across sample pairs (`MeanBC`) at each cumulative `rank`, normalized proportion
+#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis similarity across sample pairs (`MeanBC`) at each cumulative `rank`, normalized proportion
 #'   (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric (`elbow_slope_diffs`).
 #'   \item \code{otu_ranked} tibble with ranked OTU/ASVs .
 #'   \item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy
@@ -40,7 +36,7 @@
 #' The core set is defined using two separate methods:
 #'
 #' The function rank OTU/ASVs by occupancy (optionally with abundance
-#' weighting: `rank_score = (1 − weight) * Index + weight * scaled_abundance`,
+#' weighting: `rank_score = (1 - weight) * Index + weight * scaled_abundance`,
 #' where scaled_abundance is mean relative abundance rescaled to `[0,1]`). For
 #' each `k = 1..K`, recompute `S_k` as the mean Bray-Curtis similarity across
 #' all sample pairs using only the first `k` ranked OTUs; when `k = K`, this
@@ -48,14 +44,14 @@
 #' gives `C_k = S_k / S_K`.
 #'
 #' The **elbow** is the point of diminishing returns: for each `k`, compare the
-#' average *left* slope `(S_k − S_1) / (k − 1)` to the average *right* slope
-#' `(S_K − S_k) / (K − k)`, and choose the `k` that maximizes `(left − right)`.
+#' average *left* slope `(S_k - S_1) / (k - 1)` to the average *right* slope
+#' `(S_K - S_k) / (K - k)`, and choose the `k` that maximizes `(left - right)`.
 #'
 #' The **last percent Bray-Curtis increase** method uses the same accumulation
 #' curve, examine the multiplicative step when adding the `k-th` OTU:
-#' `Increase_k = S_k / S_{k−1}` (equivalently, `Increase_k = C_k / C_{k−1}`).
-#' Choose the largest `k` such that `Increase_k ≥ 1 + p`, where `p` is your
-#' chosen percent threshold (increase_value; recommended `p ≥ 0.02` or `2%`).
+#' `Increase_k = S_k / S_{k-1}` (equivalently, `Increase_k = C_k / C_{k-1}`).
+#' Choose the largest `k` such that `Increase_k >= 1 + p`, where `p` is your
+#' chosen percent threshold (increase_value; recommended `p >= 0.02` or `2%`).
 #' This selects the final rank for which adding one more taxon still increases
 #' the explained Bray-Curtis similarity by at least `p`.
 #'
@@ -68,7 +64,7 @@
 #' and \pkg{vegan}.
 #'
 #' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data tax_table
-#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last select
+#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last select slice_head
 #' @importFrom tidyr pivot_longer gather
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang ensym as_name .data
@@ -100,6 +96,7 @@ identify_core <- function(
     priority_var,
     increase_value = 0.02,
     abundance_weight = 0,
+    max_otus = NULL,
     seed = NULL
 ) {
     # input checks ---------------------------------
@@ -121,8 +118,12 @@ identify_core <- function(
 
     # define arguments ---------------------------------
 
-    if (min(sample_sums(physeq_obj)) == max(sample_sums(physeq_obj))) {
-        nReads <- min(sample_sums(physeq_obj))
+    # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
+    min_sum <- min(sample_sums(physeq_obj))
+    max_sum <- max(sample_sums(physeq_obj))
+
+    if (abs(min_sum - max_sum) < 1e-6) {
+        nReads <- round(min_sum) # Use rounded value for display
         cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
     } else {
         stop("The otu_table() is not rarefied!")
@@ -206,19 +207,25 @@ identify_core <- function(
             .groups = "drop"
         )
 
-    #  weight in abundance ---------------------------------
-    if (abundance_weight < 0 | abundance_weight > 1) {
-        cli::cli_abort("abundance_weight must be between 0 and 1")
-    }
-
+    # Rank and weight in abundance ---------------------------------
     otu_ranked <- occ_abun |>
         left_join(PresenceSum, by = 'otu')
+
+    rank_method <- if (abundance_weight > 0) {
+        paste0("Index + abundance (weight = ", abundance_weight, ")")
+    } else {
+        "Index only"
+    }
 
     if (abundance_weight == 0) {
         # No abundance weighting - use Index directly
         otu_ranked <- otu_ranked |>
             mutate(rank = Index) |>
             arrange(desc(rank))
+
+        cli::cli_alert_info(
+            "Ranked by {rank_method}."
+        )
     } else {
         otu_ranked <- otu_ranked |>
             mutate(
@@ -239,6 +246,32 @@ identify_core <- function(
                 otu_occ,
                 otu_rel
             )
+        cli::cli_alert_info(
+            "Ranked by {rank_method})."
+        )
+    }
+
+    # Optional: Limit analysis to top N OTUs
+    if (!is.null(max_otus)) {
+        if (!is.numeric(max_otus) || max_otus < 1) {
+            cli::cli_abort("`max_otus` must be a positive integer.")
+        }
+
+        max_otus <- as.integer(max_otus)
+
+        if (max_otus < nrow(otu_ranked)) {
+            total_otus <- nrow(otu_ranked)
+            otu_ranked <- otu_ranked |>
+                slice_head(n = max_otus)
+
+            cli::cli_alert_info(
+                "Limiting analysis to top {max_otus} of {total_otus} OTUs (ranked by {rank_method})."
+            )
+        } else {
+            cli::cli_alert_info(
+                "max_otus ({max_otus}) >= total OTUs ({nrow(otu_ranked)}). Using all OTUs (ranked by {rank_method})."
+            )
+        }
     }
 
     otu_ranked_ordered <- otu_ranked$otu

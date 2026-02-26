@@ -1,6 +1,6 @@
 # tests/testthat/test-plot_abundance_occupancy.R
 test_that("plot_abundance_occupancy returns a ggplot and builds", {
-    testthat::skip_if_not_installed("ggplot2")
+    skip_if_not_installed("ggplot2")
 
     abundance_occupancy <- data.frame(
         otu = paste0("OTU", 1:100),
@@ -24,6 +24,6 @@ test_that("plot_abundance_occupancy returns a ggplot and builds", {
         core_set = "increase"
     )
 
-    testthat::expect_s3_class(p, "ggplot")
-    testthat::expect_silent(ggplot2::ggplot_build(p))
+    expect_s3_class(p, "ggplot")
+    expect_silent(ggplot2::ggplot_build(p))
 })

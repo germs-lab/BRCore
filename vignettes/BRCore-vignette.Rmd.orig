@@ -258,7 +258,7 @@ plot_abund_occ_elbow <- plot_abundance_occupancy(
 )
 ```
 
-```{r fig_4_plot_elbow, echo=TRUE, fig.width=7, fig.height=6}
+```{r fig4_plot_elbow, echo=TRUE, fig.width=7, fig.height=6}
 plot_abund_occ_elbow +
   scale_fill_manual(values = c("darkgreen", "grey"))
 ```

@@ -9,29 +9,27 @@ identify_core(
   priority_var,
   increase_value = 0.02,
   abundance_weight = 0,
+  max_otus = NULL,
   seed = NULL
 )
 }
 \arguments{
 \item{physeq_obj}{A \code{phyloseq} object with at least \code{otu_table} and \code{sample_data}.}
 
-\item{priority_var}{The column name in the \code{sample_data} (e.g. "sampling_date",
-"site") that is used for prioritizing the core microbiome.}
+\item{priority_var}{The column name in the \code{sample_data} (e.g. "sampling_date", "site") that is used for prioritizing the core microbiome.}
 
 \item{increase_value}{Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).}
 
-\item{abundance_weight}{Numeric in \verb{[0,1]}; how much to weight mean relative
-abundance in the ranking score. \code{0} (default) uses occupancy/composite
-only. \code{1} ranks purely by abundance. Values in between blend the two
-(e.g., abundance_weight = 0.3 gives 70\% occupancy/composite + 30\% abundance).}
+\item{abundance_weight}{Numeric in \verb{[0,1]}; how much to weight mean relative abundance in the ranking score. \code{0} (default) uses occupancy/composite only. \code{1} ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70\% occupancy/composite + 30\% abundance).}
+
+\item{max_otus}{Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)}
 
 \item{seed}{Optional integer to set the RNG seed for reproducibility.}
 }
 \value{
 A list with:
 \itemize{
-\item \code{bray_curtis_ranked} tibble with \code{rank}, mean Bray-Curtis similarity
-across sample pairs (\code{MeanBC}) at each cumulative \code{rank}, normalized proportion
+\item \code{bray_curtis_ranked} tibble with \code{rank}, mean Bray-Curtis similarity across sample pairs (\code{MeanBC}) at each cumulative \code{rank}, normalized proportion
 (\code{proportionBC}), the multiplicative \code{IncreaseBC}, and the elbow metric (\code{elbow_slope_diffs}).
 \item \code{otu_ranked} tibble with ranked OTU/ASVs .
 \item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy
@@ -58,7 +56,7 @@ and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 The core set is defined using two separate methods:
 
 The function rank OTU/ASVs by occupancy (optionally with abundance
-weighting: \verb{rank_score = (1 − weight) * Index + weight * scaled_abundance},
+weighting: \code{rank_score = (1 - weight) * Index + weight * scaled_abundance},
 where scaled_abundance is mean relative abundance rescaled to \verb{[0,1]}). For
 each \verb{k = 1..K}, recompute \code{S_k} as the mean Bray-Curtis similarity across
 all sample pairs using only the first \code{k} ranked OTUs; when \code{k = K}, this
@@ -66,14 +64,14 @@ yields \code{S_K}, the value computed with all OTUs. Normalizing by \code{S_K}
 gives \code{C_k = S_k / S_K}.
 
 The \strong{elbow} is the point of diminishing returns: for each \code{k}, compare the
-average \emph{left} slope \verb{(S_k − S_1) / (k − 1)} to the average \emph{right} slope
-\verb{(S_K − S_k) / (K − k)}, and choose the \code{k} that maximizes \verb{(left − right)}.
+average \emph{left} slope \code{(S_k - S_1) / (k - 1)} to the average \emph{right} slope
+\code{(S_K - S_k) / (K - k)}, and choose the \code{k} that maximizes \code{(left - right)}.
 
 The \strong{last percent Bray-Curtis increase} method uses the same accumulation
 curve, examine the multiplicative step when adding the \code{k-th} OTU:
-\verb{Increase_k = S_k / S_\{k−1\}} (equivalently, \verb{Increase_k = C_k / C_\{k−1\}}).
-Choose the largest \code{k} such that \verb{Increase_k ≥ 1 + p}, where \code{p} is your
-chosen percent threshold (increase_value; recommended \verb{p ≥ 0.02} or \verb{2\%}).
+\verb{Increase_k = S_k / S_\{k-1\}} (equivalently, \verb{Increase_k = C_k / C_\{k-1\}}).
+Choose the largest \code{k} such that \code{Increase_k >= 1 + p}, where \code{p} is your
+chosen percent threshold (increase_value; recommended \code{p >= 0.02} or \verb{2\%}).
 This selects the final rank for which adding one more taxon still increases
 the explained Bray-Curtis similarity by at least \code{p}.
 }

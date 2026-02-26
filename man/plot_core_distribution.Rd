@@ -7,7 +7,7 @@
 plot_core_distribution(
   core_result,
   core_set = "elbow",
-  group_var = "sampling_date",
+  group_var = "Crop",
   plot_type = c("bar", "line", "heatmap")
 )
 }
