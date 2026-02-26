@@ -6,7 +6,17 @@
 # usethis::use_github_action("check-standard") will install it.
 on:
   push:
+    branches:
+      - "release/**"
+      - "patch*"
+      - "feature*"
+      - "feature/**"
+      - "patch/**"
   pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: # Manual trigger on ANY branch
 
 name: R-CMD-check.yaml
 
