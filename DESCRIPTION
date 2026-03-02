@@ -2,14 +2,25 @@ Package: BRCore
 Title: Provides a Set of Tools to Process and Analyze Microbial Data from Bioenergy Research Centers
 Version: 1.0.2
 Authors@R: c(
-    person("Bolívar", "Aponte Rolón", email = "bolaponte@pm.me", role = c("aut", "cre"),
+    person("Bolívar", "Aponte Rolón",
+           email = "bolaponte@pm.me", 
+           role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2544-4551")),
-    person("Gian Maria Niccolo", "Benucci", role = c("aut"), 
+    person("Gian Maria Niccolo", "Benucci",
+           role = "aut", 
            comment = c(ORCID = "0000-0003-1589-947X")),
-    person("Brandon", "Kristy", role = "aut"),
-    person("Ashley", "Shade", role = "aut"),
-    person("Nejc", "Stopnisek", role = "aut"),
-    person("Adina", "Howe", role = "ctb")
+    person("Brandon", "Kristy", 
+           role = "aut", 
+           comment = c(ORCID = "0000-0003-1589-947X")),
+    person("Ashley", "Shade", 
+           role = "aut", 
+           comment = c(ORCID = "0000-0002-7189-3067")),
+    person("Nejc", "Stopnisek", 
+           role = "aut", 
+           comment = c(ORCID = "0000-0002-1532-6826")),
+    person("Adina", "Howe", 
+           role = "ctb", 
+           comment = c(ORCID = "0000-0002-7705-343X")) 
   )
 Description: BRCore provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 License: MIT + file LICENSE
@@ -17,32 +28,32 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
-    cli,
-    dplyr,
-    ggplot2,
-    Hmisc,
-    magrittr,
-    scales,
-    minpack.lm,
-    parallel,
-    ggsci,
-    ggpubr,
-    ggrepel,
-    parallelly,
-    phyloseq,
-    rlang,
-    stats4,
-    tibble,
-    tidyr,
-    vegan
+    cli (>= 3.6.5),
+    dplyr (>= 1.1.4),
+    ggplot2 (>= 4.0.1),
+    ggpubr (>= 0.6.2),
+    ggrepel (>= 0.9.6),
+    ggsci (>= 4.1.0),
+    Hmisc (>= 5.2.4),
+    magrittr (>= 2.0.4),
+    minpack.lm (>= 1.2.4),
+    parallel (>= 4.5.2),
+    parallelly (>= 1.45.1),
+    phyloseq (>= 1.54.0),
+    rlang (>= 1.1.6),
+    scales (>= 1.4.0),
+    stats4 (>= 4.5.2),
+    tibble (>= 3.3.0),
+    tidyr (>= 1.3.1),
+    vegan (>= 2.7.2)
 Suggests:
-    tidyverse,
-    devtools,
-    viridis,
-    here,
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
+    devtools (>= 2.4.5),
+    here (>= 1.0.1),
+    knitr (>= 1.50),
+    rmarkdown (>= 2.30),
+    testthat (>= 3.2.3),
+    tidyverse (>= 2.0.0),
+    viridis (>= 0.6.5)
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.4)
