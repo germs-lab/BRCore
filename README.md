@@ -39,7 +39,13 @@ BRCore provides tools for:
 
 ### Quick Install (Recommended)
 
-Install the development version of BRCore from GitHub with:
+Install the latest *stable* version of BRCore from CRAN with:
+
+``` r
+install.packages("BRCore")
+```
+
+Install the *development* version of BRCore from GitHub with:
 
 ``` r
 # install.packages("pak")
