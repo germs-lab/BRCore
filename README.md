@@ -6,7 +6,8 @@
 <!-- badges: start -->
 
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)[![](https://www.r-pkg.org/badges/version/BRCore)](https://www.r-pkg.org/badges/version/BRCore)
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![](https://www.r-pkg.org/badges/version/BRCore)](https://www.r-pkg.org/badges/version/BRCore)
 [![](https://cranlogs.r-pkg.org/badges/grand-total/BRCore)](https://cran.r-project.org/package=BRCore)
 [![Codecov test
 coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.codecov.io/gh/germs-lab/BRCore)
@@ -36,18 +37,28 @@ BRCore provides tools for:
 
 ## Installation
 
-For stable releases, use:
+### Quick Install (Recommended)
+
+Install the latest *stable* version of BRCore from CRAN with:
 
 ``` r
 install.packages("BRCore")
 ```
 
-Install the development version of BRCore from GitHub with:
+Install the *development* version of BRCore from GitHub with:
 
 ``` r
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
+```
 
+***Note:*** *If you don’t have `pak` installed, you can use `devtools`
+or `remotes` but you may need to install dependencies manually. `pak`
+handles dependencies automatically.*
+
+### Install with Vignettes
+
+``` r
 # For the latest development version with vignettes, use:
 # install.packages("devtools")
 devtools::install_github("germs-lab/BRCore", build_vignettes = TRUE)
@@ -56,6 +67,9 @@ devtools::install_github("germs-lab/BRCore", build_vignettes = TRUE)
 # install.packages("remotes")
 remotes::install_github("germs-lab/BRCore", build_vignettes = TRUE)
 ```
+
+***Note:** Building vignettes requires additional time and dependencies.
+Use this option only if you need local access to documentation*
 
 ## Quick Start
 
@@ -103,8 +117,20 @@ plot_neutral_model(bcse_neutral)
 
 ## Documentation
 
-For detailed documentation and examples, see the package vignette:
+For detailed examples and use cases, see the package vignette:
 
 ``` r
 vignette("BRCore-vignette", package = "BRCore")
 ```
+
+## Contributing
+
+Contributions to BRCore are welcome! Please see the
+[CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to
+contribute.
+
+## Code of Conduct
+
+Please note that this project is released with a [Contributor Code of
+Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
+to abide by its terms.
