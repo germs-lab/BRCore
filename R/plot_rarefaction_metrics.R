@@ -181,7 +181,7 @@ plot_rarefaction_metrics <- function(data) {
     # Plot f - Ranked samples (fixed)
     {
       temp_df <- arrange(sample_df, read_num)
-      ggplot(temp_df, aes(x = 1:seq_len(temp_df), y = read_num)) +
+      ggplot(temp_df, aes(x = seq_len(nrow(temp_df)), y = read_num)) +
         geom_bar(stat = "identity", fill = "firebrick", color = NA) +
         scale_y_continuous(labels = scales::comma) +
         theme_classic() +
