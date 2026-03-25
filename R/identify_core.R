@@ -87,359 +87,359 @@
 #' )
 #'
 #' # Inspect results
-#'  str(res)
+#' str(res)
 #' }
 #'
 #' @export
 identify_core <- function(
-    physeq_obj,
-    priority_var,
-    increase_value = 0.02,
-    abundance_weight = 0,
-    max_otus = NULL,
-    seed = NULL
+  physeq_obj,
+  priority_var,
+  increase_value = 0.02,
+  abundance_weight = 0,
+  max_otus = NULL,
+  seed = NULL
 ) {
-    # input checks ---------------------------------
-    cli::cli_text("\nSeed used: {seed}\n")
+  # input checks ---------------------------------
+  cli::cli_text("\nSeed used: {seed}\n")
 
-    if (is.null(seed)) {
-        cli::cli_warn("No seed was set. Results may not be reproducible.")
-    } else {
-        set.seed(seed)
-    }
+  if (is.null(seed)) {
+    cli::cli_warn("No seed was set. Results may not be reproducible.")
+  } else {
+    set.seed(seed)
+  }
 
-    if (!inherits(physeq_obj, "phyloseq")) {
-        cli::cli_abort(
-            "{.arg physeq_obj} must be a 'phyloseq' object.\nYou've supplied a {class(physeq_obj)[1]} vector."
-        )
-    }
-
-    cli::cli_alert_success("Input phyloseq object is valid!")
-
-    # define arguments ---------------------------------
-
-    # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
-    min_sum <- min(sample_sums(physeq_obj))
-    max_sum <- max(sample_sums(physeq_obj))
-
-    if (abs(min_sum - max_sum) < 1e-6) {
-        nReads <- round(min_sum) # Use rounded value for display
-        cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
-    } else {
-        stop("The otu_table() is not rarefied!")
-    }
-
-    otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
-        as("matrix")
-    map <- sample_data(physeq_obj) |> as("data.frame")
-    map$sample_id <- rownames(map)
-
-    ### check for a tax_table if present, if not just print a warning and continue.
-    taxa <- NULL
-    tx <- tryCatch(tax_table(physeq_obj), error = function(e) NULL)
-
-    if (!is.null(tx)) {
-        txm <- tryCatch(as(tx, "matrix"), error = function(e) NULL)
-        if (!is.null(txm) && is.matrix(txm) && ncol(txm) > 0L) {
-            taxa <- as.data.frame(txm, stringsAsFactors = FALSE)
-        }
-    }
-
-    if (is.null(taxa)) {
-        cli::cli_alert_info(
-            "No taxonomy found (or empty). Continuing without taxonomy."
-        )
-    }
-
-    # core prioritizing variable ---------------------------------
-    data_var <- priority_var
-    cli::cli_alert_success("Core prioritizing variable: {data_var}")
-
-    # validate abundance_weight ---------------------------------
-    if (
-        !is.numeric(abundance_weight) ||
-            length(abundance_weight) != 1L ||
-            is.na(abundance_weight)
-    ) {
-        stop("`abundance_weight` must be a single numeric in [0,1].")
-    }
-    if (abundance_weight < 0 || abundance_weight > 1) {
-        cli::cli_warn(
-            "`abundance_weight`={abundance_weight} is outside [0,1]; clamping."
-        )
-        abundance_weight <- max(0, min(1, abundance_weight))
-    }
-
-    # abundance occupancy ---------------------------------
-    # occupancy and mean rel. abundance
-    otu_PA <- 1 * (otu > 0)
-    otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
-    otu_rel <- apply(
-        decostand(otu, method = "total", MARGIN = 2),
-        1,
-        mean
+  if (!inherits(physeq_obj, "phyloseq")) {
+    cli::cli_abort(
+      "{.arg physeq_obj} must be a 'phyloseq' object.\nYou've supplied a {class(physeq_obj)[1]} vector."
     )
+  }
 
-    occ_abun <- data.frame(otu_occ = otu_occ, otu_rel = otu_rel) |>
-        tibble::rownames_to_column("otu")
+  cli::cli_alert_success("Input phyloseq object is valid!")
 
-    # PresenceSum ---------------------------------
+  # define arguments ---------------------------------
 
-    PresenceSum <- data.frame(
-        otu = as.factor(rownames(otu)),
-        otu,
-        check.names = FALSE
-    ) |>
-        gather(sample_id, abun, -otu) |>
-        left_join(map, by = "sample_id") |>
-        group_by(otu, .data[[data_var]]) |>
-        summarise(
-            time_freq = sum(abun > 0) / length(abun), # frequency within date
-            coreTime = ifelse(time_freq == 1, 1, 0), # 1 if occupancy=1 at that date
-            .groups = "drop"
-        ) |>
-        group_by(otu) |>
-        summarise(
-            sumF = sum(time_freq),
-            sumG = sum(coreTime),
-            nS = 2L * length(.data[[data_var]]), # K per original
-            Index = (sumF + sumG) / nS, # can be up to 2 (original behavior)
-            .groups = "drop"
-        )
+  # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
+  min_sum <- min(sample_sums(physeq_obj))
+  max_sum <- max(sample_sums(physeq_obj))
 
-    # Rank and weight in abundance ---------------------------------
-    otu_ranked <- occ_abun |>
-        left_join(PresenceSum, by = 'otu')
+  if (abs(min_sum - max_sum) < 1e-6) {
+    nReads <- round(min_sum) # Use rounded value for display
+    cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
+  } else {
+    stop("The otu_table() is not rarefied!")
+  }
 
-    rank_method <- if (abundance_weight > 0) {
-        paste0("Index + abundance (weight = ", abundance_weight, ")")
-    } else {
-        "Index only"
+  otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
+    as("matrix")
+  map <- sample_data(physeq_obj) |> as("data.frame")
+  map$sample_id <- rownames(map)
+
+  ### check for a tax_table if present, if not just print a warning and continue.
+  taxa <- NULL
+  tx <- tryCatch(tax_table(physeq_obj), error = function(e) NULL)
+
+  if (!is.null(tx)) {
+    txm <- tryCatch(as(tx, "matrix"), error = function(e) NULL)
+    if (!is.null(txm) && is.matrix(txm) && ncol(txm) > 0L) {
+      taxa <- as.data.frame(txm, stringsAsFactors = FALSE)
     }
+  }
 
-    if (abundance_weight == 0) {
-        # No abundance weighting - use Index directly
-        otu_ranked <- otu_ranked |>
-            mutate(rank = Index) |>
-            arrange(desc(rank))
-
-        cli::cli_alert_info(
-            "Ranked by {rank_method}."
-        )
-    } else {
-        otu_ranked <- otu_ranked |>
-            mutate(
-                occ_norm = otu_occ / max(otu_occ, na.rm = TRUE),
-                abun_norm = otu_rel / max(otu_rel, na.rm = TRUE),
-                spatial_weight = (abundance_weight * abun_norm) +
-                    ((1 - abundance_weight) * occ_norm),
-                rank = spatial_weight * Index
-            ) |>
-            arrange(desc(rank), desc(Index), otu) |>
-            select(
-                otu,
-                rank,
-                Index,
-                spatial_weight,
-                occ_norm,
-                abun_norm,
-                otu_occ,
-                otu_rel
-            )
-        cli::cli_alert_info(
-            "Ranked by {rank_method})."
-        )
-    }
-
-    # Optional: Limit analysis to top N OTUs
-    if (!is.null(max_otus)) {
-        if (!is.numeric(max_otus) || max_otus < 1) {
-            cli::cli_abort("`max_otus` must be a positive integer.")
-        }
-
-        max_otus <- as.integer(max_otus)
-
-        if (max_otus < nrow(otu_ranked)) {
-            total_otus <- nrow(otu_ranked)
-            otu_ranked <- otu_ranked |>
-                slice_head(n = max_otus)
-
-            cli::cli_alert_info(
-                "Limiting analysis to top {max_otus} of {total_otus} OTUs (ranked by {rank_method})."
-            )
-        } else {
-            cli::cli_alert_info(
-                "max_otus ({max_otus}) >= total OTUs ({nrow(otu_ranked)}). Using all OTUs (ranked by {rank_method})."
-            )
-        }
-    }
-
-    otu_ranked_ordered <- otu_ranked$otu
-
-    # BC accumulation ---------------------------------
-    # cumulative BC across samples while adding taxa in rank order
-    # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
-    sample_pairs <- utils::combn(ncol(otu), 2)
-    pair_labels <- apply(sample_pairs, 2, function(ix) {
-        paste(colnames(otu)[ix], collapse = " - ")
-    })
-
-    # start with the first ranked OTU
+  if (is.null(taxa)) {
     cli::cli_alert_info(
-        "Ranking OTUs based on BC dissimilarity, starting at {Sys.time()}"
+      "No taxonomy found (or empty). Continuing without taxonomy."
     )
+  }
 
-    start_idx <- match(otu_ranked$otu[1], rownames(otu))
-    start_matrix <- matrix(
-        otu[start_idx, ],
-        nrow = 1,
-        dimnames = list(otu_ranked$otu[1], colnames(otu))
+  # core prioritizing variable ---------------------------------
+  data_var <- priority_var
+  cli::cli_alert_success("Core prioritizing variable: {data_var}")
+
+  # validate abundance_weight ---------------------------------
+  if (
+    !is.numeric(abundance_weight) ||
+      length(abundance_weight) != 1L ||
+      is.na(abundance_weight)
+  ) {
+    stop("`abundance_weight` must be a single numeric in [0,1].")
+  }
+  if (abundance_weight < 0 || abundance_weight > 1) {
+    cli::cli_warn(
+      "`abundance_weight`={abundance_weight} is outside [0,1]; clamping."
     )
+    abundance_weight <- max(0, min(1, abundance_weight))
+  }
 
-    bc_vec <- apply(sample_pairs, 2, function(ix) {
-        sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) / (2 * nReads)
-    })
+  # abundance occupancy ---------------------------------
+  # occupancy and mean rel. abundance
+  otu_PA <- 1 * (otu > 0)
+  otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
+  otu_rel <- apply(
+    decostand(otu, method = "total", MARGIN = 2),
+    1,
+    mean
+  )
 
-    BCaddition <- data.frame(
-        x_names = pair_labels,
-        `1` = bc_vec,
-        check.names = FALSE
-    )
+  occ_abun <- data.frame(otu_occ = otu_occ, otu_rel = otu_rel) |>
+    tibble::rownames_to_column("otu")
 
-    if (nrow(otu_ranked) > 1) {
-        progressbar_calc_bc <- cli::cli_progress_bar(
-            name = "Calculating BC rankings",
-            total = nrow(otu_ranked) - 1,
-            format = "{cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
-            .auto_close = TRUE,
-            .envir = parent.frame()
-        )
+  # PresenceSum ---------------------------------
 
-        for (i in 2:nrow(otu_ranked)) {
-            add_idx <- match(otu_ranked$otu[i], rownames(otu))
-            add_matrix <- matrix(
-                otu[add_idx, ],
-                nrow = 1,
-                dimnames = list(otu_ranked$otu[i], colnames(otu))
-            )
-            start_matrix <- rbind(start_matrix, add_matrix)
-
-            bc_vec <- apply(sample_pairs, 2, function(ix) {
-                sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) /
-                    (2 * nReads)
-            })
-            BCaddition <- left_join(
-                BCaddition,
-                data.frame(
-                    x_names = pair_labels,
-                    value = bc_vec,
-                    check.names = FALSE
-                ),
-                by = "x_names"
-            )
-            names(BCaddition)[ncol(BCaddition)] <- as.character(i)
-        }
-    }
-
-    temp_BC_matrix <- BCaddition |>
-        tibble::column_to_rownames("x_names") |>
-        as.matrix()
-
-    BC_ranked <- data.frame(
-        rank = as.factor(rownames(t(temp_BC_matrix))),
-        t(temp_BC_matrix),
-        check.names = FALSE
+  PresenceSum <- data.frame(
+    otu = as.factor(rownames(otu)),
+    otu,
+    check.names = FALSE
+  ) |>
+    gather(sample_id, abun, -otu) |>
+    left_join(map, by = "sample_id") |>
+    group_by(otu, .data[[data_var]]) |>
+    summarise(
+      time_freq = sum(abun > 0) / length(abun), # frequency within date
+      coreTime = ifelse(time_freq == 1, 1, 0), # 1 if occupancy=1 at that date
+      .groups = "drop"
     ) |>
-        pivot_longer(
-            -rank,
-            names_to = "comparison",
-            values_to = "BC"
-        ) |>
-        group_by(.data$rank) |>
-        summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
-        arrange(MeanBC) |>
-        mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
+    group_by(otu) |>
+    summarise(
+      sumF = sum(time_freq),
+      sumG = sum(coreTime),
+      nS = 2L * length(.data[[data_var]]), # K per original
+      Index = (sumF + sumG) / nS, # can be up to 2 (original behavior)
+      .groups = "drop"
+    )
 
-    # multiplicative increase between successive ranks
-    if (nrow(BC_ranked) >= 2) {
-        Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
-        increaseDF <- data.frame(
-            IncreaseBC = c(0, Increase),
-            rank = factor(seq_len(length(Increase) + 1))
-        )
+  # Rank and weight in abundance ---------------------------------
+  otu_ranked <- occ_abun |>
+    left_join(PresenceSum, by = "otu")
+
+  rank_method <- if (abundance_weight > 0) {
+    paste0("Index + abundance (weight = ", abundance_weight, ")")
+  } else {
+    "Index only"
+  }
+
+  if (abundance_weight == 0) {
+    # No abundance weighting - use Index directly
+    otu_ranked <- otu_ranked |>
+      mutate(rank = Index) |>
+      arrange(desc(rank))
+
+    cli::cli_alert_info(
+      "Ranked by {rank_method}."
+    )
+  } else {
+    otu_ranked <- otu_ranked |>
+      mutate(
+        occ_norm = otu_occ / max(otu_occ, na.rm = TRUE),
+        abun_norm = otu_rel / max(otu_rel, na.rm = TRUE),
+        spatial_weight = (abundance_weight * abun_norm) +
+          ((1 - abundance_weight) * occ_norm),
+        rank = spatial_weight * Index
+      ) |>
+      arrange(desc(rank), desc(Index), otu) |>
+      select(
+        otu,
+        rank,
+        Index,
+        spatial_weight,
+        occ_norm,
+        abun_norm,
+        otu_occ,
+        otu_rel
+      )
+    cli::cli_alert_info(
+      "Ranked by {rank_method})."
+    )
+  }
+
+  # Optional: Limit analysis to top N OTUs
+  if (!is.null(max_otus)) {
+    if (!is.numeric(max_otus) || max_otus < 1) {
+      cli::cli_abort("`max_otus` must be a positive integer.")
+    }
+
+    max_otus <- as.integer(max_otus)
+
+    if (max_otus < nrow(otu_ranked)) {
+      total_otus <- nrow(otu_ranked)
+      otu_ranked <- otu_ranked |>
+        slice_head(n = max_otus)
+
+      cli::cli_alert_info(
+        "Limiting analysis to top {max_otus} of {total_otus} OTUs (ranked by {rank_method})."
+      )
     } else {
-        increaseDF <- data.frame(IncreaseBC = 0, rank = factor(1))
+      cli::cli_alert_info(
+        "max_otus ({max_otus}) >= total OTUs ({nrow(otu_ranked)}). Using all OTUs (ranked by {rank_method})."
+      )
     }
-    BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
+  }
 
-    # elbow by forward-backward slope difference
-    elbow_slope_differences <- function(pos) {
-        left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
-        right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
-            max(1, (nrow(BC_ranked) - pos))
-        left - right
+  otu_ranked_ordered <- otu_ranked$otu
+
+  # BC accumulation ---------------------------------
+  # cumulative BC across samples while adding taxa in rank order
+  # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
+  sample_pairs <- utils::combn(ncol(otu), 2)
+  pair_labels <- apply(sample_pairs, 2, function(ix) {
+    paste(colnames(otu)[ix], collapse = " - ")
+  })
+
+  # start with the first ranked OTU
+  cli::cli_alert_info(
+    "Ranking OTUs based on BC dissimilarity, starting at {Sys.time()}"
+  )
+
+  start_idx <- match(otu_ranked$otu[1], rownames(otu))
+  start_matrix <- matrix(
+    otu[start_idx, ],
+    nrow = 1,
+    dimnames = list(otu_ranked$otu[1], colnames(otu))
+  )
+
+  bc_vec <- apply(sample_pairs, 2, function(ix) {
+    sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) / (2 * nReads)
+  })
+
+  BCaddition <- data.frame(
+    x_names = pair_labels,
+    `1` = bc_vec,
+    check.names = FALSE
+  )
+
+  if (nrow(otu_ranked) > 1) {
+    progressbar_calc_bc <- cli::cli_progress_bar(
+      name = "Calculating BC rankings",
+      total = nrow(otu_ranked) - 1,
+      format = "{cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
+      .auto_close = TRUE,
+      .envir = parent.frame()
+    )
+
+    for (i in 2:nrow(otu_ranked)) {
+      add_idx <- match(otu_ranked$otu[i], rownames(otu))
+      add_matrix <- matrix(
+        otu[add_idx, ],
+        nrow = 1,
+        dimnames = list(otu_ranked$otu[i], colnames(otu))
+      )
+      start_matrix <- rbind(start_matrix, add_matrix)
+
+      bc_vec <- apply(sample_pairs, 2, function(ix) {
+        sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) /
+          (2 * nReads)
+      })
+      BCaddition <- left_join(
+        BCaddition,
+        data.frame(
+          x_names = pair_labels,
+          value = bc_vec,
+          check.names = FALSE
+        ),
+        by = "x_names"
+      )
+      names(BCaddition)[ncol(BCaddition)] <- as.character(i)
     }
-    BC_ranked$elbow_slope_diffs <- vapply(
-        seq_len(nrow(BC_ranked)),
-        elbow_slope_differences,
-        numeric(1)
+  }
+
+  temp_BC_matrix <- BCaddition |>
+    tibble::column_to_rownames("x_names") |>
+    as.matrix()
+
+  BC_ranked <- data.frame(
+    rank = as.factor(rownames(t(temp_BC_matrix))),
+    t(temp_BC_matrix),
+    check.names = FALSE
+  ) |>
+    pivot_longer(
+      -rank,
+      names_to = "comparison",
+      values_to = "BC"
+    ) |>
+    group_by(.data$rank) |>
+    summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
+    arrange(MeanBC) |>
+    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
+
+  # multiplicative increase between successive ranks
+  if (nrow(BC_ranked) >= 2) {
+    Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
+    increaseDF <- data.frame(
+      IncreaseBC = c(0, Increase),
+      rank = factor(seq_len(length(Increase) + 1))
     )
+  } else {
+    increaseDF <- data.frame(IncreaseBC = 0, rank = factor(1))
+  }
+  BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
-    elbow <- which.max(BC_ranked$elbow_slope_diffs)
+  # elbow by forward-backward slope difference
+  elbow_slope_differences <- function(pos) {
+    left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
+    right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
+      max(1, (nrow(BC_ranked) - pos))
+    left - right
+  }
+  BC_ranked$elbow_slope_diffs <- vapply(
+    seq_len(nrow(BC_ranked)),
+    elbow_slope_differences,
+    numeric(1)
+  )
 
-    # threshold cut based on multiplicative increase
-    thr <- 1 + increase_value
-    valid_increases <- which(BC_ranked$IncreaseBC >= thr)
+  elbow <- which.max(BC_ranked$elbow_slope_diffs)
 
-    lastCall <- if (length(valid_increases)) {
-        utils::tail(valid_increases, 1)
-    } else {
-        1
-    }
+  # threshold cut based on multiplicative increase
+  thr <- 1 + increase_value
+  valid_increases <- which(BC_ranked$IncreaseBC >= thr)
 
-    # identified core sets ---------------------------------
+  lastCall <- if (length(valid_increases)) {
+    utils::tail(valid_increases, 1)
+  } else {
+    1
+  }
 
-    #elbow_core <- otu_ranked |>
-    #    tibble::rownames_to_column("otu_order") |>
-    #    mutate(otu_order = as.numeric(.data$otu_order)) |>
-    #    filter(.data$otu_order <= elbow) |>
-    #    pull(.data$otu)
+  # identified core sets ---------------------------------
 
-    #increase_core <- otu_ranked |>
-    #    tibble::rownames_to_column("otu_order") |>
-    #    mutate(otu_order = as.numeric(.data$otu_order)) |>
-    #    filter(.data$otu_order <= lastCall) |>
-    #    pull(.data$otu)
+  # elbow_core <- otu_ranked |>
+  #    tibble::rownames_to_column("otu_order") |>
+  #    mutate(otu_order = as.numeric(.data$otu_order)) |>
+  #    filter(.data$otu_order <= elbow) |>
+  #    pull(.data$otu)
 
-    elbow_core <- otu_ranked_ordered[seq_len(elbow)]
-    cli::cli_alert_success(
-        "Elbow method identified {.val {length(elbow_core)}} core OTUs"
-    )
-    increase_core <- otu_ranked_ordered[seq_len(lastCall)]
-    cli::cli_alert_success(
-        "% increase method identified {.val {length(increase_core)}} core OTUs"
-    )
+  # increase_core <- otu_ranked |>
+  #    tibble::rownames_to_column("otu_order") |>
+  #    mutate(otu_order = as.numeric(.data$otu_order)) |>
+  #    filter(.data$otu_order <= lastCall) |>
+  #    pull(.data$otu)
 
-    # return ---------------------------------
-    out <- list(
-        bray_curtis_ranked = BC_ranked,
-        otu_ranked = otu_ranked,
-        abundance_occupancy = occ_abun,
-        priority_var = data_var,
-        abundance_weight = abundance_weight,
-        elbow = as.integer(elbow),
-        bc_increase = as.integer(lastCall),
-        increase_value = increase_value,
-        elbow_core = elbow_core,
-        increase_core = increase_core,
-        otu_table = otu,
-        metadata = map,
-        taxonomy = taxa
-    )
+  elbow_core <- otu_ranked_ordered[seq_len(elbow)]
+  cli::cli_alert_success(
+    "Elbow method identified {.val {length(elbow_core)}} core OTUs"
+  )
+  increase_core <- otu_ranked_ordered[seq_len(lastCall)]
+  cli::cli_alert_success(
+    "% increase method identified {.val {length(increase_core)}} core OTUs"
+  )
 
-    class(out) <- c("identify_core_result", class(out))
+  # return ---------------------------------
+  out <- list(
+    bray_curtis_ranked = BC_ranked,
+    otu_ranked = otu_ranked,
+    abundance_occupancy = occ_abun,
+    priority_var = data_var,
+    abundance_weight = abundance_weight,
+    elbow = as.integer(elbow),
+    bc_increase = as.integer(lastCall),
+    increase_value = increase_value,
+    elbow_core = elbow_core,
+    increase_core = increase_core,
+    otu_table = otu,
+    metadata = map,
+    taxonomy = taxa
+  )
 
-    cli::cli_alert_success("Analysis complete!")
+  class(out) <- c("identify_core_result", class(out))
 
-    out
+  cli::cli_alert_success("Analysis complete!")
+
+  out
 }

@@ -44,8 +44,10 @@
 #'   seed = 1234
 #' )
 #'
-#' plot_abundance_occupancy(core_result = switchgrass_core,
-#'                          core_set = "increase")
+#' plot_abundance_occupancy(
+#'   core_result = switchgrass_core,
+#'   core_set = "increase"
+#' )
 #' }
 #'
 #' @importFrom dplyr mutate
@@ -55,78 +57,78 @@
 #'
 #' @export
 plot_abundance_occupancy <- function(core_result, core_set = "elbow") {
-    # Validate core_set parameter
-    if (!core_set %in% c("elbow", "increase")) {
-        stop("core_set must be either 'elbow' or 'increase'")
-    }
+  # Validate core_set parameter
+  if (!core_set %in% c("elbow", "increase")) {
+    stop("core_set must be either 'elbow' or 'increase'")
+  }
 
-    # Select appropriate core OTU set
-    if (core_set == "elbow") {
-        core_otus <- core_result$elbow_core
-    } else if (core_set == "increase") {
-        core_otus <- core_result$increase_core
-    }
+  # Select appropriate core OTU set
+  if (core_set == "elbow") {
+    core_otus <- core_result$elbow_core
+  } else if (core_set == "increase") {
+    core_otus <- core_result$increase_core
+  }
 
-    # Prepare data frame with membership classification
-    whole_df <- core_result$abundance_occupancy |>
-        mutate(
-            membership = ifelse(otu %in% core_otus, "Core", "Not core")
-        ) |>
-        mutate(membership = as.factor(membership))
+  # Prepare data frame with membership classification
+  whole_df <- core_result$abundance_occupancy |>
+    mutate(
+      membership = ifelse(otu %in% core_otus, "Core", "Not core")
+    ) |>
+    mutate(membership = as.factor(membership))
 
-    # Create plot
-    p <- whole_df |>
-        ggplot(aes(
-            x = log10(otu_rel),
-            y = otu_occ,
-            fill = membership
-        )) +
-        geom_point(
-            shape = 21,
-            size = 1.5,
-            alpha = 0.9,
-            aes(color = after_scale(fill))
-        ) +
-        scale_fill_manual(
-            values = c("Core" = "#CC2D35", "Not core" = "grey")
-        ) +
-        theme_classic() +
-        theme(
-            plot.title = element_text(
-                hjust = 0.5,
-                size = 12,
-                face = "bold"
-            ),
-            plot.subtitle = element_text(hjust = 0.5, size = 9),
-            legend.position = c(0.98, 0.02),
-            legend.justification = c("right", "bottom"),
-            legend.background = element_rect(
-                fill = alpha("white", 0.7),
-                color = NA
-            ),
-            legend.key.height = unit(0.4, "cm"),
-            legend.key.width = unit(0.4, "cm"),
-            legend.title = element_blank(),
-            legend.text = element_text(size = 9)
-        ) +
-        labs(
-            title = "Abundance-Occupancy curve",
-            x = "Log10(mean abundance)",
-            y = "Occupancy"
+  # Create plot
+  p <- whole_df |>
+    ggplot(aes(
+      x = log10(otu_rel),
+      y = otu_occ,
+      fill = membership
+    )) +
+    geom_point(
+      shape = 21,
+      size = 1.5,
+      alpha = 0.9,
+      aes(color = after_scale(fill))
+    ) +
+    scale_fill_manual(
+      values = c("Core" = "#CC2D35", "Not core" = "grey")
+    ) +
+    theme_classic() +
+    theme(
+      plot.title = element_text(
+        hjust = 0.5,
+        size = 12,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(hjust = 0.5, size = 9),
+      legend.position = c(0.98, 0.02),
+      legend.justification = c("right", "bottom"),
+      legend.background = element_rect(
+        fill = alpha("white", 0.7),
+        color = NA
+      ),
+      legend.key.height = unit(0.4, "cm"),
+      legend.key.width = unit(0.4, "cm"),
+      legend.title = element_blank(),
+      legend.text = element_text(size = 9)
+    ) +
+    labs(
+      title = "Abundance-Occupancy curve",
+      x = "Log10(mean abundance)",
+      y = "Occupancy"
+    )
+
+  # change legend shape to avoid confusion with the scatter points.
+  p <- p +
+    guides(
+      fill = guide_legend(
+        override.aes = list(
+          shape = 22,
+          size = 5,
+          colour = NA,
+          stroke = 0
         )
+      )
+    )
 
-    # change legend shape to avoid confusion with the scatter points.
-    p <- p +
-        guides(
-            fill = guide_legend(
-                override.aes = list(
-                    shape = 22,
-                    size = 5,
-                    colour = NA,
-                    stroke = 0
-                )
-            )
-        )
-
-    return(p)
+  return(p)
 }

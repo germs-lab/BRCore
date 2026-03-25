@@ -47,73 +47,73 @@
 #'
 #' @export
 add_rarefaction_metrics <- function(data) {
-    # Internal function to identify outliers
-    find_outlier <- function(x) {
-        x < quantile(x, 0.25) - 1.5 * IQR(x) |
-            x > quantile(x, 0.75) + 1.5 * IQR(x)
+  # Internal function to identify outliers
+  find_outlier <- function(x) {
+    x < quantile(x, 0.25) - 1.5 * IQR(x) |
+      x > quantile(x, 0.75) + 1.5 * IQR(x)
+  }
+
+  # Extract OTU table and transpose if needed
+  if (inherits(data, "phyloseq")) {
+    otu_mat <- otu_table(data, taxa_are_rows = TRUE)
+    if (!taxa_are_rows(data)) {
+      otu_mat <- t(otu_mat)
     }
+    otu_df <- as.data.frame(otu_mat)
+  } else if (inherits(data, "data.frame")) {
+    otu_df <- as.data.frame(t(data))
+  } else {
+    stop("Input must be a phyloseq object or a data.frame")
+  }
 
-    # Extract OTU table and transpose if needed
-    if (inherits(data, "phyloseq")) {
-        otu_mat <- otu_table(data, taxa_are_rows = TRUE)
-        if (!taxa_are_rows(data)) {
-            otu_mat <- t(otu_mat)
-        }
-        otu_df <- as.data.frame(otu_mat)
-    } else if (inherits(data, "data.frame")) {
-        otu_df <- as.data.frame(t(data))
-    } else {
-        stop("Input must be a phyloseq object or a data.frame")
-    }
+  # Compute metrics
+  df_stats <- otu_df |>
+    rownames_to_column("otu_id") |>
+    pivot_longer(
+      -otu_id,
+      names_to = "sample_id",
+      values_to = "seq_num"
+    ) |>
+    group_by(sample_id) |>
+    summarize(
+      read_num = sum(.data$seq_num),
+      singlton_num = sum(.data$seq_num == 1),
+      goods_cov = 100 * (1 - .data$singlton_num / .data$read_num)
+    ) |>
+    mutate(
+      outlier = ifelse(
+        find_outlier(log10(.data$read_num)),
+        .data$read_num,
+        NA
+      )
+    ) |>
+    ungroup()
 
-    # Compute metrics
-    df_stats <- otu_df |>
-        rownames_to_column("otu_id") |>
-        pivot_longer(
-            -otu_id,
-            names_to = "sample_id",
-            values_to = "seq_num"
-        ) |>
-        group_by(sample_id) |>
-        summarize(
-            read_num = sum(.data$seq_num),
-            singlton_num = sum(.data$seq_num == 1),
-            goods_cov = 100 * (1 - .data$singlton_num / .data$read_num)
-        ) |>
-        mutate(
-            outlier = ifelse(
-                find_outlier(log10(.data$read_num)),
-                .data$read_num,
-                NA
-            )
-        ) |>
-        ungroup()
+  # Append to sample metadata or return updated data.frame
+  if (inherits(data, "phyloseq")) {
+    sample_df <- sample_data(data) |>
+      as.matrix() |>
+      as.data.frame() |>
+      rownames_to_column("sample_id")
 
-    # Append to sample metadata or return updated data.frame
-    if (inherits(data, "phyloseq")) {
-        sample_df <- sample_data(data) |>
-            as.matrix() |>
-            as.data.frame() |>
-            rownames_to_column("sample_id")
+    sample_df_updated <- left_join(
+      sample_df,
+      df_stats,
+      by = "sample_id"
+    ) |>
+      #mutate(read_num = read_num.y) |>
+      #select(-read_num.x, -read_num.y) |>
+      as.data.frame() |>
+      column_to_rownames("sample_id")
 
-        sample_df_updated <- left_join(
-            sample_df,
-            df_stats,
-            by = "sample_id"
-        ) |>
-            #mutate(read_num = read_num.y) |>
-            #select(-read_num.x, -read_num.y) |>
-            as.data.frame() |>
-            column_to_rownames("sample_id")
+    sample_data(data) <- sample_df_updated
+    return(data)
+  } else {
+    data_out <- data |>
+      rownames_to_column("sample_id") |>
+      left_join(df_stats, by = "sample_id") |>
+      column_to_rownames("sample_id")
 
-        sample_data(data) <- sample_df_updated
-        return(data)
-    } else {
-        data_out <- data |>
-            rownames_to_column("sample_id") |>
-            left_join(df_stats, by = "sample_id") |>
-            column_to_rownames("sample_id")
-
-        return(data_out)
-    }
+    return(data_out)
+  }
 }

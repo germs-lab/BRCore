@@ -39,12 +39,15 @@
 #'   priority_var = "sampling_date",
 #'   increase_value = 0.02,
 #'   abundance_weight = 0,
-#'   seed = 1234)
+#'   seed = 1234
+#' )
 #'
-#' plot_core_distribution(core_result = switchgrass_core,
-#'                        core_set = "increase",
-#'                        group_var = "sampling_date",
-#'                        plot_type  = "bar")
+#' plot_core_distribution(
+#'   core_result = switchgrass_core,
+#'   core_set = "increase",
+#'   group_var = "sampling_date",
+#'   plot_type = "bar"
+#' )
 #' }
 #'
 #' @importFrom tibble rownames_to_column
@@ -60,188 +63,188 @@
 #'
 #' @export
 plot_core_distribution <- function(
-    core_result,
-    core_set = "elbow",
-    group_var = "Crop",
-    plot_type = c("bar", "line", "heatmap")
+  core_result,
+  core_set = "elbow",
+  group_var = "Crop",
+  plot_type = c("bar", "line", "heatmap")
 ) {
-    # match plot_type
-    plot_type <- match.arg(plot_type)
+  # match plot_type
+  plot_type <- match.arg(plot_type)
 
-    # Validate core_set argument
-    if (!core_set %in% c("elbow", "increase")) {
-        cli::cli_abort("core_set must be either 'elbow' or 'increase'")
-    }
+  # Validate core_set argument
+  if (!core_set %in% c("elbow", "increase")) {
+    cli::cli_abort("core_set must be either 'elbow' or 'increase'")
+  }
 
-    # Select appropriate core OTU set
-    if (core_set == "elbow") {
-        core_otus <- core_result$elbow_core
-    } else {
-        core_otus <- core_result$increase_core
-    }
+  # Select appropriate core OTU set
+  if (core_set == "elbow") {
+    core_otus <- core_result$elbow_core
+  } else {
+    core_otus <- core_result$increase_core
+  }
 
-    # Calculate relative abundance
-    otu_relabun <- decostand(
-        as.data.frame(core_result$otu_table),
-        method = "total",
-        MARGIN = 2
+  # Calculate relative abundance
+  otu_relabun <- decostand(
+    as.data.frame(core_result$otu_table),
+    method = "total",
+    MARGIN = 2
+  )
+
+  # Prepare metadata
+  map <- as.data.frame(core_result$metadata)
+
+  if (!"sample_id" %in% colnames(map)) {
+    map <- map |> rownames_to_column("sample_id")
+  }
+
+  # Validate required columns
+  if (is.null(group_var)) {
+    cli::cli_abort("group_var must be specified.")
+  }
+  if (!group_var %in% colnames(map)) {
+    cli::cli_abort(paste0(
+      "Missing required column '",
+      group_var,
+      "' in metadata. Available columns: ",
+      paste(colnames(map), collapse = ", ")
+    ))
+  }
+
+  otu_ranked <- core_result$otu_ranked
+
+  # Prepare plotting data
+  plotDF <- otu_relabun |>
+    as.data.frame() |>
+    rownames_to_column(var = "otu") |>
+    pivot_longer(
+      cols = -otu,
+      names_to = "sample_id",
+      values_to = "relabun"
+    ) |>
+    left_join(map, by = "sample_id") |>
+    left_join(otu_ranked, by = "otu") |>
+    filter(otu %in% core_otus) |>
+    group_by(otu, .data[[group_var]]) |>
+    summarise(
+      time_freq = sum(relabun > 0) / n(),
+      coreTime = ifelse(time_freq == 1, 1, 0),
+      detect = ifelse(time_freq > 0, 1, 0),
+      .groups = "drop"
     )
 
-    # Prepare metadata
-    map <- as.data.frame(core_result$metadata)
+  # Set factor levels for proper ordering
+  core_levels <- otu_ranked$otu[otu_ranked$otu %in% core_otus]
+  plotDF$otu <- factor(plotDF$otu, levels = core_levels)
 
-    if (!"sample_id" %in% colnames(map)) {
-        map <- map |> rownames_to_column("sample_id")
-    }
+  # Create plot
+  if (plot_type == "bar") {
+    p <- ggplot(
+      plotDF,
+      aes(
+        x = otu,
+        y = time_freq,
+        fill = factor(.data[[group_var]])
+      )
+    ) +
+      geom_bar(stat = "identity", position = "dodge") +
+      coord_flip() +
+      scale_x_discrete(limits = rev(levels(plotDF$otu))) +
+      theme_classic() +
+      theme(
+        plot.title = element_text(
+          hjust = 0.5,
+          size = 12,
+          face = "bold"
+        ),
+        plot.subtitle = element_text(hjust = 0.5, size = 9),
+        axis.text = element_text(size = 6),
+        legend.key.height = unit(0.4, "cm"),
+        legend.key.width = unit(0.4, "cm"),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8)
+      ) +
+      labs(
+        title = paste("Core set occupancy across:", group_var),
+        x = "Ranked ASV/OTUs",
+        y = "Occupancy"
+      ) +
+      scale_fill_npg()
+  } else if (plot_type == "line") {
+    group_levels <- length(levels(factor(plotDF[[group_var]])))
 
-    # Validate required columns
-    if (is.null(group_var)) {
-        cli::cli_abort("group_var must be specified.")
-    }
-    if (!group_var %in% colnames(map)) {
-        cli::cli_abort(paste0(
-            "Missing required column '",
-            group_var,
-            "' in metadata. Available columns: ",
-            paste(colnames(map), collapse = ", ")
-        ))
-    }
-
-    otu_ranked <- core_result$otu_ranked
-
-    # Prepare plotting data
-    plotDF <- otu_relabun |>
-        as.data.frame() |>
-        rownames_to_column(var = "otu") |>
-        pivot_longer(
-            cols = -otu,
-            names_to = "sample_id",
-            values_to = "relabun"
-        ) |>
-        left_join(map, by = "sample_id") |>
-        left_join(otu_ranked, by = 'otu') |>
-        filter(otu %in% core_otus) |>
-        group_by(otu, .data[[group_var]]) |>
-        summarise(
-            time_freq = sum(relabun > 0) / n(),
-            coreTime = ifelse(time_freq == 1, 1, 0),
-            detect = ifelse(time_freq > 0, 1, 0),
-            .groups = "drop"
+    # one facet per group_var level, one line per panel
+    p <- ggplot(
+      plotDF,
+      aes(
+        x = otu,
+        y = time_freq,
+        group = factor(.data[[group_var]]),
+        color = factor(.data[[group_var]])
+      )
+    ) +
+      geom_line() +
+      geom_point(size = 0.7) +
+      facet_wrap(
+        stats::as.formula(paste("~", group_var)),
+        nrow = group_levels
+      ) +
+      scale_y_continuous(limits = c(0, 1)) +
+      theme_classic() +
+      theme(
+        plot.title = element_text(
+          hjust = 0.5,
+          size = 12,
+          face = "bold"
+        ),
+        legend.position = "none",
+        axis.ticks.x = element_line(),
+        axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(
+          angle = 45,
+          size = 6,
+          vjust = 1,
+          hjust = 1
         )
+      ) +
+      labs(
+        title = paste("Core set occupancy across:", group_var),
+        x = "Ranked ASV/OTUs",
+        y = "Occupancy"
+      )
+  } else if (plot_type == "heatmap") {
+    p <- ggplot(
+      plotDF,
+      aes(
+        x = factor(.data[[group_var]]),
+        y = otu,
+        fill = time_freq
+      )
+    ) +
+      geom_tile(color = "white", linewidth = 0.5) +
+      # viridis if you want:
+      # viridis::scale_fill_viridis(option = "plasma", name = "Occupancy") +
+      theme_classic() +
+      theme(
+        plot.title = element_text(
+          hjust = 0.5,
+          size = 12,
+          face = "bold"
+        ),
+        legend.key.height = grid::unit(0.4, "cm"),
+        legend.key.width = grid::unit(0.4, "cm"),
+        legend.title = element_text(size = 8, face = "bold"),
+        legend.text = element_text(size = 8),
+        axis.ticks.x = element_line(),
+        axis.text.y = element_text(size = 6),
+        axis.text.x = element_text(angle = 33, vjust = 1, hjust = 1)
+      ) +
+      labs(
+        title = paste("Core set occupancy across:", group_var),
+        x = paste(group_var),
+        y = "Ranked ASV/OTUs",
+        fill = "Occupancy"
+      )
+  }
 
-    # Set factor levels for proper ordering
-    core_levels <- otu_ranked$otu[otu_ranked$otu %in% core_otus]
-    plotDF$otu <- factor(plotDF$otu, levels = core_levels)
-
-    # Create plot
-    if (plot_type == "bar") {
-        p <- ggplot(
-            plotDF,
-            aes(
-                x = otu,
-                y = time_freq,
-                fill = factor(.data[[group_var]])
-            )
-        ) +
-            geom_bar(stat = "identity", position = "dodge") +
-            coord_flip() +
-            scale_x_discrete(limits = rev(levels(plotDF$otu))) +
-            theme_classic() +
-            theme(
-                plot.title = element_text(
-                    hjust = 0.5,
-                    size = 12,
-                    face = "bold"
-                ),
-                plot.subtitle = element_text(hjust = 0.5, size = 9),
-                axis.text = element_text(size = 6),
-                legend.key.height = unit(0.4, "cm"),
-                legend.key.width = unit(0.4, "cm"),
-                legend.title = element_blank(),
-                legend.text = element_text(size = 8)
-            ) +
-            labs(
-                title = paste("Core set occupancy across:", group_var),
-                x = "Ranked ASV/OTUs",
-                y = "Occupancy"
-            ) +
-            scale_fill_npg()
-    } else if (plot_type == "line") {
-        group_levels <- length(levels(factor(plotDF[[group_var]])))
-
-        # one facet per group_var level, one line per panel
-        p <- ggplot(
-            plotDF,
-            aes(
-                x = otu,
-                y = time_freq,
-                group = factor(.data[[group_var]]),
-                color = factor(.data[[group_var]])
-            )
-        ) +
-            geom_line() +
-            geom_point(size = 0.7) +
-            facet_wrap(
-                stats::as.formula(paste("~", group_var)),
-                nrow = group_levels
-            ) +
-            scale_y_continuous(limits = c(0, 1)) +
-            theme_classic() +
-            theme(
-                plot.title = element_text(
-                    hjust = 0.5,
-                    size = 12,
-                    face = "bold"
-                ),
-                legend.position = "none",
-                axis.ticks.x = element_line(),
-                axis.text.y = element_text(size = 8),
-                axis.text.x = element_text(
-                    angle = 45,
-                    size = 6,
-                    vjust = 1,
-                    hjust = 1
-                )
-            ) +
-            labs(
-                title = paste("Core set occupancy across:", group_var),
-                x = "Ranked ASV/OTUs",
-                y = "Occupancy"
-            )
-    } else if (plot_type == "heatmap") {
-        p <- ggplot(
-            plotDF,
-            aes(
-                x = factor(.data[[group_var]]),
-                y = otu,
-                fill = time_freq
-            )
-        ) +
-            geom_tile(color = "white", linewidth = 0.5) +
-            # viridis if you want:
-            # viridis::scale_fill_viridis(option = "plasma", name = "Occupancy") +
-            theme_classic() +
-            theme(
-                plot.title = element_text(
-                    hjust = 0.5,
-                    size = 12,
-                    face = "bold"
-                ),
-                legend.key.height = grid::unit(0.4, "cm"),
-                legend.key.width = grid::unit(0.4, "cm"),
-                legend.title = element_text(size = 8, face = "bold"),
-                legend.text = element_text(size = 8),
-                axis.ticks.x = element_line(),
-                axis.text.y = element_text(size = 6),
-                axis.text.x = element_text(angle = 33, vjust = 1, hjust = 1)
-            ) +
-            labs(
-                title = paste("Core set occupancy across:", group_var),
-                x = paste(group_var),
-                y = "Ranked ASV/OTUs",
-                fill = "Occupancy"
-            )
-    }
-
-    return(p)
+  return(p)
 }

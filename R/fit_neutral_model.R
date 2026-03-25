@@ -50,10 +50,10 @@
 #' )
 #'
 #' switchgrass_core_fit <- fit_neutral_model(
-#'     otu_table = switchgrass_core$otu_table,
-#'     core_set = switchgrass_core$increase_core,
-#'     abundance_occupancy = switchgrass_core$abundance_occupancy
-#'     )
+#'   otu_table = switchgrass_core$otu_table,
+#'   core_set = switchgrass_core$increase_core,
+#'   abundance_occupancy = switchgrass_core$abundance_occupancy
+#' )
 #'
 #' str(switchgrass_core_fit)
 #' switchgrass_core_fit$goodness_of_fit
@@ -66,76 +66,76 @@
 #' @importFrom Hmisc binconf
 #' @export
 fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
-    #source("../PAPER_Shade_CurrOpinMicro/script/sncm.fit.R")
+  # source("../PAPER_Shade_CurrOpinMicro/script/sncm.fit.R")
 
-    # input checks ----
-    if (!is.matrix(otu_table) && !is.data.frame(otu_table)) {
-        cli::cli_abort(
-            "`otu_table` must be a matrix or data.frame (samples x taxa)."
-        )
-    }
-
-    spp <- as.matrix(t(otu_table))
-
-    core_taxa <- as.character(if (is.null(core_set)) character() else core_set)
-    if (!length(core_taxa)) {
-        cli::cli_abort(
-            "`core_set` must be a non-empty character vector of ASV/OTU IDs."
-        )
-    }
-
-    if (!("otu" %in% colnames(abundance_occupancy))) {
-        cli::cli_abort(
-            "`abundance_occupancy` must contain a column named {.field otu} to join predictions."
-        )
-    }
-
-    # add membership (plot-friendly labels) ----
-    occ_abun <- abundance_occupancy |>
-        dplyr::mutate(
-            membership = ifelse(.data$otu %in% core_taxa, "Core", "Not core")
-        )
-
-    # fit model ----
-    obs.np <- sncm.fit(spp, core_taxa, stats = FALSE, pool = NULL)
-    sta.np <- sncm.fit(spp, core_taxa, stats = TRUE, pool = NULL)
-
-    if (is.null(rownames(obs.np))) {
-        cli::cli_abort(
-            "Per-taxon predictions must have rownames as ASV/OTU IDs."
-        )
-    }
-    obs_tbl <- tibble::as_tibble(obs.np, rownames = "otu")
-
-    # ASV/OTUs in/out prediction intervals ----
-    obs_tbl$fit_class <- "As predicted"
-    obs_tbl[
-        which(obs_tbl$freq < obs_tbl$pred.lwr),
-        "fit_class"
-    ] <- "Below prediction"
-    obs_tbl[
-        which(obs_tbl$freq > obs_tbl$pred.upr),
-        "fit_class"
-    ] <- "Above prediction"
-    obs_tbl[which(is.na(obs_tbl$freq)), "fit_class"] <- "NA"
-    fit_table <- as.data.frame(dplyr::left_join(occ_abun, obs_tbl, by = 'otu'))
-
-    # compute above/below proportions ----
-    sta.np$above.pred <- sum(obs_tbl$freq > (obs_tbl$pred.upr), na.rm = TRUE) /
-        sta.np$Richness
-    sta.np$below.pred <- sum(obs_tbl$freq < (obs_tbl$pred.lwr), na.rm = TRUE) /
-        sta.np$Richness
-    fit_res <- as.data.frame(sta.np)
-    #colnames(fit_res) <- "statistics"
-
-    # return ----
-    out <- list(
-        goodness_of_fit = fit_res,
-        model_prediction = fit_table
+  # input checks ----
+  if (!is.matrix(otu_table) && !is.data.frame(otu_table)) {
+    cli::cli_abort(
+      "`otu_table` must be a matrix or data.frame (samples x taxa)."
     )
-    class(out) <- c("fit_neutral_model", class(out))
+  }
 
-    cli::cli_alert_success("Analysis complete!")
+  spp <- as.matrix(t(otu_table))
 
-    out
+  core_taxa <- as.character(if (is.null(core_set)) character() else core_set)
+  if (!length(core_taxa)) {
+    cli::cli_abort(
+      "`core_set` must be a non-empty character vector of ASV/OTU IDs."
+    )
+  }
+
+  if (!("otu" %in% colnames(abundance_occupancy))) {
+    cli::cli_abort(
+      "`abundance_occupancy` must contain a column named {.field otu} to join predictions."
+    )
+  }
+
+  # add membership (plot-friendly labels) ----
+  occ_abun <- abundance_occupancy |>
+    dplyr::mutate(
+      membership = ifelse(.data$otu %in% core_taxa, "Core", "Not core")
+    )
+
+  # fit model ----
+  obs.np <- sncm.fit(spp, core_taxa, stats = FALSE, pool = NULL)
+  sta.np <- sncm.fit(spp, core_taxa, stats = TRUE, pool = NULL)
+
+  if (is.null(rownames(obs.np))) {
+    cli::cli_abort(
+      "Per-taxon predictions must have rownames as ASV/OTU IDs."
+    )
+  }
+  obs_tbl <- tibble::as_tibble(obs.np, rownames = "otu")
+
+  # ASV/OTUs in/out prediction intervals ----
+  obs_tbl$fit_class <- "As predicted"
+  obs_tbl[
+    which(obs_tbl$freq < obs_tbl$pred.lwr),
+    "fit_class"
+  ] <- "Below prediction"
+  obs_tbl[
+    which(obs_tbl$freq > obs_tbl$pred.upr),
+    "fit_class"
+  ] <- "Above prediction"
+  obs_tbl[which(is.na(obs_tbl$freq)), "fit_class"] <- "NA"
+  fit_table <- as.data.frame(dplyr::left_join(occ_abun, obs_tbl, by = "otu"))
+
+  # compute above/below proportions ----
+  sta.np$above.pred <- sum(obs_tbl$freq > (obs_tbl$pred.upr), na.rm = TRUE) /
+    sta.np$Richness
+  sta.np$below.pred <- sum(obs_tbl$freq < (obs_tbl$pred.lwr), na.rm = TRUE) /
+    sta.np$Richness
+  fit_res <- as.data.frame(sta.np)
+  # colnames(fit_res) <- "statistics"
+
+  # return ----
+  out <- list(
+    goodness_of_fit = fit_res,
+    model_prediction = fit_table
+  )
+  class(out) <- c("fit_neutral_model", class(out))
+
+  cli::cli_alert_success("Analysis complete!")
+
+  out
 }
