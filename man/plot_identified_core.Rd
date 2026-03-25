@@ -44,10 +44,10 @@ data("switchgrass", package = "BRCore")
 
 # Identify core taxa
 res <- identify_core(
- physeq_obj = switchgrass,
- priority_var = "sampling_date",
- increase_value = 0.02,
- seed = 48821
+  physeq_obj = switchgrass,
+  priority_var = "sampling_date",
+  increase_value = 0.02,
+  seed = 48821
 )
 
 # Plot using the returned curve and cut indices; label from increase_value
@@ -56,7 +56,7 @@ plot_identified_core(
   elbow = res$elbow,
   lastCall = res$bc_increase,
   increase_value = res$increase_value
- )
+)
 }
 
 }

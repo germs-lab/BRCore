@@ -96,7 +96,7 @@ res <- identify_core(
 )
 
 # Inspect results
- str(res)
+str(res)
 }
 
 }

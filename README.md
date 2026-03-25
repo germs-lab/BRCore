@@ -52,24 +52,7 @@ Install the *development* version of BRCore from GitHub with:
 pak::pak("germs-lab/BRCore")
 ```
 
-***Note:*** *If you don’t have `pak` installed, you can use `devtools`
-or `remotes` but you may need to install dependencies manually. `pak`
-handles dependencies automatically.*
-
-### Install with Vignettes
-
-``` r
-# For the latest development version with vignettes, use:
-# install.packages("devtools")
-devtools::install_github("germs-lab/BRCore", build_vignettes = TRUE)
-
-# or using remotes
-# install.packages("remotes")
-remotes::install_github("germs-lab/BRCore", build_vignettes = TRUE)
-```
-
-***Note:** Building vignettes requires additional time and dependencies.
-Use this option only if you need local access to documentation*
+***Note:*** *`pak` handles dependencies automatically.*
 
 ## Quick Start
 

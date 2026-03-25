@@ -25,10 +25,14 @@ detect_hpc_type <- function() {
   # Check each HPC type
   for (type in names(hpc_type_vars)) {
     if (
-      any(sapply(hpc_type_vars[[type]], function(var) {
-        val <- Sys.getenv(var, "")
-        !identical(val, "")
-      }))
+      any(vapply(
+        hpc_type_vars[[type]],
+        function(var) {
+          val <- Sys.getenv(var, "")
+          !identical(val, "")
+        },
+        FUN.VALUE = logical(1)
+      ))
     ) {
       return(type)
     }
@@ -36,10 +40,14 @@ detect_hpc_type <- function() {
 
   # Check generic HPC indicators
   if (
-    any(sapply(generic_vars, function(var) {
-      val <- Sys.getenv(var, "")
-      !identical(val, "")
-    }))
+    any(vapply(
+      generic_vars,
+      function(var) {
+        val <- Sys.getenv(var, "")
+        !identical(val, "")
+      },
+      FUN.VALUE = logical(1)
+    ))
   ) {
     return("generic_hpc")
   }

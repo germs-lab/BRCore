@@ -25,21 +25,23 @@ data(GlobalPatterns, package = "phyloseq")
 
 # Perform multiple rarefaction
 otu_table_rare <-
-    multi_rarefy(
-        physeq = GlobalPatterns,
-        depth_level = 200,
-        num_iter = 3,
-        threads = 1,
-        set_seed = 123
-    )
+  multi_rarefy(
+    physeq = GlobalPatterns,
+    depth_level = 200,
+    num_iter = 3,
+    threads = 1,
+    set_seed = 123
+  )
 
 # Check the rarefied data output
 rowSums(otu_table_rare)
 
 # Recreate the phyloseq object and check
-rarefied_GlobalPatterns<-
-    update_otu_table(physeq = GlobalPatterns,
-                otu_rare = otu_table_rare )
+rarefied_GlobalPatterns <-
+  update_otu_table(
+    physeq = GlobalPatterns,
+    otu_rare = otu_table_rare
+  )
 
 sample_sums(rarefied_GlobalPatterns)
 }

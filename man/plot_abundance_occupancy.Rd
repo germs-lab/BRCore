@@ -53,8 +53,10 @@ switchgrass_core <- identify_core(
   seed = 1234
 )
 
-plot_abundance_occupancy(core_result = switchgrass_core,
-                         core_set = "increase")
+plot_abundance_occupancy(
+  core_result = switchgrass_core,
+  core_set = "increase"
+)
 }
 
 }

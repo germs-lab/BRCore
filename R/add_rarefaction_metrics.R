@@ -1,11 +1,14 @@
 #' Calculate and append pre-rarefaction statistics to microbiome data
 #'
-#' This function adds read count, singleton count, Good's coverage, and marks outlier samples
-#' to a `phyloseq` object or `data.frame` based on the OTU/ASV abundance table.
+#' This function adds read count, singleton count, Good's coverage,
+#' and marks outlier samples to a `phyloseq` object or `data.frame`
+#' based on the OTU/ASV abundance table.
 #'
-#' @param data A `phyloseq` object or a `data.frame` with samples as rows and taxa as columns.
+#' @param data A `phyloseq` object or a `data.frame` with samples
+#'   as rows and taxa as columns.
 #'
-#' @return The same object (`phyloseq` or `data.frame`) with new columns:
+#' @return The same object (`phyloseq` or `data.frame`) with new
+#'   columns:
 #' \itemize{
 #'   \item `read_num`
 #'   \item `singlton_num`
@@ -13,11 +16,17 @@
 #'   \item `outlier`
 #' }
 #'
-#' @details About Good's coverage. Initially developed by Alan Turing and I.J. Good during their cryptographic analyses in World War II, it was later adopted by
-#' ecologists, particularly in microbial diversity studies, to assess the completeness of a sample's representation of the overall community.
-#' It's calculated as `1 - (F1/N)`, where `F1` is the number of OTUs (Operational Taxonomic Units) represented by only one individual (singletons)
-#' and `N` is the total number of individuals in the sample. For example, a Good's coverage of 0.95, means that 5% of the reads in that sample
-#' are from OTUs that appear only once.
+#' @details About Good's coverage. Initially developed by Alan
+#'   Turing and I.J. Good during their cryptographic analyses in
+#'   World War II, it was later adopted by ecologists, particularly
+#'   in microbial diversity studies, to assess the completeness of
+#'   a sample's representation of the overall community.
+#' It's calculated as `1 - (F1/N)`, where `F1` is the number of
+#'   OTUs (Operational Taxonomic Units) represented by only one
+#'   individual (singletons) and `N` is the total number of
+#'   individuals in the sample. For example, a Good's coverage of
+#'   0.95, means that 5% of the reads in that sample are from OTUs
+#'   that appear only once.
 #'
 #' @examples
 #' \donttest{
@@ -26,18 +35,22 @@
 #' # From an object class "phyloseq" with added alpha metrics
 #'
 #' data("bcse", package = "BRCore")
-#' bcse_metrics <- add_rarefaction_metrics(data=bcse)
+#' bcse_metrics <- add_rarefaction_metrics(data = bcse)
 #' sample_data(bcse_metrics)
 #'
 #' # From a class "data.frame" count table object
 #'
-#' bcse_otutable <- as.data.frame(as(otu_table(bcse), "matrix"))
-#' test_otutable_metrics <- add_rarefaction_metrics(data = bcse_otutable)
+#' bcse_otutable <- as.data.frame(
+#'   as(otu_table(bcse), "matrix")
+#' )
+#' test_otutable_metrics <- add_rarefaction_metrics(
+#'   data = bcse_otutable
+#' )
 #' test_otutable_metrics[
 #'   utils::tail(seq_len(nrow(test_otutable_metrics)), 10),
 #'   utils::tail(seq_len(ncol(test_otutable_metrics)), 20)
-#'   ]
-#'}
+#' ]
+#' }
 #'
 #' @importFrom phyloseq otu_table sample_data sample_data<- taxa_are_rows
 #' @importFrom tibble rownames_to_column column_to_rownames
@@ -101,8 +114,6 @@ add_rarefaction_metrics <- function(data) {
       df_stats,
       by = "sample_id"
     ) |>
-      #mutate(read_num = read_num.y) |>
-      #select(-read_num.x, -read_num.y) |>
       as.data.frame() |>
       column_to_rownames("sample_id")
 
