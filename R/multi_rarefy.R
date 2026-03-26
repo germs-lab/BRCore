@@ -100,7 +100,7 @@ multi_rarefy <- function(
   dataframe <- as.data.frame(
     as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
   )
-  
+
   # Input parameter checks ----
   cli::cli_alert_info(
     "Input (matrix/df dim): {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
@@ -171,28 +171,13 @@ multi_rarefy <- function(
   mean_data <- mean_data[, colSums(mean_data) > 0]
   n_taxa_after <- ncol(mean_data)
 
-  # Count zeros in original matrix ---
-  original_zeros <- sum(dataframe == 0)
-  original_total <- nrow(dataframe) * ncol(dataframe)
-  original_sparsity <- round(original_zeros / original_total * 100, 2)
-  cli::cli_alert_info(
-      "Original matrix: {.val {original_zeros}} zeros ({.val {original_sparsity}}% sparsity) out of {.val {original_total}} entries"
-  )
-  
-  # Count zeros in rarefied mean matrix
-  rarefied_zeros <- sum(mean_data == 0)
-  rarefied_total <- nrow(mean_data) * ncol(mean_data)
-  rarefied_sparsity <- round(rarefied_zeros / rarefied_total * 100, 2)
-  cli::cli_alert_info(
-      "Rarefied matrix: {.val {rarefied_zeros}} zeros ({.val {rarefied_sparsity}}% sparsity) out of {.val {rarefied_total}} entries"
-  )
-  
   # Report results ---
   n_samples_after <- nrow(mean_data)
   n_samples_removed <- n_samples_before - n_samples_after
   n_taxa_removed <- n_taxa_before - n_taxa_after
 
   cli::cli_h2("Rarefaction Results")
+  cli::cli_h3("Sample Removal")
   if (n_samples_removed > 0) {
     cli::cli_alert_warning(
       "{.val {n_samples_removed}} sample{?s} removed (depth < {.val {depth_level}})"
@@ -203,16 +188,30 @@ multi_rarefy <- function(
     )
   }
 
+  cli::cli_h3("Taxa Removal")
   if (n_taxa_removed > 0) {
     cli::cli_alert_info(
       "{.val {n_taxa_removed}} taxa removed (zero abundance)"
     )
   }
 
+  cli::cli_h3("Data Sparsity")
+  # Count zeros in original matrix ---
+  original_sparsity <- .sparsity_count(dataframe)
+  cli::cli_alert_info(
+    "Original matrix: {.val {original_sparsity$zeros}} zeros ({.val {original_sparsity$sparsity}}% sparsity) out of {.val {original_sparsity$total}} entries"
+  )
+
+  # Count zeros in rarefied mean matrix
+  rarefied_sparsity <- .sparsity_count(mean_data)
+  cli::cli_alert_info(
+    "Rarefied matrix: {.val {rarefied_sparsity$zeros}} zeros ({.val {rarefied_sparsity$sparsity}}% sparsity) out of {.val {rarefied_sparsity$total}} entries"
+  )
+
+  cli::cli_h3("Final Data Dimensions")
   cli::cli_alert_success(
     "Output: {.val {nrow(mean_data)}} samples x {.val {ncol(mean_data)}} taxa"
   )
-
   return(mean_data)
 }
 
@@ -246,4 +245,23 @@ multi_rarefy <- function(
   colnames(out) <- colnames(x)
   rownames(out) <- rownames(x)
   out
+}
+
+#' Count zeros and sparsity in a data frame
+#' @param dataframe A data frame to analyze.
+#' @return A list containing the number of zeros
+#'
+#' @noRd
+#' @keywords internal
+.sparsity_count <- function(dataframe) {
+  original_zeros <- sum(dataframe == 0)
+  original_total <- nrow(dataframe) * ncol(dataframe)
+
+  sparsity <- round(original_zeros / original_total * 100, 2)
+
+  list(
+    zeros = original_zeros,
+    total = original_total,
+    sparsity = sparsity
+  )
 }
