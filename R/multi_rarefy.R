@@ -20,12 +20,14 @@
 #'
 #' @importFrom parallelly availableCores
 #' @importFrom parallel makeCluster stopCluster clusterExport parLapply
+#' @importFrom parallel clusterEvalQ
 #' @importFrom dplyr bind_rows group_by summarise across everything filter near
 #' @importFrom dplyr where
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom phyloseq otu_table
 #' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning cli_alert_success cli_alert_danger
 #' @importFrom utils head
+#' @importFrom vegan rrarefy
 #'
 #' @examples
 #' \donttest{
@@ -132,11 +134,12 @@ multi_rarefy <- function(
     varlist = c(
       "dataframe",
       "depth_level",
-      ".single_rarefy",
+      #".single_rarefy",
       "iteration_seeds"
     ),
     envir = environment()
   )
+  clusterEvalQ(cl, library(vegan))
 
   # Run rarefactions in parallel ----
   cli::cli_alert_info("Running rarefaction...")
@@ -145,7 +148,11 @@ multi_rarefy <- function(
     if (!is.na(iteration_seeds[i])) {
       set.seed(iteration_seeds[i])
     }
-    df <- .single_rarefy(dataframe, sample_size = depth_level)
+    df <- vegan::rrarefy(
+      dataframe,
+      sample = depth_level
+    )
+    # df <- .single_rarefy(dataframe, sample_size = depth_level)
     df <- as.data.frame(df)
     rownames_to_column(df, "sample_id")
   })
@@ -215,37 +222,6 @@ multi_rarefy <- function(
   return(mean_data)
 }
 
-
-#' Single rarefaction iteration
-#'
-#' @param x A matrix with samples as rows and taxa as columns.
-#' @param sample_size The number of sequences to sample.
-#'
-#' @return A matrix with rarefied counts.
-#'
-#' @noRd
-#' @keywords internal
-.single_rarefy <- function(x, sample_size) {
-  x <- as.matrix(x)
-
-  out <- t(apply(x, 1, function(row) {
-    total <- sum(row)
-    if (total < sample_size) {
-      return(rep(NA_integer_, length(row)))
-    }
-
-    sampled <- sample(
-      rep(seq_along(row), times = row),
-      size = sample_size,
-      replace = FALSE
-    )
-    tabulate(sampled, nbins = length(row))
-  }))
-
-  colnames(out) <- colnames(x)
-  rownames(out) <- rownames(x)
-  out
-}
 
 #' Count zeros and sparsity in a data frame
 #' @param dataframe A data frame to analyze.
