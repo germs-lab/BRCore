@@ -170,7 +170,7 @@ test_vignette_data <- list(
 )
 
 # Save the test data
-output_file <- "tests/test_sets/test_vignette_data.rda"
+output_file <- "tests/testthat/test_sets/test_vignette_data.rda"
 cat(paste0("Saving to ", output_file, "...\n"))
 save(test_vignette_data, file = output_file)
 

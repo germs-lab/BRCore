@@ -279,10 +279,6 @@ identify_core <- function(
   # BC accumulation ---------------------------------
   # cumulative BC across samples while adding taxa in rank order
   # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
-  # sample_pairs <- utils::combn(ncol(otu), 2)
-  # pair_labels <- apply(sample_pairs, 2, function(ix) {
-  #   paste(colnames(otu)[ix], collapse = " - ")
-  # })
 
   # start with the first ranked OTU
   cli::cli_alert_info(
@@ -297,9 +293,6 @@ identify_core <- function(
   )
 
   bc_vec <- .calculate_bc(start_matrix, nReads)
-  # apply(sample_pairs, 2, function(ix) {
-  # sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) / (2 * nReads)
-  # })
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -324,11 +317,8 @@ identify_core <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      # bc_vec <- apply(sample_pairs, 2, function(ix) {
-      #   sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) /
-      #     (2 * nReads)
-      # })
       bc_vec <- .calculate_bc(start_matrix, nReads)
+
       BCaddition <- left_join(
         BCaddition,
         data.frame(
@@ -483,14 +473,16 @@ identify_core <- function(
   }
 
   sample_pairs <- utils::combn(ncol(matrix), 2)
+  pair_labels <- apply(sample_pairs, 2, function(x) {
+    paste(colnames(matrix)[x], collapse = " - ")
+  })
 
   bc_values <- apply(sample_pairs, 2, function(x) {
     sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
   })
 
-  pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(matrix)[x], collapse = " - ")
-  })
-
-  list(values = bc_values, names = pair_labels)
+  list(
+    values = bc_values,
+    names = pair_labels
+  )
 }
