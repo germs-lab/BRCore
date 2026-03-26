@@ -10,7 +10,7 @@ test_that("1: Vignette test data structures are valid", {
       is.data.frame(test_vignette_data$test_bcse_rarefied_otutable)
   )
 
-  expect_equal(999.999999999996, 1000, tol = 1e-6) # Sanity check for floating-point precision
+  expect_equal(999.999999999996, 1000, tolerance = 1e-6) # Sanity check for floating-point precision
 
   row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable)
   expect_true(all(near(row_sums, 1000, tol = 1e-6)))

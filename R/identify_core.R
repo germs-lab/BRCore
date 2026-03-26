@@ -279,10 +279,10 @@ identify_core <- function(
   # BC accumulation ---------------------------------
   # cumulative BC across samples while adding taxa in rank order
   # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
-  sample_pairs <- utils::combn(ncol(otu), 2)
-  pair_labels <- apply(sample_pairs, 2, function(ix) {
-    paste(colnames(otu)[ix], collapse = " - ")
-  })
+  # sample_pairs <- utils::combn(ncol(otu), 2)
+  # pair_labels <- apply(sample_pairs, 2, function(ix) {
+  #   paste(colnames(otu)[ix], collapse = " - ")
+  # })
 
   # start with the first ranked OTU
   cli::cli_alert_info(
@@ -296,13 +296,14 @@ identify_core <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- apply(sample_pairs, 2, function(ix) {
-    sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) / (2 * nReads)
-  })
+  bc_vec <- .calculate_bc(start_matrix, nReads)
+  # apply(sample_pairs, 2, function(ix) {
+  # sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) / (2 * nReads)
+  # })
 
   BCaddition <- data.frame(
-    x_names = pair_labels,
-    `1` = bc_vec,
+    x_names = bc_vec$names,
+    `1` = bc_vec$values,
     check.names = FALSE
   )
 
@@ -311,8 +312,7 @@ identify_core <- function(
       name = "Calculating BC rankings",
       total = nrow(otu_ranked) - 1,
       format = "{cli::pb_bar} {cli::pb_percent} | ETA: {cli::pb_eta}",
-      .auto_close = TRUE,
-      .envir = parent.frame()
+      .auto_close = TRUE
     )
 
     for (i in 2:nrow(otu_ranked)) {
@@ -324,20 +324,23 @@ identify_core <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      bc_vec <- apply(sample_pairs, 2, function(ix) {
-        sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) /
-          (2 * nReads)
-      })
+      # bc_vec <- apply(sample_pairs, 2, function(ix) {
+      #   sum(abs(start_matrix[, ix[1]] - start_matrix[, ix[2]])) /
+      #     (2 * nReads)
+      # })
+      bc_vec <- .calculate_bc(start_matrix, nReads)
       BCaddition <- left_join(
         BCaddition,
         data.frame(
-          x_names = pair_labels,
-          value = bc_vec,
+          x_names = bc_vec$names,
+          value = bc_vec$values,
           check.names = FALSE
         ),
         by = "x_names"
       )
       names(BCaddition)[ncol(BCaddition)] <- as.character(i)
+
+      cli::cli_progress_update()
     }
   }
 
@@ -442,4 +445,52 @@ identify_core <- function(
   cli::cli_alert_success("Analysis complete!")
 
   out
+}
+
+
+#' Calculate Bray-Curtis Dissimilarity Between Sample Pairs
+#'
+#' This function calculates the Bray-Curtis dissimilarity between all pairs of samples in a matrix.
+#' The dissimilarity is normalized by the total number of reads (`nReads`) to account for differences
+#' in sequencing depth.
+#'
+#' @param matrix A numeric matrix or data frame where rows represent taxa (e.g., ASVs) and columns
+#'   represent samples. The column names of the matrix are used to generate pairwise sample names.
+#' @param nReads A numeric value representing the total number of reads used for normalization.
+#'   Typically, this is the minimum or average sequencing depth across samples.
+#' @return A list containing:
+#'   \itemize{
+#'     \item \code{values}: A numeric vector of Bray-Curtis dissimilarity values for each sample pair.
+#'     \item \code{names}: A character vector of pairwise sample names (e.g., "Sample1-Sample2").
+#'   }
+#' @import utils
+#' @export
+#'
+#' @noRd
+#' @keywords internal
+
+.calculate_bc <- function(matrix, nReads) {
+  if (nrow(matrix) == 0) {
+    cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
+    return(list(values = numeric(0), names = character(0)))
+  }
+
+  if (ncol(matrix) < 2) {
+    cli::cli_alert_warning(
+      "{.arg matrix} has fewer than 2 columns. Need at least 2 columns to calculate pairwise distances."
+    )
+    return(list(values = numeric(0), names = character(0)))
+  }
+
+  sample_pairs <- utils::combn(ncol(matrix), 2)
+
+  bc_values <- apply(sample_pairs, 2, function(x) {
+    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
+  })
+
+  pair_labels <- apply(sample_pairs, 2, function(x) {
+    paste(colnames(matrix)[x], collapse = " - ")
+  })
+
+  list(values = bc_values, names = pair_labels)
 }
