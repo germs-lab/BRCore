@@ -40,6 +40,7 @@
 #'   physeq = bcse,
 #'   depth_level = 1000,
 #'   num_iter = 100,
+#'   .summarize = TRUE,
 #'   threads = 2,
 #'   set_seed = 7642
 #' )
@@ -52,6 +53,7 @@ multi_rarefy <- function(
   physeq,
   depth_level,
   num_iter = 100,
+  .summarize = TRUE,
   threads = get_available_cores(),
   set_seed = NULL
 ) {
@@ -144,25 +146,44 @@ multi_rarefy <- function(
   # Run rarefactions in parallel ----
   cli::cli_alert_info("Running rarefaction...")
 
+  com_iter <- vector(mode = "list", length = num_iter)
   com_iter <- parLapply(cl, 1:num_iter, function(i) {
     if (!is.na(iteration_seeds[i])) {
       set.seed(iteration_seeds[i])
     }
+
     df <- vegan::rrarefy(
       dataframe,
       sample = depth_level
     )
-    # df <- .single_rarefy(dataframe, sample_size = depth_level)
-    df <- as.data.frame(df)
-    rownames_to_column(df, "sample_id")
+
+    df <- as.data.frame(df) |>
+      rownames_to_column("sample_id") |>
+      mutate(iter = i)
   })
 
   # Aggregate results ----
   n_samples_before <- nrow(dataframe)
 
+  # if (!.summarize) {
+  #   com_iter_df <- do.call(rbind, com_iter)
+  #   rarefied_data <- com_iter_df |>
+  #     mutate(
+  #       unique_id = paste0(sample_id, "_", iter)
+  #     ) |>
+  #     relocate(unique_id, .after = sample_id) |>
+  #     select(!iter) |>
+  #     filter(rowSums(across(where(is.numeric))) >= depth_level) |>
+  #     column_to_rownames("unique_id")
+
+  #   return(rarefied_data)
+  # }
+
+  # if (.summarize) {
   mean_data <- bind_rows(com_iter) |>
     group_by(sample_id) |>
     summarise(across(everything(), mean), .groups = "drop") |>
+    select(!iter) |>
     filter(
       dplyr::near(
         # We use near() to account for floating-point precision issues that can arise when averaging counts
@@ -172,6 +193,8 @@ multi_rarefy <- function(
       )
     ) |>
     column_to_rownames("sample_id")
+  # return(mean_data)
+  # }
 
   # Remove ASVs/OTUs with zero total abundance
   n_taxa_before <- ncol(mean_data)
