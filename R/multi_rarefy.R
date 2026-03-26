@@ -100,7 +100,7 @@ multi_rarefy <- function(
   dataframe <- as.data.frame(
     as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
   )
-
+  
   # Input parameter checks ----
   cli::cli_alert_info(
     "Input (matrix/df dim): {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
@@ -171,6 +171,22 @@ multi_rarefy <- function(
   mean_data <- mean_data[, colSums(mean_data) > 0]
   n_taxa_after <- ncol(mean_data)
 
+  # Count zeros in original matrix ---
+  original_zeros <- sum(dataframe == 0)
+  original_total <- nrow(dataframe) * ncol(dataframe)
+  original_sparsity <- round(original_zeros / original_total * 100, 2)
+  cli::cli_alert_info(
+      "Original matrix: {.val {original_zeros}} zeros ({.val {original_sparsity}}% sparsity) out of {.val {original_total}} entries"
+  )
+  
+  # Count zeros in rarefied mean matrix
+  rarefied_zeros <- sum(mean_data == 0)
+  rarefied_total <- nrow(mean_data) * ncol(mean_data)
+  rarefied_sparsity <- round(rarefied_zeros / rarefied_total * 100, 2)
+  cli::cli_alert_info(
+      "Rarefied matrix: {.val {rarefied_zeros}} zeros ({.val {rarefied_sparsity}}% sparsity) out of {.val {rarefied_total}} entries"
+  )
+  
   # Report results ---
   n_samples_after <- nrow(mean_data)
   n_samples_removed <- n_samples_before - n_samples_after
