@@ -53,3 +53,35 @@ test_that("multi_rarefy retains samples with row sums near depth_level (floating
   expect_true("fp_below" %in% result$sample_id)
   expect_false("too_low" %in% result$sample_id)
 })
+
+test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FALSE", {
+  skip_if_not_installed("phyloseq")
+
+  data("bcse", package = "BRCore")
+
+  num_iterations <- 3
+  rarefied_data <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = num_iterations,
+    .summarize = FALSE,
+    threads = 1,
+    set_seed = 123
+  )
+
+  # The number of rows should be equal to the number of unique samples multiplied by the number of iterations
+  unique_samples <- nrow(unique(sample_data(bcse)))
+  expected_rows <- unique_samples * num_iterations
+
+  removed_samples <- setdiff(
+    unique(rownames(sample_data(bcse))),
+    unique(sub(
+      "_iter_.*",
+      "",
+      rownames(rarefied_data)
+    ))
+  )
+  removed_rows <- length(removed_samples) * num_iterations
+
+  expect_equal(nrow(rarefied_data) + removed_rows, expected_rows)
+})

@@ -91,12 +91,13 @@
 #' }
 #'
 #' @export
-identify_core <- function(
+identify_core_avgdist <- function(
   physeq_obj,
   priority_var,
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
+  num_iter = 100,
   seed = NULL
 ) {
   # input checks ---------------------------------
@@ -292,7 +293,7 @@ identify_core <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- .calculate_bc(start_matrix, nReads)
+  bc_vec <- .calculate_bc_(start_matrix, nReads, num_iterations = num_iter)
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -317,7 +318,7 @@ identify_core <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      bc_vec <- .calculate_bc(start_matrix, nReads)
+      bc_vec <- .calculate_bc_(start_matrix, nReads, num_iterations = num_iter)
 
       BCaddition <- left_join(
         BCaddition,
@@ -447,6 +448,7 @@ identify_core <- function(
 #' @param matrix A numeric matrix or data frame where rows represent taxa (e.g., ASVs) and columns
 #'   represent samples. The column names of the matrix are used to generate pairwise sample names.
 #' @param nReads A numeric value representing the total number of reads used for normalization.
+#' @param num_iterations
 #'   Typically, this is the minimum or average sequencing depth across samples.
 #' @return A list containing:
 #'   \itemize{
@@ -459,7 +461,7 @@ identify_core <- function(
 #' @noRd
 #' @keywords internal
 
-.calculate_bc <- function(matrix, nReads) {
+.calculate_bc_ <- function(matrix, nReads, num_iterations = 1) {
   if (nrow(matrix) == 0) {
     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
     return(list(values = numeric(0), names = character(0)))
@@ -477,9 +479,16 @@ identify_core <- function(
     paste(colnames(matrix)[x], collapse = " - ")
   })
 
-  bc_values <- apply(sample_pairs, 2, function(x) {
-    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
-  })
+  # bc_values <- apply(sample_pairs, 2, function(x) {
+  #   sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
+  # })
+
+  bc_values <- as.vector(vegan::avgdist(
+    t(matrix),
+    sample = nReads,
+    iterations = num_iterations,
+    dmethod = "bray"
+  ))
 
   list(
     values = bc_values,
