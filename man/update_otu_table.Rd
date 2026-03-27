@@ -9,13 +9,27 @@ update_otu_table(physeq, otu_rare)
 \arguments{
 \item{physeq}{A \code{phyloseq} object in which you want to add the rarefied OTU/ASV table.}
 
-\item{otu_rare}{A rarefied otu_table dataframe.}
+\item{otu_rare}{A rarefied otu_table dataframe. Can be either:
+\itemize{
+\item Summarized: one row per sample (from \code{multi_rarefy(.summarize = TRUE)})
+\item Unsummarized: multiple rows per sample with \verb{_iter_#} suffixes
+(from \code{multi_rarefy(.summarize = FALSE)}). The \code{sample_data} will be
+replicated to match each iteration row.
+}}
 }
 \value{
 A \code{phyloseq} object.
 }
 \description{
-This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} object \code{otu_table()} layer.
+This function imports a rarefied otu_table (or normalized) in a \code{phyloseq}
+object \code{otu_table()} layer. It handles both summarized output (from
+\code{multi_rarefy(.summarize = TRUE)}) and unsummarized output with iteration
+suffixes (from \code{multi_rarefy(.summarize = FALSE)}).
+}
+\details{
+When unsummarized output is provided, the \code{sample_data} is replicated to
+match the iteration rows. Each row retains its \verb{_iter_#} suffix so
+individual iterations can be distinguished downstream.
 }
 \examples{
 \donttest{
@@ -23,7 +37,7 @@ library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# Perform multiple rarefaction
+# Perform multiple rarefaction (summarized)
 otu_table_rare <-
   multi_rarefy(
     physeq = GlobalPatterns,
@@ -33,10 +47,6 @@ otu_table_rare <-
     set_seed = 123
   )
 
-# Check the rarefied data output
-rowSums(otu_table_rare)
-
-# Recreate the phyloseq object and check
 rarefied_GlobalPatterns <-
   update_otu_table(
     physeq = GlobalPatterns,
@@ -44,6 +54,25 @@ rarefied_GlobalPatterns <-
   )
 
 sample_sums(rarefied_GlobalPatterns)
+
+# Also works with unsummarized output (keeps all iterations)
+otu_table_rare_full <-
+  multi_rarefy(
+    physeq = GlobalPatterns,
+    depth_level = 200,
+    num_iter = 3,
+    .summarize = FALSE,
+    threads = 1,
+    set_seed = 123
+  )
+
+rarefied_GlobalPatterns2 <-
+  update_otu_table(
+    physeq = GlobalPatterns,
+    otu_rare = otu_table_rare_full
+  )
+
+sample_sums(rarefied_GlobalPatterns2)
 }
 
 }
