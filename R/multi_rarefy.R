@@ -10,6 +10,9 @@
 #'   OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform
 #'   for rarefaction.
+#' @param .summarize A logical indicating whether to summarize the results by
+#'   averaging across iterations (default = TRUE). If FALSE, the function will
+#'   return the rarefied data frame for all iterations without summarization. #'   Sample names are returned as unique IDs with the "_iter_#" suffix.
 #' @param threads Number of threads (default = 4).
 #' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
 #'
@@ -21,7 +24,7 @@
 #' @importFrom parallelly availableCores
 #' @importFrom parallel makeCluster stopCluster clusterExport parLapply
 #' @importFrom parallel clusterEvalQ
-#' @importFrom dplyr bind_rows group_by summarise across everything filter near
+#' @importFrom dplyr group_by summarise across everything filter near
 #' @importFrom dplyr where
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom phyloseq otu_table
@@ -101,9 +104,13 @@ multi_rarefy <- function(
   }
 
   # Prepare data ----
-  dataframe <- as.data.frame(
-    as.matrix(t(otu_table(physeq, taxa_are_rows = TRUE)))
-  )
+  otu_mat <- as.matrix(otu_table(physeq, ))
+
+  if (phyloseq::taxa_are_rows(physeq)) {
+    otu_mat <- t(otu_mat) # We want samples as rows
+  }
+
+  dataframe <- as.data.frame(otu_mat)
 
   # Input parameter checks ----
   cli::cli_alert_info(
@@ -136,7 +143,6 @@ multi_rarefy <- function(
     varlist = c(
       "dataframe",
       "depth_level",
-      #".single_rarefy",
       "iteration_seeds"
     ),
     envir = environment()
@@ -146,8 +152,8 @@ multi_rarefy <- function(
   # Run rarefactions in parallel ----
   cli::cli_alert_info("Running rarefaction...")
 
-  com_iter <- vector(mode = "list", length = num_iter)
-  com_iter <- parLapply(cl, 1:num_iter, function(i) {
+  com_iter_list <- vector(mode = "list", length = num_iter)
+  com_iter_list <- parLapply(cl, 1:num_iter, function(i) {
     if (!is.na(iteration_seeds[i])) {
       set.seed(iteration_seeds[i])
     }
@@ -165,84 +171,84 @@ multi_rarefy <- function(
   # Aggregate results ----
   n_samples_before <- nrow(dataframe)
 
-  # if (!.summarize) {
-  #   com_iter_df <- do.call(rbind, com_iter)
-  #   rarefied_data <- com_iter_df |>
-  #     mutate(
-  #       unique_id = paste0(sample_id, "_", iter)
-  #     ) |>
-  #     relocate(unique_id, .after = sample_id) |>
-  #     select(!iter) |>
-  #     filter(rowSums(across(where(is.numeric))) >= depth_level) |>
-  #     column_to_rownames("unique_id")
+  com_iter_df <- do.call(rbind, com_iter_list)
 
-  #   return(rarefied_data)
-  # }
+  if (.summarize) {
+    mean_data <- com_iter_df |>
+      group_by(sample_id) |>
+      summarise(across(everything(), mean), .groups = "drop") |>
+      select(!iter) |>
+      filter(
+        dplyr::near(
+          # We use near() to account for floating-point precision issues that can arise when averaging counts
+          rowSums(across(where(is.numeric))),
+          depth_level,
+          tol = 1e-6 # Accept values within ±0.5 of depth_level
+        )
+      ) |>
+      column_to_rownames("sample_id")
 
-  # if (.summarize) {
-  mean_data <- bind_rows(com_iter) |>
-    group_by(sample_id) |>
-    summarise(across(everything(), mean), .groups = "drop") |>
-    select(!iter) |>
-    filter(
-      dplyr::near(
-        # We use near() to account for floating-point precision issues that can arise when averaging counts
-        rowSums(across(where(is.numeric))),
-        depth_level,
-        tol = 1e-6 # Accept values within ±0.5 of depth_level
-      )
-    ) |>
-    column_to_rownames("sample_id")
-  # return(mean_data)
-  # }
+    processed_data <- mean_data
+    remove(mean_data) # Free memory from intermediate data frame
+  }
+
+  if (!.summarize) {
+    rarefied_data <- com_iter_df |>
+      mutate(
+        sample_id = paste0(sample_id, "_iter_", iter)
+      ) |>
+      select(!c(iter)) |>
+      filter(
+        dplyr::near(
+          rowSums(across(where(is.numeric))),
+          depth_level,
+          tol = 1e-6 # Accept values within ±0.5 of depth_level
+        )
+      ) |>
+      column_to_rownames("sample_id")
+
+    processed_data <- rarefied_data
+    remove(rarefied_data) # Free memory from intermediate data frame
+  }
 
   # Remove ASVs/OTUs with zero total abundance
-  n_taxa_before <- ncol(mean_data)
-  mean_data <- mean_data[, colSums(mean_data) > 0]
-  n_taxa_after <- ncol(mean_data)
+  n_taxa_before <- ncol(processed_data)
+  processed_data <- processed_data[, colSums(processed_data) > 0]
+  n_taxa_after <- ncol(processed_data)
 
   # Report results ---
-  n_samples_after <- nrow(mean_data)
-  n_samples_removed <- n_samples_before - n_samples_after
+  if (.summarize) {
+    n_samples_after <- nrow(processed_data)
+    n_samples_removed <- n_samples_before - n_samples_after
+    removed_samples <- setdiff(rownames(dataframe), rownames(processed_data))
+  } else {
+    unique_samples <- length(unique(sub(
+      "_iter_.*",
+      "",
+      rownames(processed_data)
+    )))
+    n_samples_removed <- n_samples_before - unique_samples
+    original_sample_ids <- sub("_iter_.*", "", rownames(processed_data)) |>
+      unique()
+    removed_samples <- setdiff(rownames(dataframe), original_sample_ids)
+  }
+
   n_taxa_removed <- n_taxa_before - n_taxa_after
 
-  cli::cli_h2("Rarefaction Results")
-  cli::cli_h3("Sample Removal")
-  if (n_samples_removed > 0) {
-    cli::cli_alert_warning(
-      "{.val {n_samples_removed}} sample{?s} removed (depth < {.val {depth_level}})"
-    )
-    removed_samples <- setdiff(rownames(dataframe), rownames(mean_data))
-    cli::cli_alert_warning(
-      "Samples removed: {.val {paste(removed_samples, collapse = ', ')}}"
-    )
-  }
-
-  cli::cli_h3("Taxa Removal")
-  if (n_taxa_removed > 0) {
-    cli::cli_alert_info(
-      "{.val {n_taxa_removed}} taxa removed (zero abundance)"
-    )
-  }
-
-  cli::cli_h3("Data Sparsity")
-  # Count zeros in original matrix ---
-  original_sparsity <- .sparsity_count(dataframe)
-  cli::cli_alert_info(
-    "Original matrix: {.val {original_sparsity$zeros}} zeros ({.val {original_sparsity$sparsity}}% sparsity) out of {.val {original_sparsity$total}} entries"
+  .report_rarefaction_results(
+    n_samples_removed = n_samples_removed,
+    n_taxa_removed = n_taxa_removed,
+    removed_samples = removed_samples,
+    dataframe = dataframe,
+    processed_data = processed_data,
+    depth_level = depth_level,
+    .summarize = .summarize,
+    unique_samples = if (.summarize) NULL else unique_samples,
+    num_iter = if (.summarize) NULL else num_iter
   )
 
-  # Count zeros in rarefied mean matrix
-  rarefied_sparsity <- .sparsity_count(mean_data)
-  cli::cli_alert_info(
-    "Rarefied matrix: {.val {rarefied_sparsity$zeros}} zeros ({.val {rarefied_sparsity$sparsity}}% sparsity) out of {.val {rarefied_sparsity$total}} entries"
-  )
-
-  cli::cli_h3("Final Data Dimensions")
-  cli::cli_alert_success(
-    "Output: {.val {nrow(mean_data)}} samples x {.val {ncol(mean_data)}} taxa"
-  )
-  return(mean_data)
+  # Return the processed data frame
+  return(processed_data)
 }
 
 
@@ -263,4 +269,80 @@ multi_rarefy <- function(
     total = original_total,
     sparsity = sparsity
   )
+}
+
+#' Helper function to report rarefaction results
+#' @param n_samples_removed Number of samples removed during rarefaction.
+#' @param n_taxa_removed Number of taxa removed during rarefaction.
+#' @param removed_samples A vector of sample names that were removed.
+#' @param dataframe The original data frame before rarefaction.
+#' @param processed_data The data frame after rarefaction.
+#' @param depth_level The depth level used for rarefaction.
+#' @param .summarize Whether the data was summarized (TRUE) or not (FALSE).
+#' @param unique_samples The number of unique samples in the processed data (only relevant if .summarize = FALSE).
+#' @param num_iter The number of iterations performed (only relevant if .summarize = FALSE).
+#' @return None. This function is used for side-effect reporting via cli messages.
+#' @noRd
+#' @keywords internal
+#'
+.report_rarefaction_results <- function(
+  n_samples_removed,
+  n_taxa_removed,
+  removed_samples,
+  dataframe,
+  processed_data,
+  depth_level,
+  .summarize = TRUE,
+  unique_samples = NULL,
+  num_iter = NULL
+) {
+  cli::cli_h2("Rarefaction Results")
+
+  # Sample Removal
+  cli::cli_h3("Sample Removal")
+  if (n_samples_removed > 0) {
+    cli::cli_alert_warning(
+      "{.val {n_samples_removed}} sample{?s} removed (depth < {.val {depth_level}})"
+    )
+    cli::cli_alert_warning(
+      "Samples removed: {.val {paste(removed_samples, collapse = ', ')}}"
+    )
+  }
+
+  # Taxa Removal
+  cli::cli_h3("Taxa Removal")
+  if (n_taxa_removed > 0) {
+    cli::cli_alert_info(
+      "{.val {n_taxa_removed}} taxa removed (zero abundance)"
+    )
+  }
+
+  # Data Sparsity
+  cli::cli_h3("Data Sparsity")
+  original_sparsity <- .sparsity_count(dataframe)
+  cli::cli_alert_info(
+    "Original matrix: {.val {original_sparsity$zeros}} zeros ({.val {original_sparsity$sparsity}}% sparsity) out of {.val {original_sparsity$total}} entries"
+  )
+
+  rarefied_sparsity <- .sparsity_count(processed_data)
+  sparsity_msg <- if (.summarize) {
+    "Rarefied matrix"
+  } else {
+    "Rarefied matrix (all iterations)"
+  }
+  cli::cli_alert_info(
+    "{sparsity_msg}: {.val {rarefied_sparsity$zeros}} zeros ({.val {rarefied_sparsity$sparsity}}% sparsity) out of {.val {rarefied_sparsity$total}} entries"
+  )
+
+  # Final Data Dimensions
+  cli::cli_h3("Final Data Dimensions")
+  if (.summarize) {
+    cli::cli_alert_success(
+      "Output: {.val {nrow(processed_data)}} samples x {.val {ncol(processed_data)}} taxa"
+    )
+  } else {
+    cli::cli_alert_success(
+      "Output: {.val {nrow(processed_data)}} rows ({.val {unique_samples}} samples x {.val {num_iter}} iterations) x {.val {ncol(processed_data)}} taxa"
+    )
+  }
 }

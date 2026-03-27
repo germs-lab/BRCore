@@ -8,6 +8,7 @@ test_that("Test if parallel rarefaction works correctly", {
       physeq = bcse,
       depth_level = 3000,
       num_iter = 3,
+      .summarize = TRUE,
       threads = 1,
       set_seed = 123
     )
