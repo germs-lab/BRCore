@@ -94,6 +94,7 @@
 identify_core_avgdist <- function(
   physeq_obj,
   priority_var,
+  depth_level = 1000,
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
@@ -123,12 +124,12 @@ identify_core_avgdist <- function(
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))
 
-  if (abs(min_sum - max_sum) < 1e-6) {
-    nReads <- round(min_sum) # Use rounded value for display
-    cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
-  } else {
-    stop("The otu_table() is not rarefied!")
-  }
+  #if (abs(min_sum - max_sum) < 1e-6) {
+  #  depth_level <- round(min_sum) # Use rounded value for display
+  #  cli::cli_alert_info("otu_table() is rarefied at a depth of: {depth_level}")
+  #} else {
+  #  stop("The otu_table() is not rarefied!")
+  #}
 
   otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
     as("matrix")
@@ -279,7 +280,7 @@ identify_core_avgdist <- function(
 
   # BC accumulation ---------------------------------
   # cumulative BC across samples while adding taxa in rank order
-  # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
+  # pairwise BC on *current* subset of taxa, normalized by depth_level, matching your formula
 
   # start with the first ranked OTU
   cli::cli_alert_info(
@@ -293,7 +294,7 @@ identify_core_avgdist <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- .calculate_bc_(start_matrix, nReads, num_iterations = num_iter)
+  bc_vec <- .calculate_bc_(start_matrix, depth_level, num_iterations = num_iter)
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -318,7 +319,7 @@ identify_core_avgdist <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      bc_vec <- .calculate_bc_(start_matrix, nReads, num_iterations = num_iter)
+      bc_vec <- .calculate_bc_(start_matrix, depth_level, num_iterations = num_iter)
 
       BCaddition <- left_join(
         BCaddition,
@@ -337,8 +338,10 @@ identify_core_avgdist <- function(
 
   temp_BC_matrix <- BCaddition |>
     tibble::column_to_rownames("x_names") |>
-    as.matrix()
-
+    as.matrix() 
+  
+  print(temp_BC_matrix)
+  
   BC_ranked <- data.frame(
     rank = as.factor(rownames(t(temp_BC_matrix))),
     t(temp_BC_matrix),
@@ -349,11 +352,14 @@ identify_core_avgdist <- function(
       names_to = "comparison",
       values_to = "BC"
     ) |>
+    .peek() |>
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     arrange(MeanBC) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
+  print(max(BC_ranked$MeanBC))
+  
   # multiplicative increase between successive ranks
   if (nrow(BC_ranked) >= 2) {
     Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
@@ -381,6 +387,12 @@ identify_core_avgdist <- function(
 
   elbow <- which.max(BC_ranked$elbow_slope_diffs)
 
+  # FALLBACK: if elbow is empty, NA, or 0, default to 1
+  if (length(elbow) == 0 || is.na(elbow) || elbow == 0) {
+      cli::cli_warn("Elbow calculation failed (possibly due to low variation). Defaulting to 1.")
+      elbow <- 1
+  }
+  
   # threshold cut based on multiplicative increase
   thr <- 1 + increase_value
   valid_increases <- which(BC_ranked$IncreaseBC >= thr)
@@ -442,12 +454,12 @@ identify_core_avgdist <- function(
 #' Calculate Bray-Curtis Dissimilarity Between Sample Pairs
 #'
 #' This function calculates the Bray-Curtis dissimilarity between all pairs of samples in a matrix.
-#' The dissimilarity is normalized by the total number of reads (`nReads`) to account for differences
+#' The dissimilarity is normalized by the total number of reads (`depth_level`) to account for differences
 #' in sequencing depth.
 #'
 #' @param matrix A numeric matrix or data frame where rows represent taxa (e.g., ASVs) and columns
 #'   represent samples. The column names of the matrix are used to generate pairwise sample names.
-#' @param nReads A numeric value representing the total number of reads used for normalization.
+#' @param depth_level A numeric value representing the total number of reads used for normalization.
 #' @param num_iterations
 #'   Typically, this is the minimum or average sequencing depth across samples.
 #' @return A list containing:
@@ -461,7 +473,7 @@ identify_core_avgdist <- function(
 #' @noRd
 #' @keywords internal
 
-.calculate_bc_ <- function(matrix, nReads, num_iterations = 1) {
+.calculate_bc_ <- function(matrix, depth_level, num_iterations) {
   if (nrow(matrix) == 0) {
     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
     return(list(values = numeric(0), names = character(0)))
@@ -474,18 +486,25 @@ identify_core_avgdist <- function(
     return(list(values = numeric(0), names = character(0)))
   }
 
-  sample_pairs <- utils::combn(ncol(matrix), 2)
+ #Filter samples that meet the depth requirement
+  keep_samples <- colSums(matrix) >= depth_level    
+  #print(keep_samples)
+  
+  # Subset the matrix to valid samples only
+  filtered_matrix <- matrix[, keep_samples, drop = FALSE]
+  
+  sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
   pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(matrix)[x], collapse = " - ")
+    paste(colnames(filtered_matrix)[x], collapse = " - ")
   })
 
   # bc_values <- apply(sample_pairs, 2, function(x) {
-  #   sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
+  #   sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level)
   # })
 
   bc_values <- as.vector(vegan::avgdist(
-    t(matrix),
-    sample = nReads,
+    t(filtered_matrix),
+    sample = depth_level,
     iterations = num_iterations,
     dmethod = "bray"
   ))
@@ -495,3 +514,10 @@ identify_core_avgdist <- function(
     names = pair_labels
   )
 }
+
+.peek <- function(x, n = 5) {
+    print(head(x, n))
+    print(tail(x, n))
+    return(x)
+}
+

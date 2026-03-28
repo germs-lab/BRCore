@@ -7,6 +7,7 @@
 identify_core_avgdist(
   physeq_obj,
   priority_var,
+  depth_level = 1000,
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
