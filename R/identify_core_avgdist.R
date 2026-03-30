@@ -123,13 +123,16 @@ identify_core_avgdist <- function(
   # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))
+  is_rarefied <- abs(min_sum - max_sum) < 1e-6
 
-  #if (abs(min_sum - max_sum) < 1e-6) {
-  #  depth_level <- round(min_sum) # Use rounded value for display
-  #  cli::cli_alert_info("otu_table() is rarefied at a depth of: {depth_level}")
-  #} else {
-  #  stop("The otu_table() is not rarefied!")
-  #}
+  if (is_rarefied) {
+    depth_level <- round(min_sum) # Use rounded value for display
+    cli::cli_alert_info("otu_table() is rarefied at a depth of: {depth_level}")
+  } else {
+    cli::cli_alert_warning(
+      "The otu_table() is not rarefied! Using depth_level={depth_level} for normalization in BC calculations. Consider rarefying your data or adjusting depth_level accordingly."
+    )
+  }
 
   otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
     as("matrix")
@@ -294,7 +297,12 @@ identify_core_avgdist <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- .calculate_bc_(start_matrix, depth_level, num_iterations = num_iter)
+  bc_vec <- .calculate_bc_(
+    start_matrix,
+    depth_level,
+    num_iterations = num_iter,
+    is_rarefied = is_rarefied
+  )
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -319,7 +327,11 @@ identify_core_avgdist <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      bc_vec <- .calculate_bc_(start_matrix, depth_level, num_iterations = num_iter)
+      bc_vec <- .calculate_bc_(
+        start_matrix,
+        depth_level,
+        num_iterations = num_iter
+      )
 
       BCaddition <- left_join(
         BCaddition,
@@ -338,10 +350,10 @@ identify_core_avgdist <- function(
 
   temp_BC_matrix <- BCaddition |>
     tibble::column_to_rownames("x_names") |>
-    as.matrix() 
-  
+    as.matrix()
+
   print(temp_BC_matrix)
-  
+
   BC_ranked <- data.frame(
     rank = as.factor(rownames(t(temp_BC_matrix))),
     t(temp_BC_matrix),
@@ -352,14 +364,13 @@ identify_core_avgdist <- function(
       names_to = "comparison",
       values_to = "BC"
     ) |>
-    .peek() |>
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     arrange(MeanBC) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
   print(max(BC_ranked$MeanBC))
-  
+
   # multiplicative increase between successive ranks
   if (nrow(BC_ranked) >= 2) {
     Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
@@ -389,10 +400,12 @@ identify_core_avgdist <- function(
 
   # FALLBACK: if elbow is empty, NA, or 0, default to 1
   if (length(elbow) == 0 || is.na(elbow) || elbow == 0) {
-      cli::cli_warn("Elbow calculation failed (possibly due to low variation). Defaulting to 1.")
-      elbow <- 1
+    cli::cli_warn(
+      "Elbow calculation failed (possibly due to low variation). Defaulting to 1."
+    )
+    elbow <- 1
   }
-  
+
   # threshold cut based on multiplicative increase
   thr <- 1 + increase_value
   valid_increases <- which(BC_ranked$IncreaseBC >= thr)
@@ -473,7 +486,12 @@ identify_core_avgdist <- function(
 #' @noRd
 #' @keywords internal
 
-.calculate_bc_ <- function(matrix, depth_level, num_iterations) {
+.calculate_bc_ <- function(
+  matrix,
+  depth_level,
+  num_iterations,
+  is_rarefied = TRUE
+) {
   if (nrow(matrix) == 0) {
     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
     return(list(values = numeric(0), names = character(0)))
@@ -486,38 +504,36 @@ identify_core_avgdist <- function(
     return(list(values = numeric(0), names = character(0)))
   }
 
- #Filter samples that meet the depth requirement
-  keep_samples <- colSums(matrix) >= depth_level    
-  #print(keep_samples)
-  
-  # Subset the matrix to valid samples only
-  filtered_matrix <- matrix[, keep_samples, drop = FALSE]
-  
-  sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
+  sample_pairs <- utils::combn(ncol(matrix), 2)
   pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(filtered_matrix)[x], collapse = " - ")
+    paste(colnames(matrix)[x], collapse = " - ")
   })
 
-  # bc_values <- apply(sample_pairs, 2, function(x) {
-  #   sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level)
-  # })
+  # Conditional handling for rarefied vs unrarefied data
+  if (is_rarefied) {
+    # Data already rarefied - use vegdist directly without subsampling
 
-  bc_values <- as.vector(vegan::avgdist(
-    t(filtered_matrix),
-    sample = depth_level,
-    iterations = num_iterations,
-    dmethod = "bray"
-  ))
+    bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
+
+    # Get the actual per-pair normalization vegdist used
+    pair_sums <- apply(sample_pairs, 2, function(x) {
+      sum(matrix[, x[1]]) + sum(matrix[, x[2]])
+    })
+
+    # Reverse vegdist normalization and apply our own
+    bc_values <- bc_vegan * pair_sums / (2 * depth_level)
+  } else {
+    # Unrarefied data - use avgdist with rarefaction
+    bc_values <- as.vector(vegan::avgdist(
+      t(matrix),
+      sample = depth_level,
+      iterations = num_iter,
+      dmethod = "bray"
+    ))
+  }
 
   list(
     values = bc_values,
     names = pair_labels
   )
 }
-
-.peek <- function(x, n = 5) {
-    print(head(x, n))
-    print(tail(x, n))
-    return(x)
-}
-

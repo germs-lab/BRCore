@@ -19,6 +19,7 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
     physeq_obj = switchgrass,
     priority_var = "sampling_date",
     increase_value = 0.02,
+    abundance_weight = 0,
     seed = 4
   )
 
@@ -83,7 +84,7 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
   expect_equal(nrow(res$bray_curtis_ranked), nrow(res$otu_ranked))
 
   # ---- reproducibility with same seed ----
-  res2 <- identify_core(
+  res <- identify_core(
     physeq_obj = switchgrass,
     priority_var = "sampling_date",
     increase_value = 0.02,
@@ -278,43 +279,43 @@ test_that("identify_core and identify_core_avgdist produce equivalent results", 
   )
 
   res_r <- do.call(identify_core, args)
-  res_cpp <- do.call(identify_core_avgdist, args)
+  res_avgdist <- do.call(identify_core_avgdist, args)
 
   # Core set agreement
-  expect_equal(res_r$elbow, res_cpp$elbow)
-  expect_equal(res_r$bc_increase, res_cpp$bc_increase)
+  expect_equal(res_r$elbow, res_avgdist$elbow)
+  expect_equal(res_r$bc_increase, res_avgdist$bc_increase)
 
   # OTU ranking order
 
-  expect_equal(res_r$otu_ranked$otu, res_cpp$otu_ranked$otu)
+  expect_equal(res_r$otu_ranked$otu, res_avgdist$otu_ranked$otu)
 
   # BC accumulation curve values
   expect_equal(
     res_r$bray_curtis_ranked$MeanBC,
-    res_cpp$bray_curtis_ranked$MeanBC,
+    res_avgdist$bray_curtis_ranked$MeanBC,
     tolerance = 1e-10
   )
 
   expect_equal(
     res_r$bray_curtis_ranked$proportionBC,
-    res_cpp$bray_curtis_ranked$proportionBC,
+    res_avgdist$bray_curtis_ranked$proportionBC,
     tolerance = 1e-10
   )
 
   expect_equal(
     res_r$bray_curtis_ranked$IncreaseBC,
-    res_cpp$bray_curtis_ranked$IncreaseBC,
+    res_avgdist$bray_curtis_ranked$IncreaseBC,
     tolerance = 1e-10
   )
 
   # Core OTU sets
   expect_equal(
     sort(res_r$elbow_core),
-    sort(res_cpp$elbow_core)
+    sort(res_avgdist$elbow_core)
   )
   expect_equal(
     sort(res_r$increase_core),
-    sort(res_cpp$increase_core)
+    sort(res_avgdist$increase_core)
   )
 })
 
@@ -354,7 +355,7 @@ test_that("identify_core_avgdist is faster than identify_core", {
   time_r <- system.time(do.call(identify_core, args))[["elapsed"]]
   time_avgdist <- system.time(do.call(identify_core_avgdist, args))[["elapsed"]]
 
-  speedup <- time_r / time_cpp
+  speedup <- time_r / time_avgdist
 
   cli::cli_h2("Benchmark Results")
   cli::cli_alert_info("identify_core:     {round(time_r, 2)}s")
@@ -424,7 +425,7 @@ test_that("identify_core_avgdist with abundance_weight matches identify_core", {
   )
 
   res_r <- do.call(identify_core, args)
-  res_cpp <- do.call(identify_core_avgdist, args)
+  res_avgdist <- do.call(identify_core_avgdist, args)
   res_avgdist <- do.call(identify_core_avgdist, args)
 
   expect_equal(res_r$otu_ranked$otu, res_avgdist$otu_ranked$otu)
