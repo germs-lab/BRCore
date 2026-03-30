@@ -527,7 +527,7 @@ identify_core_avgdist <- function(
     bc_values <- as.vector(vegan::avgdist(
       t(matrix),
       sample = depth_level,
-      iterations = num_iter,
+      iterations = num_iterations,
       dmethod = "bray"
     ))
   }
