@@ -330,7 +330,8 @@ identify_core_avgdist <- function(
       bc_vec <- .calculate_bc_(
         start_matrix,
         depth_level,
-        num_iterations = num_iter
+        num_iterations = num_iter,
+        is_rarefied = is_rarefied
       )
 
       BCaddition <- left_join(
@@ -352,8 +353,6 @@ identify_core_avgdist <- function(
     tibble::column_to_rownames("x_names") |>
     as.matrix()
 
-  print(temp_BC_matrix)
-
   BC_ranked <- data.frame(
     rank = as.factor(rownames(t(temp_BC_matrix))),
     t(temp_BC_matrix),
@@ -368,8 +367,6 @@ identify_core_avgdist <- function(
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     arrange(MeanBC) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
-
-  print(max(BC_ranked$MeanBC))
 
   # multiplicative increase between successive ranks
   if (nrow(BC_ranked) >= 2) {
@@ -504,14 +501,13 @@ identify_core_avgdist <- function(
     return(list(values = numeric(0), names = character(0)))
   }
 
-  sample_pairs <- utils::combn(ncol(matrix), 2)
-  pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(matrix)[x], collapse = " - ")
-  })
-
   # Conditional handling for rarefied vs unrarefied data
   if (is_rarefied) {
     # Data already rarefied - use vegdist directly without subsampling
+    sample_pairs <- utils::combn(ncol(matrix), 2)
+    pair_labels <- apply(sample_pairs, 2, function(x) {
+      paste(colnames(matrix)[x], collapse = " - ")
+    })
 
     bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
 
@@ -523,13 +519,39 @@ identify_core_avgdist <- function(
     # Reverse vegdist normalization and apply our own
     bc_values <- bc_vegan * pair_sums / (2 * depth_level)
   } else {
-    # Unrarefied data - use avgdist with rarefaction
-    bc_values <- as.vector(vegan::avgdist(
-      t(matrix),
-      sample = depth_level,
-      iterations = num_iterations,
-      dmethod = "bray"
-    ))
+    # Unrarefied data - filter samples by depth FIRST
+    # floating_depth <- depth_level * c(0.999, 1.111)
+    # col_sums <- colSums(matrix)
+    # keep_samples <- dplyr::near(
+    #   col_sums,
+    #   depth_level,
+    #   tol = 1e-6
+    # )
+    keep_samples <- colSums(matrix) >= depth_level
+
+    filtered_matrix <- matrix[, keep_samples, drop = FALSE]
+
+    if (ncol(filtered_matrix) < 2) {
+      return(list(values = numeric(0), names = character(0)))
+    }
+
+    # NOW compute sample pairs from the filtered matrix
+    sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
+    pair_labels <- apply(sample_pairs, 2, function(x) {
+      paste(colnames(filtered_matrix)[x], collapse = " - ")
+    })
+
+    # Use avgdist with rarefaction
+    bc_values <- as.vector(
+      suppressWarnings(
+        vegan::avgdist(
+          t(filtered_matrix),
+          sample = depth_level,
+          iterations = num_iterations,
+          dmethod = "bray"
+        )
+      )
+    )
   }
 
   list(
