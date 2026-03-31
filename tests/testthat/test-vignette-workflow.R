@@ -148,7 +148,7 @@ test_that("2: Vignette workflow produces consistent results", {
 
   # Step 6: Identify core microbiome
   bcse_rare_core <- identify_core(
-    physeq_obj = bcse,
+    physeq_obj = bcse_rare,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
