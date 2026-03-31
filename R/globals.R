@@ -36,7 +36,8 @@ utils::globalVariables(
     "singlton_num",
     "read_num",
     "goods_cov",
-    "outlier"
+    "outlier",
+    "iter"
   )
 )
 

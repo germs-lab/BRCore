@@ -12,6 +12,13 @@
 #' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
 #' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative abundance in the ranking score. `0` (default) uses occupancy/composite only. `1` ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
 #' @param max_otus Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)
+#' @param depth_level Integer. The sequencing depth used for normalization in
+#' Bray-Curtis calculations. If data is rarefied, this is automatically set
+#' to the rarefaction depth. For unrarefied data, samples with depth below
+#' this threshold are excluded from pairwise comparisons.
+#' @param num_iter Integer. Number of subsampling iterations used when
+#' calculating average dissimilarity for unrarefied data (default 100).
+#' Ignored if data is already rarefied.
 #' @param seed Optional integer to set the RNG seed for reproducibility.
 #'
 #' @return A list with:
@@ -94,10 +101,10 @@
 identify_core_avgdist <- function(
   physeq_obj,
   priority_var,
-  depth_level = 1000,
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
+  depth_level = 1000,
   num_iter = 100,
   seed = NULL
 ) {
@@ -130,7 +137,7 @@ identify_core_avgdist <- function(
     cli::cli_alert_info("otu_table() is rarefied at a depth of: {depth_level}")
   } else {
     cli::cli_alert_warning(
-      "The otu_table() is not rarefied! Using depth_level={depth_level} for normalization in BC calculations. Consider rarefying your data or adjusting depth_level accordingly."
+      "The otu_table() is not rarefied! \n Using depth_level={depth_level} for normalization in BC calculations. \n Consider rarefying your data or adjusting depth_level accordingly."
     )
   }
 
@@ -511,7 +518,7 @@ identify_core_avgdist <- function(
 
     bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
 
-    # Get the actual per-pair normalization vegdist used
+    # Per-pair normalization vegdist used
     pair_sums <- apply(sample_pairs, 2, function(x) {
       sum(matrix[, x[1]]) + sum(matrix[, x[2]])
     })
@@ -520,14 +527,9 @@ identify_core_avgdist <- function(
     bc_values <- bc_vegan * pair_sums / (2 * depth_level)
   } else {
     # Unrarefied data - filter samples by depth FIRST
-    # floating_depth <- depth_level * c(0.999, 1.111)
-    # col_sums <- colSums(matrix)
-    # keep_samples <- dplyr::near(
-    #   col_sums,
-    #   depth_level,
-    #   tol = 1e-6
-    # )
-    keep_samples <- colSums(matrix) >= depth_level
+    floating_depth <- depth_level * 0.9999999 # account for floating-point precision
+
+    keep_samples <- colSums(matrix) >= floating_depth #ASV/OTUs should be columns
 
     filtered_matrix <- matrix[, keep_samples, drop = FALSE]
 
