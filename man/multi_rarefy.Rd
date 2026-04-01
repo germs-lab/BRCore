@@ -8,6 +8,7 @@ multi_rarefy(
   physeq,
   depth_level,
   num_iter = 100,
+  .summarize = TRUE,
   threads = get_available_cores(),
   set_seed = NULL
 )
@@ -20,6 +21,10 @@ OTUs/ASVs) to which samples should be rarefied.}
 
 \item{num_iter}{An integer specifying the number of iterations to perform
 for rarefaction.}
+
+\item{.summarize}{A logical indicating whether to summarize the results by
+averaging across iterations (default = TRUE). If FALSE, the function will
+return the rarefied data frame for all iterations without summarization. #'   Sample names are returned as unique IDs with the "\emph{iter}#" suffix.}
 
 \item{threads}{Number of threads (default = 4).}
 
@@ -44,11 +49,12 @@ data("bcse", package = "BRCore")
 
 # Example rarefaction (single iteration, single core to keep examples fast)
 otu_table_rare <- multi_rarefy(
-   physeq = bcse,
-   depth_level = 1000,
-   num_iter = 100,
-   threads = 2,
-   set_seed = 7642
+  physeq = bcse,
+  depth_level = 1000,
+  num_iter = 100,
+  .summarize = TRUE,
+  threads = 2,
+  set_seed = 7642
 )
 
 rowSums(otu_table_rare)

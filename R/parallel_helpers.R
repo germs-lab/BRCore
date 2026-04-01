@@ -7,7 +7,7 @@
 #'
 #' @examples
 #' detect_hpc_type()
-#' 
+#'
 #' @export
 detect_hpc_type <- function() {
   # Map of environment variables to HPC types
@@ -25,10 +25,14 @@ detect_hpc_type <- function() {
   # Check each HPC type
   for (type in names(hpc_type_vars)) {
     if (
-      any(sapply(hpc_type_vars[[type]], function(var) {
-        val <- Sys.getenv(var, "")
-        !identical(val, "")
-      }))
+      any(vapply(
+        hpc_type_vars[[type]],
+        function(var) {
+          val <- Sys.getenv(var, "")
+          !identical(val, "")
+        },
+        FUN.VALUE = logical(1)
+      ))
     ) {
       return(type)
     }
@@ -36,10 +40,14 @@ detect_hpc_type <- function() {
 
   # Check generic HPC indicators
   if (
-    any(sapply(generic_vars, function(var) {
-      val <- Sys.getenv(var, "")
-      !identical(val, "")
-    }))
+    any(vapply(
+      generic_vars,
+      function(var) {
+        val <- Sys.getenv(var, "")
+        !identical(val, "")
+      },
+      FUN.VALUE = logical(1)
+    ))
   ) {
     return("generic_hpc")
   }
@@ -53,7 +61,7 @@ detect_hpc_type <- function() {
 #' @return Logical indicating whether we're in any HPC environment
 #' @examples
 #' is_hpc_environment()
-#' 
+#'
 #' @export
 is_hpc_environment <- function() {
   !identical(detect_hpc_type(), "local")
@@ -69,10 +77,10 @@ is_hpc_environment <- function() {
 #' @examples
 #' get_available_cores()
 #' get_available_cores(default = 2)
-#' 
-#' @import parallelly
-#' @import parallel
-#' 
+#'
+#' @importFrom parallelly availableCores makeClusterPSOCK
+#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
+#'
 #' @export
 get_available_cores <- function(default = 1) {
   if (is_hpc_environment()) {
@@ -127,7 +135,9 @@ get_available_cores <- function(default = 1) {
     } else {
       # Safe local default: leave one core free for system
       cores <- max(1, parallel::detectCores() - 1L)
-      if (is.na(cores)) cores <- default
+      if (is.na(cores)) {
+        cores <- default
+      }
       cli::cli_alert_info(
         "Local environment. Using {cores} core(s)/worker(s) via parallel::detectCores().
         Keeping 1 core/worker available for system."
@@ -146,9 +156,9 @@ get_available_cores <- function(default = 1) {
 #' @return Either a cluster object (HPC) or integer number of cores (local)
 #' @examples
 #' setup_parallel_backend()
-#' 
-#' @import parallelly
-#' @import parallel
+#'
+#' @importFrom parallelly availableCores makeClusterPSOCK
+#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
 #' @export
 setup_parallel_backend <- function(default = 1) {
   if (is_hpc_environment()) {
@@ -165,7 +175,7 @@ setup_parallel_backend <- function(default = 1) {
       # Fallback if parallelly is not available
       cores <- get_available_cores(default)
       cli::cli_alert_info(
-        "Creating HPC cluster with {cores - 1L} core(s)/worker(s) using parallel::makeCluster(). 
+        "Creating HPC cluster with {cores - 1L} core(s)/worker(s) using parallel::makeCluster().
         Keeping 1 core/worker available for system."
       )
       cl <- parallel::makeCluster(cores - 1L)

@@ -8,3 +8,5 @@
 ^Meta$
 ^README\.Rmd$
 ^codecov\.yml$
+^\.vscode$
+^[.]?air[.]toml$

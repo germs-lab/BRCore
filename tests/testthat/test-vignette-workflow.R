@@ -10,7 +10,7 @@ test_that("1: Vignette test data structures are valid", {
       is.data.frame(test_vignette_data$test_bcse_rarefied_otutable)
   )
 
-  expect_equal(999.999999999996, 1000, tol = 1e-6) # Sanity check for floating-point precision
+  expect_equal(999.999999999996, 1000, tolerance = 1e-6) # Sanity check for floating-point precision
 
   row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable)
   expect_true(all(near(row_sums, 1000, tol = 1e-6)))
@@ -155,6 +155,16 @@ test_that("2: Vignette workflow produces consistent results", {
     seed = 2134
   )
 
+  # bcse_rare_core <- identify_core_avgdist(
+  #   physeq_obj = bcse_rare,
+  #   priority_var = "Crop",
+  #   increase_value = 0.02,
+  #   abundance_weight = 0,
+  #   depth_level = 1000,
+  #   num_iter = 100,
+  #   seed = 2134
+  # )
+
   # Test: Core identification results match
   expect_s3_class(bcse_rare_core, "identify_core_result")
   expect_equal(
@@ -274,6 +284,16 @@ test_that("3: Vignette core distribution plots are consistent", {
     seed = 2134
   )
 
+  # bcse_rare_core <- identify_core_avgdist(
+  #   physeq_obj = bcse_rare,
+  #   priority_var = "Crop",
+  #   increase_value = 0.02,
+  #   abundance_weight = 0,
+  #   depth_level = 1000,
+  #   num_iter = 100,
+  #   seed = 2134
+  # )
+
   # Test bar plot
   plot_core_dist_bar <- plot_core_distribution(
     core_result = bcse_rare_core,
@@ -384,6 +404,16 @@ test_that("4: Vignette neutral model fitting is consistent", {
     abundance_weight = 0,
     seed = 2134
   )
+
+  # bcse_rare_core <- identify_core_avgdist(
+  #   physeq_obj = bcse_rare,
+  #   priority_var = "Crop",
+  #   increase_value = 0.02,
+  #   abundance_weight = 0,
+  #   depth_level = 1000,
+  #   num_iter = 100,
+  #   seed = 2134
+  # )
 
   # Fit neutral model
   bcse_rare_core_neutral_fit <- fit_neutral_model(

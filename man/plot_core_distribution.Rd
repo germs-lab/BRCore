@@ -55,12 +55,15 @@ switchgrass_core <- identify_core(
   priority_var = "sampling_date",
   increase_value = 0.02,
   abundance_weight = 0,
-  seed = 1234)
+  seed = 1234
+)
 
-plot_core_distribution(core_result = switchgrass_core,
-                       core_set = "increase",
-                       group_var = "sampling_date",
-                       plot_type  = "bar")
+plot_core_distribution(
+  core_result = switchgrass_core,
+  core_set = "increase",
+  group_var = "sampling_date",
+  plot_type = "bar"
+)
 }
 
 }

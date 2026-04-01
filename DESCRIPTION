@@ -59,3 +59,5 @@ Depends:
     R (>= 4.4)
 LazyData: true
 VignetteBuilder: knitr
+URL: https://github.com/germs-lab/BRCore
+BugReports: https://github.com/germs-lab/BRCore/issues
