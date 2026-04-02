@@ -69,19 +69,60 @@ test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FAL
     set_seed = 123
   )
 
-  # The number of rows should be equal to the number of unique samples multiplied by the number of iterations
-  unique_samples <- nrow(unique(sample_data(bcse)))
-  expected_rows <- unique_samples * num_iterations
+  # Should return a list of data frames
+  expect_type(rarefied_data, "list")
+  expect_equal(length(rarefied_data), num_iterations)
+  expect_true(all(sapply(rarefied_data, is.data.frame)))
 
+  # Each iteration should have the correct naming
+  expect_equal(names(rarefied_data), paste0("iter_", 1:num_iterations))
+
+  # Extract unique sample IDs from the first iteration (they all share the same samples)
+  unique_samples <- nrow(sample_data(bcse))
+
+  # Calculate expected samples after removing low-depth samples
   removed_samples <- setdiff(
-    unique(rownames(sample_data(bcse))),
-    unique(sub(
-      "_iter_.*",
-      "",
-      rownames(rarefied_data)
-    ))
+    rownames(sample_data(bcse)),
+    unique(sub("_iter_.*", "", rownames(rarefied_data[[1]])))
   )
-  removed_rows <- length(removed_samples) * num_iterations
 
-  expect_equal(nrow(rarefied_data) + removed_rows, expected_rows)
+  expected_samples_per_iter <- unique_samples - length(removed_samples)
+
+  # Check each iteration has the expected number of samples
+  for (i in seq_along(rarefied_data)) {
+    expect_equal(
+      nrow(rarefied_data[[i]]),
+      expected_samples_per_iter,
+      info = paste(
+        "Iteration",
+        i,
+        "should have",
+        expected_samples_per_iter,
+        "samples"
+      )
+    )
+  }
+
+  # Verify row names have iteration suffixes
+  for (i in seq_along(rarefied_data)) {
+    iter_suffix <- paste0("_iter_", i)
+    expect_true(
+      all(grepl(paste0(iter_suffix, "$"), rownames(rarefied_data[[i]]))),
+      info = paste(
+        "All row names in iteration",
+        i,
+        "should end with",
+        iter_suffix
+      )
+    )
+  }
+
+  # Verify all samples are rarefied to the correct depth
+  for (i in seq_along(rarefied_data)) {
+    row_sums <- rowSums(rarefied_data[[i]])
+    expect_true(
+      all(abs(row_sums - 3000) < 1e-6),
+      info = paste("All samples in iteration", i, "should have depth ~3000")
+    )
+  }
 })
