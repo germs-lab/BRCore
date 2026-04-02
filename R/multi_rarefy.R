@@ -12,8 +12,9 @@
 #'   for rarefaction.
 #' @param .summarize A logical indicating whether to summarize the results by
 #'   averaging across iterations (default = TRUE). If FALSE, the function will
-#'   return the rarefied data frame for all iterations without summarization. #'   Sample names are returned as unique IDs with the "_iter_#" suffix.
-#' @param threads Number of threads (default = 4).
+#'   return a named list of data frames (e.g. iter_1), one for each iteration, without
+#' averaging.
+#' @param threads Number of threads (default = `get_available_cores()`).
 #' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
 #'
 #' @return A data frame with taxa as rows and samples as columns. The values

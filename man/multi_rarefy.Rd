@@ -24,9 +24,10 @@ for rarefaction.}
 
 \item{.summarize}{A logical indicating whether to summarize the results by
 averaging across iterations (default = TRUE). If FALSE, the function will
-return the rarefied data frame for all iterations without summarization. #'   Sample names are returned as unique IDs with the "\emph{iter}#" suffix.}
+return a named list of data frames (e.g. iter_1), one for each iteration, without
+averaging.}
 
-\item{threads}{Number of threads (default = 4).}
+\item{threads}{Number of threads (default = \code{get_available_cores()}).}
 
 \item{set_seed}{An optional integer to set the random seed for reproducibility (default = NULL).}
 }
