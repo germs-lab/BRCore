@@ -163,18 +163,20 @@ multi_rarefy <- function(
       sample = depth_level
     )
 
+    # Summarization metadata
     df <- as.data.frame(df) |>
       rownames_to_column("sample_id") |>
       mutate(iter = i)
   })
 
-  # Aggregate results ----
+  # Aggregate results and removal of zero-abundance taxa ----
   n_samples_before <- nrow(dataframe)
 
-  com_iter_df <- do.call(rbind, com_iter_list)
-
   if (.summarize) {
-    mean_data <- com_iter_df |>
+    com_iter_df <- do.call(rbind, com_iter_list) |>
+      as.data.frame()
+
+    processed_data <- com_iter_df |>
       group_by(sample_id) |>
       summarise(across(everything(), mean), .groups = "drop") |>
       select(!iter) |>
@@ -188,47 +190,61 @@ multi_rarefy <- function(
       ) |>
       column_to_rownames("sample_id")
 
-    processed_data <- mean_data
-    remove(mean_data) # Free memory from intermediate data frame
+    # Cleaning
+    processed_data <- processed_data[, colSums(processed_data) > 0]
   }
 
   if (!.summarize) {
-    rarefied_data <- com_iter_df |>
-      mutate(
-        sample_id = paste0(sample_id, "_iter_", iter)
-      ) |>
-      select(!c(iter)) |>
-      filter(
-        dplyr::near(
-          rowSums(across(where(is.numeric))),
-          depth_level,
-          tol = 1e-6 # Accept values within ±0.5 of depth_level
-        )
-      ) |>
-      column_to_rownames("sample_id")
+    processed_data <- lapply(seq_along(com_iter_list), function(i) {
+      df <- com_iter_list[[i]] |>
+        mutate(
+          sample_id = paste0(sample_id, "_iter_", iter)
+        ) |>
+        select(!c(iter)) |>
+        filter(
+          dplyr::near(
+            rowSums(across(where(is.numeric))),
+            depth_level,
+            tol = 1e-6
+          )
+        ) |>
+        column_to_rownames("sample_id")
+    })
+    names(processed_data) <- paste0("iter_", seq_len(num_iter))
 
-    processed_data <- rarefied_data
-    remove(rarefied_data) # Free memory from intermediate data frame
+    # Remove zero-abundance taxa for each iteration
+    processed_data <- lapply(processed_data, function(df) df[, colSums(df) > 0])
+
+    cli::cli_alert_info(
+      "Returning list of data frames for each iteration (unsummarized)."
+    )
   }
 
-  # Remove ASVs/OTUs with zero total abundance
-  n_taxa_before <- ncol(processed_data)
-  processed_data <- processed_data[, colSums(processed_data) > 0]
-  n_taxa_after <- ncol(processed_data)
-
-  # Report results ---
   if (.summarize) {
+    n_taxa_before <- ncol(processed_data)
+    n_taxa_after <- ncol(processed_data)
+
     n_samples_after <- nrow(processed_data)
     n_samples_removed <- n_samples_before - n_samples_after
     removed_samples <- setdiff(rownames(dataframe), rownames(processed_data))
   } else {
+    n_taxa_before <- ncol(processed_data[[1]])
+    n_taxa_after <- min(sapply(processed_data, ncol))
+
+    n_samples_after <- nrow(processed_data[[1]])
+    n_samples_removed <- n_samples_before - n_samples_after
+    removed_samples <- setdiff(
+      rownames(dataframe),
+      rownames(processed_data[[1]])
+    )
+
     unique_samples <- length(unique(sub(
       "_iter_.*",
       "",
-      rownames(processed_data)
+      rownames(processed_data[[1]])
     )))
     n_samples_removed <- n_samples_before - unique_samples
-    original_sample_ids <- sub("_iter_.*", "", rownames(processed_data)) |>
+    original_sample_ids <- sub("_iter_.*", "", rownames(processed_data[[1]])) |>
       unique()
     removed_samples <- setdiff(rownames(dataframe), original_sample_ids)
   }
@@ -259,16 +275,41 @@ multi_rarefy <- function(
 #' @noRd
 #' @keywords internal
 .sparsity_count <- function(dataframe) {
-  original_zeros <- sum(dataframe == 0)
-  original_total <- nrow(dataframe) * ncol(dataframe)
+  if (inherits(dataframe, "list")) {
+    min_zeros <- min(sapply(dataframe, function(df) sum(df == 0)))
+    min_total <- min(sapply(dataframe, function(df) nrow(df) * ncol(df)))
 
-  sparsity <- round(original_zeros / original_total * 100, 2)
+    max_zeros <- max(sapply(dataframe, function(df) sum(df == 0)))
+    max_total <- max(sapply(dataframe, function(df) nrow(df) * ncol(df)))
 
-  list(
-    zeros = original_zeros,
-    total = original_total,
-    sparsity = sparsity
-  )
+    avg_zeros <- mean(sapply(dataframe, function(df) sum(df == 0)))
+    avg_total <- mean(sapply(dataframe, function(df) nrow(df) * ncol(df)))
+  } else {
+    original_zeros <- sum(dataframe == 0)
+    original_total <- nrow(dataframe) * ncol(dataframe)
+  }
+
+  if (inherits(dataframe, "list")) {
+    sparsity <- list(
+      min_zeros = min_zeros,
+      max_zeros = max_zeros,
+      avg_zeros = avg_zeros,
+      min_total = min_total,
+      max_total = max_total,
+      avg_total = avg_total,
+      min_sparsity = round(min_zeros / min_total * 100, 2),
+      max_sparsity = round(max_zeros / max_total * 100, 2),
+      avg_sparsity = round(avg_zeros / avg_total * 100, 2)
+    )
+  } else {
+    sparsity <- round(original_zeros / original_total * 100, 2)
+
+    list(
+      zeros = original_zeros,
+      total = original_total,
+      sparsity = sparsity
+    )
+  }
 }
 
 #' Helper function to report rarefaction results
@@ -312,7 +353,7 @@ multi_rarefy <- function(
   # Taxa Removal
   cli::cli_h3("Taxa Removal")
   if (n_taxa_removed > 0) {
-    cli::cli_alert_info(
+    cli::cli_alert_warning(
       "{.val {n_taxa_removed}} taxa removed (zero abundance)"
     )
   }
@@ -325,14 +366,16 @@ multi_rarefy <- function(
   )
 
   rarefied_sparsity <- .sparsity_count(processed_data)
-  sparsity_msg <- if (.summarize) {
-    "Rarefied matrix"
-  } else {
-    "Rarefied matrix (all iterations)"
+  if (!.summarize) {
+    cli::cli_alert_info(
+      "Rarefied matrix: (across {.val {num_iter}} iterations):"
+    )
+    cli::cli_ul(c(
+      "Min: {.val {rarefied_sparsity$min_zeros}} zeros ({.val {rarefied_sparsity$min_sparsity}}% sparsity) out of {.val {rarefied_sparsity$min_total}} entries",
+      "Max: {.val {rarefied_sparsity$max_zeros}} zeros ({.val {rarefied_sparsity$max_sparsity}}% sparsity) out of {.val {rarefied_sparsity$max_total}} entries",
+      "Avg: {.val {round(rarefied_sparsity$avg_zeros, 1)}} zeros ({.val {rarefied_sparsity$avg_sparsity}}% sparsity) out of {.val {round(rarefied_sparsity$avg_total, 1)}} entries"
+    ))
   }
-  cli::cli_alert_info(
-    "{sparsity_msg}: {.val {rarefied_sparsity$zeros}} zeros ({.val {rarefied_sparsity$sparsity}}% sparsity) out of {.val {rarefied_sparsity$total}} entries"
-  )
 
   # Final Data Dimensions
   cli::cli_h3("Final Data Dimensions")
@@ -341,8 +384,33 @@ multi_rarefy <- function(
       "Output: {.val {nrow(processed_data)}} samples x {.val {ncol(processed_data)}} taxa"
     )
   } else {
-    cli::cli_alert_success(
-      "Output: {.val {nrow(processed_data)}} rows ({.val {unique_samples}} samples x {.val {num_iter}} iterations) x {.val {ncol(processed_data)}} taxa"
+    summary_stats <- list(
+      min_taxa = min(sapply(processed_data, ncol)),
+      max_taxa = max(sapply(processed_data, ncol)),
+      avg_taxa = mean(sapply(processed_data, ncol)),
+      min_samples = min(sapply(processed_data, nrow)),
+      max_samples = max(sapply(processed_data, nrow))
     )
+
+    cli::cli_alert_success(
+      "Output: {.val {num_iter}} iteration{?s} with {.val {unique_samples}} unique sample{?s}"
+    )
+    cli::cli_ul()
+    cli::cli_li("Samples per iteration:")
+    cli::cli_ul(c(
+      "Min: {.val {summary_stats$min_samples}}",
+      "Max: {.val {summary_stats$max_samples}}"
+    ))
+    cli::cli_end()
+
+    cli::cli_li("Taxa per iteration:")
+    cli::cli_ul(c(
+      "Min: {.val {summary_stats$min_taxa}}",
+      "Max: {.val {summary_stats$max_taxa}}",
+      "Avg: {.val {round(summary_stats$avg_taxa, 1)}}"
+    ))
+    cli::cli_end()
+
+    cli::cli_end()
   }
 }
