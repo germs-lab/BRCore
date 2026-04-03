@@ -10,12 +10,13 @@
 #'   OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform
 #'   for rarefaction.
-#' @param .summarize A logical indicating whether to summarize the results by
-#'   averaging across iterations (default = TRUE). If FALSE, the function will
-#'   return a named list of data frames (e.g. iter_1), one for each iteration, without
-#' averaging.
-#' @param threads Number of threads (default = `get_available_cores()`).
-#' @param set_seed An optional integer to set the random seed for reproducibility (default = NULL).
+#' @param .as_array A logical indicating whether to return the results as a 3D
+#' array or as a list of data frames. If `TRUE`, returns a 3D array with
+#' dimensions (samples x taxa x iterations). If `FALSE`, returns a list of
+#' data frames, one for each iteration, with samples as rows and taxa as
+#' columns. (default = FALSE)
+#' @param set_seed An optional integer to set the random seed for
+#' reproducibility (default = NULL).
 #'
 #' @return A data frame with taxa as rows and samples as columns. The values
 #'   represent the average sequence counts calculated across all iterations.
@@ -57,8 +58,7 @@ multi_rarefy <- function(
   physeq,
   depth_level,
   num_iter = 100,
-  .summarize = TRUE,
-  threads = get_available_cores(),
+  .as_array = FALSE,
   set_seed = NULL
 ) {
   # Input validation ----
@@ -89,11 +89,6 @@ multi_rarefy <- function(
     stop("Invalid num_iter")
   }
 
-  if (!is.numeric(threads) || threads <= 0) {
-    cli::cli_alert_danger("threads must be a positive integer")
-    stop("Invalid threads")
-  }
-
   # Seed setup: iteration-specific seeds deterministically ---
   if (is.null(set_seed)) {
     cli::cli_alert_warning("No seed set. Results may not be reproducible.")
@@ -105,17 +100,32 @@ multi_rarefy <- function(
   }
 
   # Prepare data ----
-  otu_mat <- as.matrix(otu_table(physeq, ))
+  otu_mat <- as(otu_table(physeq), "matrix")
 
   if (phyloseq::taxa_are_rows(physeq)) {
     otu_mat <- t(otu_mat) # We want samples as rows
   }
 
-  dataframe <- as.data.frame(otu_mat)
+  ## Filter samples by depth ----
+  n_samples_before <- nrow(otu_mat)
+  original_sample_ids <- rownames(otu_mat) |>
+    unique()
+  n_taxa_before <- ncol(otu_mat)
+
+  keep <- rowSums(otu_mat) >= depth_level
+
+  if (length(keep) != nrow(otu_mat)) {
+    stop("Logical subsetting mismatch: check OTU table orientation.")
+  }
+
+  otu_mat <- otu_mat[keep, , drop = FALSE]
+
+  n_samp <- nrow(otu_mat)
+  n_taxa <- ncol(otu_mat)
 
   # Input parameter checks ----
   cli::cli_alert_info(
-    "Input (matrix/df dim): {.val {nrow(dataframe)}} samples x {.val {ncol(dataframe)}} taxa"
+    "Input (matrix/df dim): {.val {nrow(otu_mat)}} samples x {.val {ncol(otu_mat)}} taxa"
   )
   cli::cli_alert_info("Rarefaction depth: {.val {depth_level}}")
   cli::cli_alert_info("Iterations: {.val {num_iter}}")
@@ -123,145 +133,94 @@ multi_rarefy <- function(
   cli::cli_alert_info("taxa_are_rows: {phyloseq::taxa_are_rows(physeq)}")
 
   cli::cli_alert_info(
-    "OTU matrix/df rownames head: {paste(head(rownames(dataframe)), collapse = ', ')}"
+    "OTU matrix/df rownames head: {paste(head(rownames(otu_mat)), collapse = ', ')}"
   )
   cli::cli_alert_info(
-    "OTU matrix/df colnames head: {paste(head(colnames(dataframe)), collapse = ', ')}"
+    "OTU matrix/df colnames head: {paste(head(colnames(otu_mat)), collapse = ', ')}"
   )
 
   cli::cli_alert_info(
-    "Row sums summary: Min={min(rowSums(dataframe))}, Max={max(rowSums(dataframe))}, Median={median(rowSums(dataframe))}"
+    "Row sums summary: Min={min(rowSums(otu_mat))}, Max={max(rowSums(otu_mat))}, Median={median(rowSums(otu_mat))}"
   )
 
-  # Parallel setup ----
-  threads <- min(threads, availableCores())
-  cl <- makeCluster(threads)
-  on.exit(stopCluster(cl), add = TRUE)
-
-  # Export needed objects/packages to workers
-  clusterExport(
-    cl,
-    varlist = c(
-      "dataframe",
-      "depth_level",
-      "iteration_seeds"
-    ),
-    envir = environment()
-  )
-  clusterEvalQ(cl, library(vegan))
-
-  # Run rarefactions in parallel ----
-  cli::cli_alert_info("Running rarefaction...")
-
-  com_iter_list <- vector(mode = "list", length = num_iter)
-  com_iter_list <- parLapply(cl, 1:num_iter, function(i) {
-    if (!is.na(iteration_seeds[i])) {
-      set.seed(iteration_seeds[i])
-    }
-
-    df <- vegan::rrarefy(
-      dataframe,
-      sample = depth_level
-    )
-
-    # Summarization metadata
-    df <- as.data.frame(df) |>
-      rownames_to_column("sample_id") |>
-      mutate(iter = i)
-  })
-
-  # Aggregate results and removal of zero-abundance taxa ----
-  n_samples_before <- nrow(dataframe)
-
-  if (.summarize) {
-    com_iter_df <- do.call(rbind, com_iter_list) |>
-      as.data.frame()
-
-    processed_data <- com_iter_df |>
-      group_by(sample_id) |>
-      summarise(across(everything(), mean), .groups = "drop") |>
-      select(!iter) |>
-      filter(
-        dplyr::near(
-          # We use near() to account for floating-point precision issues that can arise when averaging counts
-          rowSums(across(where(is.numeric))),
-          depth_level,
-          tol = 1e-6 # Accept values within ±0.5 of depth_level
-        )
-      ) |>
-      column_to_rownames("sample_id")
-
-    # Cleaning
-    processed_data <- processed_data[, colSums(processed_data) > 0]
+  # Single iteration ----
+  if (num_iter == 1) {
+    rare <- vegan::rrarefy(otu_mat, sample = depth_level)
+    return(as.data.frame(rare))
   }
 
-  if (!.summarize) {
-    processed_data <- lapply(seq_along(com_iter_list), function(i) {
-      df <- com_iter_list[[i]] |>
-        mutate(
-          sample_id = paste0(sample_id, "_iter_", iter)
-        ) |>
-        select(!c(iter)) |>
-        filter(
-          dplyr::near(
-            rowSums(across(where(is.numeric))),
-            depth_level,
-            tol = 1e-6
-          )
-        ) |>
-        column_to_rownames("sample_id")
+  # Multiple iterations ----
+  if (.as_array) {
+    processed_data <- array(
+      0,
+      dim = c(n_samp, n_taxa, num_iter),
+      dimnames = list(
+        rownames(otu_mat),
+        colnames(otu_mat),
+        paste0("iter_", seq_len(num_iter))
+      )
+    )
+
+    for (i in seq_len(num_iter)) {
+      processed_data[,, i] <- vegan::rrarefy(otu_mat, sample = depth_level)
+    }
+  } else {
+    out <- lapply(seq_len(num_iter), function(i) {
+      if (!is.na(iteration_seeds[i])) {
+        set.seed(iteration_seeds[i])
+      }
+
+      rare_result <- vegan::rrarefy(otu_mat, sample = depth_level)
+
+      if (is.null(dim(rare_result))) {
+        rare_result <- matrix(
+          rare_result,
+          nrow = 1,
+          dimnames = list(rownames(otu_mat), names(rare_result))
+        )
+      }
+
+      as.data.frame(rare_result)
     })
-    names(processed_data) <- paste0("iter_", seq_len(num_iter))
+    names(out) <- paste0("iter_", seq_len(num_iter))
 
     # Remove zero-abundance taxa for each iteration
-    processed_data <- lapply(processed_data, function(df) df[, colSums(df) > 0])
-
-    cli::cli_alert_info(
-      "Returning list of data frames for each iteration (unsummarized)."
-    )
+    processed_data <- lapply(out, function(df) {
+      df[, colSums(df) > 0, drop = FALSE]
+    })
   }
 
-  if (.summarize) {
-    n_taxa_before <- ncol(processed_data)
-    n_taxa_after <- ncol(processed_data)
-
-    n_samples_after <- nrow(processed_data)
-    n_samples_removed <- n_samples_before - n_samples_after
-    removed_samples <- setdiff(rownames(dataframe), rownames(processed_data))
+  if (.as_array) {
+    n_samples_removed <- n_samples_before - n_samp
+    removed_samples <- setdiff(original_sample_ids, rownames(otu_mat))
+    n_taxa_removed <- n_taxa - dim(processed_data)[2]
   } else {
-    n_taxa_before <- ncol(processed_data[[1]])
     n_taxa_after <- min(sapply(processed_data, ncol))
 
     n_samples_after <- nrow(processed_data[[1]])
     n_samples_removed <- n_samples_before - n_samples_after
     removed_samples <- setdiff(
-      rownames(dataframe),
+      rownames(otu_mat),
       rownames(processed_data[[1]])
     )
 
-    unique_samples <- length(unique(sub(
-      "_iter_.*",
-      "",
-      rownames(processed_data[[1]])
-    )))
-    n_samples_removed <- n_samples_before - unique_samples
-    original_sample_ids <- sub("_iter_.*", "", rownames(processed_data[[1]])) |>
-      unique()
-    removed_samples <- setdiff(rownames(dataframe), original_sample_ids)
+    removed_samples <- setdiff(original_sample_ids, rownames(otu_mat))
+
+    n_taxa_removed <- n_taxa_before - n_taxa_after
+
+    avg_taxa_removed <- mean(sapply(processed_data, ncol))
   }
-
-  n_taxa_removed <- n_taxa_before - n_taxa_after
-
   .report_rarefaction_results(
     n_samples_removed = n_samples_removed,
+    n_taxa_before = n_taxa_before,
     n_taxa_removed = n_taxa_removed,
+    avg_taxa_removed = avg_taxa_removed,
     removed_samples = removed_samples,
-    dataframe = dataframe,
+    dataframe = otu_mat,
     processed_data = processed_data,
     depth_level = depth_level,
-    .summarize = .summarize,
-    unique_samples = if (.summarize) NULL else unique_samples,
-    num_iter = if (.summarize) NULL else num_iter
+    unique_samples = original_sample_ids,
+    num_iter = num_iter
   )
 
   # Return the processed data frame
@@ -329,16 +288,21 @@ multi_rarefy <- function(
 #'
 .report_rarefaction_results <- function(
   n_samples_removed,
+  n_taxa_before,
   n_taxa_removed,
+  avg_taxa_removed,
   removed_samples,
   dataframe,
   processed_data,
   depth_level,
-  .summarize = TRUE,
   unique_samples = NULL,
   num_iter = NULL
 ) {
   cli::cli_h2("Rarefaction Results")
+
+  # Detect if processed_data is a 3D array or list of data frames
+
+  is_array <- is.array(processed_data) && length(dim(processed_data)) == 3
 
   # Sample Removal
   cli::cli_h3("Sample Removal")
@@ -349,41 +313,94 @@ multi_rarefy <- function(
     cli::cli_alert_warning(
       "Samples removed: {.val {paste(removed_samples, collapse = ', ')}}"
     )
+  } else {
+    cli::cli_alert_success("No samples removed.")
   }
 
   # Taxa Removal
   cli::cli_h3("Taxa Removal")
   if (n_taxa_removed > 0) {
+    cli::cli_alert_info(
+      "Original taxa input: {.val {n_taxa_before}}"
+    )
     cli::cli_alert_warning(
-      "{.val {n_taxa_removed}} taxa removed (zero abundance)"
+      "Max: {.val {n_taxa_removed}} taxa removed (zero abundance) in viable samples (depth_level >= {.val {depth_level}})."
+    )
+    cli::cli_alert_warning(
+      "When using `.as_array = FALSE`, taxa removed may differ across iterations."
+    )
+  } else {
+    cli::cli_alert_warning(
+      "No taxa removed. \nWhen using `.as_array = TRUE`, taxa are not removed across iterations to \nmaintain consistent dimensions."
     )
   }
 
   # Data Sparsity
   cli::cli_h3("Data Sparsity")
-  original_sparsity <- .sparsity_count(dataframe)
-  cli::cli_alert_info(
-    "Original matrix: {.val {original_sparsity$zeros}} zeros ({.val {original_sparsity$sparsity}}% sparsity) out of {.val {original_sparsity$total}} entries"
-  )
 
-  rarefied_sparsity <- .sparsity_count(processed_data)
-  if (!.summarize) {
+  if (is_array) {
+    iter_zeros <- apply(processed_data, 3, function(mat) sum(mat == 0))
+    iter_total <- dim(processed_data)[1] * dim(processed_data)[2]
+
+    cli::cli_ul()
+    cli::cli_li("Rarefied matrix (across {.val {num_iter}} iterations):")
+    cli::cli_ul(c(
+      "Min: {.val {min(iter_zeros)}} zeros ({.val {round(min(iter_zeros) / iter_total * 100, 2)}}% sparsity) out of {.val {iter_total}} entries",
+      "Max: {.val {max(iter_zeros)}} zeros ({.val {round(max(iter_zeros) / iter_total * 100, 2)}}% sparsity) out of {.val {iter_total}} entries",
+      "Avg: {.val {round(mean(iter_zeros), 1)}} zeros ({.val {round(mean(iter_zeros) / iter_total * 100, 2)}}% sparsity) out of {.val {iter_total}} entries"
+    ))
+    cli::cli_end()
+    cli::cli_end()
+  } else {
     cli::cli_alert_info(
-      "Rarefied matrix: (across {.val {num_iter}} iterations):"
+      "Returning list of data frames for each iteration."
     )
+
+    rarefied_sparsity <- .sparsity_count(processed_data)
+    # cli::cli_alert_info(
+    #   "Rarefied matrix (across {.val {num_iter}} iterations):"
+    # )
+    cli::cli_ul()
+    cli::cli_li("Rarefied matrix (across {.val {num_iter}} iterations):")
     cli::cli_ul(c(
       "Min: {.val {rarefied_sparsity$min_zeros}} zeros ({.val {rarefied_sparsity$min_sparsity}}% sparsity) out of {.val {rarefied_sparsity$min_total}} entries",
       "Max: {.val {rarefied_sparsity$max_zeros}} zeros ({.val {rarefied_sparsity$max_sparsity}}% sparsity) out of {.val {rarefied_sparsity$max_total}} entries",
       "Avg: {.val {round(rarefied_sparsity$avg_zeros, 1)}} zeros ({.val {rarefied_sparsity$avg_sparsity}}% sparsity) out of {.val {round(rarefied_sparsity$avg_total, 1)}} entries"
     ))
+    cli::cli_end()
+    cli::cli_end()
   }
 
   # Final Data Dimensions
   cli::cli_h3("Final Data Dimensions")
-  if (.summarize) {
+
+  if (is_array) {
+    iter_nonzero_taxa <- apply(processed_data, 3, function(mat) {
+      sum(colSums(mat) > 0)
+    })
+    n_samp <- dim(processed_data)[1]
+    n_taxa <- dim(processed_data)[2]
+
     cli::cli_alert_success(
-      "Output: {.val {nrow(processed_data)}} samples x {.val {ncol(processed_data)}} taxa"
+      "Output: {.val {num_iter}} iteration{?s} with {.val {n_samp}} sample{?s}"
     )
+    cli::cli_ul()
+    cli::cli_li("Array dimensions:")
+    cli::cli_ul(c(
+      "Samples: {.val {n_samp}}",
+      "Taxa: {.val {n_taxa}}",
+      "Iterations: {.val {num_iter}}"
+    ))
+    cli::cli_end()
+
+    cli::cli_li("Non-zero taxa per iteration:")
+    cli::cli_ul(c(
+      "Min: {.val {min(iter_nonzero_taxa)}}",
+      "Max: {.val {max(iter_nonzero_taxa)}}",
+      "Avg: {.val {round(mean(iter_nonzero_taxa), 1)}}"
+    ))
+    cli::cli_end()
+    cli::cli_end()
   } else {
     summary_stats <- list(
       min_taxa = min(sapply(processed_data, ncol)),
@@ -394,7 +411,7 @@ multi_rarefy <- function(
     )
 
     cli::cli_alert_success(
-      "Output: {.val {num_iter}} iteration{?s} with {.val {unique_samples}} unique sample{?s}"
+      "Output: {.val {num_iter}} iteration{?s} with {.val {length(unique_samples)}} unique sample{?s}"
     )
     cli::cli_ul()
     cli::cli_li("Samples per iteration:")
@@ -404,14 +421,13 @@ multi_rarefy <- function(
     ))
     cli::cli_end()
 
-    cli::cli_li("Taxa per iteration:")
+    cli::cli_li("Non-zero taxa per iteration:")
     cli::cli_ul(c(
       "Min: {.val {summary_stats$min_taxa}}",
       "Max: {.val {summary_stats$max_taxa}}",
       "Avg: {.val {round(summary_stats$avg_taxa, 1)}}"
     ))
     cli::cli_end()
-
     cli::cli_end()
   }
 }
