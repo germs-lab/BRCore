@@ -8,8 +8,7 @@ multi_rarefy(
   physeq,
   depth_level,
   num_iter = 100,
-  .summarize = TRUE,
-  threads = get_available_cores(),
+  .as_array = FALSE,
   set_seed = NULL
 )
 }
@@ -22,14 +21,14 @@ OTUs/ASVs) to which samples should be rarefied.}
 \item{num_iter}{An integer specifying the number of iterations to perform
 for rarefaction.}
 
-\item{.summarize}{A logical indicating whether to summarize the results by
-averaging across iterations (default = TRUE). If FALSE, the function will
-return a named list of data frames (e.g. iter_1), one for each iteration, without
-averaging.}
+\item{.as_array}{A logical indicating whether to return the results as a 3D
+array or as a list of data frames. If \code{TRUE}, returns a 3D array with
+dimensions (samples x taxa x iterations). If \code{FALSE}, returns a list of
+data frames, one for each iteration, with samples as rows and taxa as
+columns. (default = FALSE)}
 
-\item{threads}{Number of threads (default = \code{get_available_cores()}).}
-
-\item{set_seed}{An optional integer to set the random seed for reproducibility (default = NULL).}
+\item{set_seed}{An optional integer to set the random seed for
+reproducibility (default = NULL).}
 }
 \value{
 A data frame with taxa as rows and samples as columns. The values
