@@ -4,24 +4,51 @@
 \alias{plot_variance_propagation}
 \title{Variance propagation diagnostic for rarefaction}
 \usage{
-plot_variance_propagation(physeq, rarefied, q = 0, group_var, group_color)
+plot_variance_propagation(physeq_obj, rarefied, q = 0, group_var, group_color)
 }
 \arguments{
-\item{physeq}{Raw phyloseq object}
+\item{physeq_obj}{Raw phyloseq object}
 
-\item{rarefied}{Output from iterated_rarefy_phyloseq()}
+\item{rarefied}{Output from multi_rarefy(). Either a list of dataframes or and array.}
 
-\item{q}{Hill number order (alpha only)}
+\item{q}{Hill number order (q = 0 for richness, q = 1 for Shannon, q = 2 for Simpson)}
 
-\item{group_var}{grouping variable in sample_data}
+\item{group_var}{A grouping variable to use gor grouping as in the sample_data()}
 
-\item{measure}{"alpha" or "beta"}
+\item{group_color}{A color variable to use present in the sample_data()}
 
 \item{distance}{"bray" or "jaccard" (beta only)}
 }
 \value{
-ggplot
+ggplot object comparing raw vs rarefied diversity distributions across iterations.
 }
 \description{
-Compare raw vs rarefied diversity distributions across iterations.
+This function evaluate the variance generated during multiple rarefaction iterations.
+It compares raw vs rarefied diversity metrics calculated at each iterations.
+}
+\examples{
+\donttest{
+library(phyloseq)
+library(BRCore)
+# Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
+bcse_filt <- bcse \%>\% 
+subset_samples(Crop \%in\% c("Poplar", "Switchgrass"))
+bcse_rarefied_otutable_filt <-
+ multi_rarefy(
+       physeq = bcse_filt,
+       depth_level = 1000,
+       num_iter = 100,
+       .as_array = FALSE,
+       set_seed = 7643
+   )
+
+plot_variance_propagation(
+   physeq   = bcse_filt,
+   rarefied = bcse_rarefied_otutable_filt,
+   q        = 1,
+   group_var = "Crop",
+   group_color = "Plot"
+) + scale_color_viridis_d(option = "turbo")
+}
+
 }
