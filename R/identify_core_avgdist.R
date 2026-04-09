@@ -117,13 +117,7 @@ identify_core_avgdist <- function(
     set.seed(seed)
   }
 
-  if (!inherits(physeq_obj, "phyloseq")) {
-    cli::cli_abort(
-      "{.arg physeq_obj} must be a 'phyloseq' object.\nYou've supplied a {class(physeq_obj)[1]} vector."
-    )
-  }
-
-  cli::cli_alert_success("Input phyloseq object is valid!")
+  .phyloseq_class_check(physeq_obj)
 
   # define arguments ---------------------------------
 
@@ -141,8 +135,9 @@ identify_core_avgdist <- function(
     )
   }
 
-  otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
-    as("matrix")
+  # otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
+  #   as("matrix")
+  otu <- .extract_otu_matrix(physeq_obj, samples_as_rows = FALSE) # ensures samples are rows and taxa are columns
   map <- sample_data(physeq_obj) |> as("data.frame")
   map$sample_id <- rownames(map)
 
