@@ -52,8 +52,7 @@ otu_table_rare <- multi_rarefy(
   physeq = bcse,
   depth_level = 1000,
   num_iter = 100,
-  .summarize = TRUE,
-  threads = 2,
+  .as_array = FALSE,
   set_seed = 7642
 )
 

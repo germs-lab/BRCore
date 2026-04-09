@@ -45,8 +45,7 @@
 #'   physeq = bcse,
 #'   depth_level = 1000,
 #'   num_iter = 100,
-#'   .summarize = TRUE,
-#'   threads = 2,
+#'   .as_array = FALSE,
 #'   set_seed = 7642
 #' )
 #'
@@ -270,9 +269,6 @@ multi_rarefy <- function(
 #' @param dataframe The original data frame before rarefaction.
 #' @param processed_data The data frame after rarefaction.
 #' @param depth_level The depth level used for rarefaction.
-#' @param .summarize Whether the data was summarized (TRUE) or not (FALSE).
-#' @param unique_samples The number of unique samples in the processed data (only relevant if .summarize = FALSE).
-#' @param num_iter The number of iterations performed (only relevant if .summarize = FALSE).
 #' @return None. This function is used for side-effect reporting via cli messages.
 #' @noRd
 #' @keywords internal

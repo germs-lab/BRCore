@@ -31,7 +31,7 @@ It compares raw vs rarefied diversity metrics calculated at each iterations.
 library(phyloseq)
 library(BRCore)
 # Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
-bcse_filt <- bcse \%>\% 
+bcse_filt <- bcse \%>\%
 subset_samples(Crop \%in\% c("Poplar", "Switchgrass"))
 bcse_rarefied_otutable_filt <-
  multi_rarefy(

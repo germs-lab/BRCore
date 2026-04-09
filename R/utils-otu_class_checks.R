@@ -103,7 +103,7 @@
 
 #' Convert rarefied object to a list of matrices
 #'
-#' @param x A 3D array or list of matrices from [multi_rarefy()]
+#' @param x A 3D array or list of matrices from `multi_rarefy()`
 #' @return A list of matrices, one per iteration
 #' @keywords internal
 #' @noRd
