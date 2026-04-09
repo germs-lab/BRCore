@@ -72,12 +72,7 @@ multi_rarefy <- function(
     stop("Please install 'phyloseq' to use this function.")
   }
 
-  if (!inherits(physeq, "phyloseq")) {
-    cli::cli_alert_danger(
-      "Input must be a phyloseq object, not a {.cls {class(physeq)}}"
-    )
-    stop("Input must be a phyloseq object")
-  }
+  .phyloseq_class_check(physeq)
 
   if (!is.numeric(depth_level) || depth_level <= 0) {
     cli::cli_alert_danger("depth_level must be a positive number")
