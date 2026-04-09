@@ -95,11 +95,7 @@ multi_rarefy <- function(
   }
 
   # Prepare data ----
-  otu_mat <- as(otu_table(physeq), "matrix")
-
-  if (phyloseq::taxa_are_rows(physeq)) {
-    otu_mat <- t(otu_mat) # We want samples as rows
-  }
+  otu_mat <- .extract_otu_matrix(physeq, samples_as_rows = TRUE)
 
   ## Filter samples by depth ----
   n_samples_before <- nrow(otu_mat)

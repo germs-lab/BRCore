@@ -55,7 +55,7 @@ plot_variance_propagation <- function(
   cli::cli_h1("Rarefaction Variance Propagation Visualization")
 
   # Extract raw OTU
-
+  .phyloseq_class_check(physeq_obj)
   otu_raw <- .extract_otu_matrix(physeq_obj, samples_as_rows = TRUE)
 
   metadata <- data.frame(phyloseq::sample_data(physeq_obj))

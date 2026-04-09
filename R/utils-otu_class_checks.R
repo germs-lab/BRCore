@@ -26,7 +26,7 @@
 #' @keywords internal
 #' @noRd
 .extract_otu_matrix <- function(physeq, samples_as_rows = TRUE) {
-  .phyloseq_class_check(physeq)
+  suppressMessages(.phyloseq_class_check(physeq))
 
   otu_mat <- as(phyloseq::otu_table(physeq), "matrix")
 
