@@ -135,9 +135,7 @@ identify_core_avgdist <- function(
     )
   }
 
-  # otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
-  #   as("matrix")
-  otu <- .extract_otu_matrix(physeq_obj, samples_as_rows = FALSE) # ensures samples are rows and taxa are columns
+  otu <- .extract_otu_matrix(physeq_obj, samples_as_rows = FALSE)
   map <- sample_data(physeq_obj) |> as("data.frame")
   map$sample_id <- rownames(map)
 

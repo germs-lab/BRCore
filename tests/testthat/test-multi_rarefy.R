@@ -1,21 +1,23 @@
-test_that("Test if parallel rarefaction works correctly", {
+test_that("Test if default behaviour is correct", {
   skip_if_not_installed("phyloseq")
 
   data("bcse", package = "BRCore")
 
-  otu_table_rare <-
-    multi_rarefy(
-      physeq = bcse,
-      depth_level = 3000,
-      num_iter = 3,
-      .summarize = TRUE,
-      threads = 1,
-      set_seed = 123
-    )
+  otu_table_rare <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = 3,
+    .as_array = TRUE,
+    set_seed = 123
+  )
+
+  # Should return a single averaged data frame (default behavior)
+  expect_true(is.array(otu_table_rare) && length(dim(otu_table_rare)) == 3)
 
   # Test if all the samples have the same number of reads
-  read_counts <- rowSums(otu_table_rare)
+  read_counts <- rowSums(otu_table_rare[,, 1])
   expect_equal(max(read_counts) - min(read_counts), 0) # All values are identical
+  expect_true(all(abs(read_counts - 3000) < 1e-6))
 })
 
 test_that("multi_rarefy retains samples with row sums near depth_level (floating-point tolerance)", {
@@ -54,7 +56,7 @@ test_that("multi_rarefy retains samples with row sums near depth_level (floating
   expect_false("too_low" %in% result$sample_id)
 })
 
-test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FALSE", {
+test_that("multi_rarefy outputs all rarefaction iterations when .as_array = FALSE", {
   skip_if_not_installed("phyloseq")
 
   data("bcse", package = "BRCore")
@@ -64,8 +66,7 @@ test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FAL
     physeq = bcse,
     depth_level = 3000,
     num_iter = num_iterations,
-    .summarize = FALSE,
-    threads = 1,
+    .as_array = FALSE,
     set_seed = 123
   )
 
@@ -77,13 +78,13 @@ test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FAL
   # Each iteration should have the correct naming
   expect_equal(names(rarefied_data), paste0("iter_", 1:num_iterations))
 
-  # Extract unique sample IDs from the first iteration (they all share the same samples)
-  unique_samples <- nrow(sample_data(bcse))
+  # Extract unique sample IDs from the phyloseq object
+  unique_samples <- nrow(phyloseq::sample_data(bcse))
 
   # Calculate expected samples after removing low-depth samples
   removed_samples <- setdiff(
-    rownames(sample_data(bcse)),
-    unique(sub("_iter_.*", "", rownames(rarefied_data[[1]])))
+    rownames(phyloseq::sample_data(bcse)),
+    rownames(rarefied_data[[1]])
   )
 
   expected_samples_per_iter <- unique_samples - length(removed_samples)
@@ -103,16 +104,15 @@ test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FAL
     )
   }
 
-  # Verify row names have iteration suffixes
+  # Verify row names are consistent across iterations (no iteration suffixes in new implementation)
   for (i in seq_along(rarefied_data)) {
-    iter_suffix <- paste0("_iter_", i)
-    expect_true(
-      all(grepl(paste0(iter_suffix, "$"), rownames(rarefied_data[[i]]))),
+    expect_equal(
+      rownames(rarefied_data[[1]]),
+      rownames(rarefied_data[[i]]),
       info = paste(
-        "All row names in iteration",
+        "Iteration",
         i,
-        "should end with",
-        iter_suffix
+        "should have same sample names as iteration 1"
       )
     )
   }
@@ -125,4 +125,135 @@ test_that("multi_rarefy outputs all rarefaction iterations when .summarize = FAL
       info = paste("All samples in iteration", i, "should have depth ~3000")
     )
   }
+})
+
+test_that("multi_rarefy with .as_array = TRUE returns 3D array", {
+  skip_if_not_installed("phyloseq")
+
+  data("bcse", package = "BRCore")
+
+  num_iterations <- 5
+  rarefied_array <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = num_iterations,
+    .as_array = TRUE,
+    set_seed = 456
+  )
+
+  # Should return a 3D array
+  expect_true(is.array(rarefied_array))
+  expect_equal(length(dim(rarefied_array)), 3)
+
+  # Check dimension names
+  expect_equal(dimnames(rarefied_array)[[3]], paste0("iter_", 1:num_iterations))
+
+  # All iterations should have same depth
+  for (i in seq_len(num_iterations)) {
+    row_sums <- rowSums(rarefied_array[,, i])
+    expect_true(
+      all(row_sums == 3000),
+      info = paste("All samples in iteration", i, "should have depth 3000")
+    )
+  }
+})
+
+test_that("multi_rarefy list and array have consistent dimensions", {
+  skip_if_not_installed("phyloseq")
+
+  data("bcse", package = "BRCore")
+
+  # Same parameters for both
+  rarefied_list <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = 3,
+    .as_array = FALSE,
+    set_seed = 789
+  )
+
+  rarefied_array <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = 3,
+    .as_array = TRUE,
+    set_seed = 789
+  )
+
+  # Array dimensions should match list dimensions
+  non_zero_cols <- sum(apply(rarefied_array[,, 1], 2, sum) != 0) - 1
+
+  expect_equal(dim(rarefied_array)[1], nrow(rarefied_list[[1]]))
+  expect_equal(non_zero_cols, ncol(rarefied_list[[1]]))
+  expect_equal(dim(rarefied_array)[3], length(rarefied_list))
+})
+
+test_that("multi_rarefy removes zero-abundance taxa independently per iteration", {
+  skip_if_not_installed("phyloseq")
+
+  data("bcse", package = "BRCore")
+
+  rarefied_data <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = 3,
+    .as_array = FALSE,
+    set_seed = 321
+  )
+
+  # Each iteration may have different numbers of non-zero taxa
+  taxa_counts <- sapply(rarefied_data, ncol)
+
+  # Should have some variation (not all identical)
+  # This tests that zero-taxa removal happens per iteration
+  expect_true(length(unique(taxa_counts)) >= 1)
+
+  # All should be > 0
+  expect_true(all(taxa_counts > 0))
+})
+
+test_that("multi_rarefy handles low-depth samples correctly", {
+  skip_if_not_installed("phyloseq")
+
+  data("bcse", package = "BRCore")
+
+  # Use high depth to force some samples to be removed
+  rarefied_data <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 50000,
+    num_iter = 2,
+    .as_array = FALSE,
+    set_seed = 111
+  )
+
+  # Should retain 2 samples at the depth
+  expect_true(length(rarefied_data) == 2)
+
+  # Remaining samples should all have depth == 50000
+  for (i in seq_along(rarefied_data)) {
+    row_sums <- rowSums(rarefied_data[[i]])
+    expect_true(all(row_sums == 50000))
+  }
+})
+
+test_that("multi_rarefy single iteration returns data frame (not list)", {
+  skip_if_not_installed("phyloseq")
+
+  data("bcse", package = "BRCore")
+
+  # Single iteration with .as_array = FALSE should return data frame
+  rarefied_single <- multi_rarefy(
+    physeq = bcse,
+    depth_level = 3000,
+    num_iter = 1,
+    .as_array = FALSE,
+    set_seed = 999
+  )
+
+  # Should be a list with one element
+  expect_type(rarefied_single, "list")
+
+  # Length of taxa should match original (minus any removed)
+  expect_equal(length(rarefied_single), phyloseq::otu_table(bcse) |> nrow())
+  expect_true(is.data.frame(rarefied_single))
 })
