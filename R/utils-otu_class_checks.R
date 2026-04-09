@@ -35,9 +35,6 @@
   } else if (!phyloseq::taxa_are_rows(physeq) && !samples_as_rows) {
     otu_mat <- t(otu_mat)
   }
-  # if (phyloseq::taxa_are_rows(physeq)) {
-  #   otu_mat <- t(otu_mat)
-  # }
 
   otu_mat
 }
@@ -95,16 +92,31 @@
 .get_n_iterations <- function(rarefied) {
   if (is.array(rarefied) && length(dim(rarefied)) == 3) {
     return(dim(rarefied)[3])
-  }
-
-  if (is.list(rarefied)) {
+  } else if (is.list(rarefied)) {
     return(length(rarefied))
+  } else {
+    cli::cli_abort(
+      "{.arg rarefied} must be a list or 3D array from multi_rarefy()."
+    )
   }
-
-  cli::cli_abort(
-    "{.arg rarefied} must be a list or 3D array from multi_rarefy()."
-  )
 }
+
+#' Convert rarefied object to a list of matrices
+#'
+#' @param x A 3D array or list of matrices from [multi_rarefy()]
+#' @return A list of matrices, one per iteration
+#' @keywords internal
+#' @noRd
+.get_iter_list <- function(x) {
+  if (is.array(x) && length(dim(x)) == 3) {
+    lapply(seq_len(dim(x)[3]), function(i) x[,, i])
+  } else if (is.list(x)) {
+    x
+  } else {
+    list(as.matrix(x))
+  }
+}
+
 
 #' Extract sample IDs from rarefied object
 #'
@@ -116,83 +128,13 @@
 .get_sample_ids <- function(rarefied, remove_suffix = TRUE) {
   if (is.array(rarefied) && length(dim(rarefied)) == 3) {
     return(dimnames(rarefied)[[1]])
-  }
-
-  if (is.list(rarefied)) {
+  } else if (is.list(rarefied)) {
     sample_ids <- rownames(rarefied[[1]])
 
-    if (remove_suffix) {
-      # Remove "_iter_N" suffix
-      sample_ids <- sub("_iter_\\d+$", "", sample_ids)
-      sample_ids <- unique(sample_ids)
-    }
-
     return(sample_ids)
-  }
-
-  cli::cli_abort(
-    "{.arg rarefied} must be a list or 3D array from multi_rarefy()."
-  )
-}
-
-#' Compute Hill number for a single sample
-#'
-#' @param x Numeric vector of species abundances
-#' @param q Hill number order (0 = richness, 1 = Shannon, 2 = Simpson)
-#' @return Numeric Hill number value
-#' @keywords internal
-#' @noRd
-.hill_number <- function(x, q = 0) {
-  x <- x[x > 0]
-
-  if (length(x) == 0) {
-    return(0)
-  }
-
-  p <- x / sum(x)
-
-  if (q == 0) {
-    return(length(x))
-  } else if (q == 1) {
-    return(exp(-sum(p * log(p))))
   } else {
-    return((sum(p^q))^(1 / (1 - q)))
-  }
-}
-
-#' Compute Hill numbers for all samples in a matrix
-#'
-#' @param otu_mat Matrix with samples as rows, taxa as columns
-#' @param q Hill number order (0 = richness, 1 = Shannon, 2 = Simpson)
-#' @return Numeric vector of Hill numbers (one per sample)
-#' @keywords internal
-#' @noRd
-.compute_hill_numbers <- function(otu_mat, q = 0) {
-  apply(otu_mat, 1, .hill_number, q = q)
-}
-
-#' Validate that group variables exist in sample data
-#'
-#' @param physeq A phyloseq object
-#' @param group_var Character, grouping variable name
-#' @param group_color Character, color variable name (optional)
-#' @return Invisible NULL (errors if validation fails)
-#' @keywords internal
-#' @noRd
-.validate_group_vars <- function(physeq, group_var, group_color = NULL) {
-  sample_df <- as(phyloseq::sample_data(physeq), "data.frame")
-
-  if (!group_var %in% colnames(sample_df)) {
     cli::cli_abort(
-      "{.arg group_var} '{group_var}' not found in sample_data()."
+      "{.arg rarefied} must be a list or 3D array from multi_rarefy()."
     )
   }
-
-  if (!is.null(group_color) && !group_color %in% colnames(sample_df)) {
-    cli::cli_abort(
-      "{.arg group_color} '{group_color}' not found in sample_data()."
-    )
-  }
-
-  invisible(NULL)
 }
