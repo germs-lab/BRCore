@@ -5,7 +5,7 @@
 \title{Run multiple rarefaction for microbiome count tables}
 \usage{
 multi_rarefy(
-  physeq,
+  physeq_obj,
   depth_level,
   num_iter = 100,
   .as_array = FALSE,
@@ -13,7 +13,7 @@ multi_rarefy(
 )
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object containing an OTU/ASV table.}
+\item{physeq_obj}{A \code{phyloseq} object containing an OTU/ASV table.}
 
 \item{depth_level}{An integer specifying the sequencing depth (number of
 OTUs/ASVs) to which samples should be rarefied.}
@@ -49,7 +49,7 @@ data("bcse", package = "BRCore")
 
 # Example rarefaction (single iteration, single core to keep examples fast)
 otu_table_rare <- multi_rarefy(
-  physeq = bcse,
+  physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
   .as_array = FALSE,

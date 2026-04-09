@@ -102,8 +102,8 @@ test_that("2: Vignette workflow produces consistent results", {
 
   # Step 4: Multiple rarefaction
 
-  bcse_rarefied_otutable <- multi_rarefy(
-    physeq = bcse,
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 100,
     threads = get_available_cores(),
@@ -112,28 +112,28 @@ test_that("2: Vignette workflow produces consistent results", {
 
   # Test: Rarefied OTU table properties match
   expect_equal(
-    dim(bcse_rarefied_otutable),
+    dim(bcse_rarefied_list),
     dim(test_vignette_data$test_bcse_rarefied_otutable)
   )
   # Test: All samples have row sums of 1000 (accounting for floating-point precision)
   expect_equal(
-    rowSums(bcse_rarefied_otutable),
+    rowSums(bcse_rarefied_list),
     setNames(
-      rep(1000, nrow(bcse_rarefied_otutable)),
-      rownames(bcse_rarefied_otutable)
+      rep(1000, nrow(bcse_rarefied_list)),
+      rownames(bcse_rarefied_list)
     ),
     tolerance = 1e-6
   )
   expect_equal(
-    bcse_rarefied_otutable,
+    bcse_rarefied_list,
     test_vignette_data$test_bcse_rarefied_otutable,
     tolerance = 1e-6
   )
 
   # Step 5: Update OTU table
   bcse_rare <- update_otu_table(
-    physeq = bcse,
-    otu_rare = bcse_rarefied_otutable
+    physeq_obj = bcse,
+    rarefied_otus = bcse_rarefied_list
   )
 
   # Test: Updated phyloseq object matches
@@ -263,8 +263,8 @@ test_that("3: Vignette core distribution plots are consistent", {
   library(tidyverse)
   library(viridis)
 
-  bcse_rarefied_otutable <- multi_rarefy(
-    physeq = bcse,
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 100,
     threads = get_available_cores(),
@@ -272,8 +272,8 @@ test_that("3: Vignette core distribution plots are consistent", {
   )
 
   bcse_rare <- update_otu_table(
-    physeq = bcse,
-    otu_rare = bcse_rarefied_otutable
+    physeq_obj = bcse,
+    rarefied_otus = bcse_rarefied_list
   )
 
   bcse_rare_core <- identify_core(
@@ -384,8 +384,8 @@ test_that("4: Vignette neutral model fitting is consistent", {
   library(phyloseq)
   library(tidyverse)
 
-  bcse_rarefied_otutable <- multi_rarefy(
-    physeq = bcse,
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 100,
     threads = get_available_cores(),
@@ -393,8 +393,8 @@ test_that("4: Vignette neutral model fitting is consistent", {
   )
 
   bcse_rare <- update_otu_table(
-    physeq = bcse,
-    otu_rare = bcse_rarefied_otutable
+    physeq_obj = bcse,
+    rarefied_otus = bcse_rarefied_list
   )
 
   bcse_rare_core <- identify_core(

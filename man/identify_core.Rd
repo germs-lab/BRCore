@@ -10,6 +10,8 @@ identify_core(
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
+  depth_level = 1000,
+  num_iter = 100,
   seed = NULL
 )
 }
@@ -23,6 +25,15 @@ identify_core(
 \item{abundance_weight}{Numeric in \verb{[0,1]}; how much to weight mean relative abundance in the ranking score. \code{0} (default) uses occupancy/composite only. \code{1} ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70\% occupancy/composite + 30\% abundance).}
 
 \item{max_otus}{Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)}
+
+\item{depth_level}{Integer. The sequencing depth used for normalization in
+Bray-Curtis calculations. If data is rarefied, this is automatically set
+to the rarefaction depth. For unrarefied data, samples with depth below
+this threshold are excluded from pairwise comparisons.}
+
+\item{num_iter}{Integer. Number of subsampling iterations used when
+calculating average dissimilarity for unrarefied data (default 100).
+Ignored if data is already rarefied.}
 
 \item{seed}{Optional integer to set the RNG seed for reproducibility.}
 }

@@ -5,7 +5,7 @@
 #' repeated for a specified number of iterations, and the results are averaged.
 #' Samples with fewer OTUs/ASVs than the specified `depth_level` are discarded.
 #'
-#' @param physeq A `phyloseq` object containing an OTU/ASV table.
+#' @param physeq_obj A `phyloseq` object containing an OTU/ASV table.
 #' @param depth_level An integer specifying the sequencing depth (number of
 #'   OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform
@@ -42,7 +42,7 @@
 #'
 #' # Example rarefaction (single iteration, single core to keep examples fast)
 #' otu_table_rare <- multi_rarefy(
-#'   physeq = bcse,
+#'   physeq_obj = bcse,
 #'   depth_level = 1000,
 #'   num_iter = 100,
 #'   .as_array = FALSE,
@@ -54,7 +54,7 @@
 #'
 #' @export
 multi_rarefy <- function(
-  physeq,
+  physeq_obj,
   depth_level,
   num_iter = 100,
   .as_array = FALSE,
@@ -71,7 +71,7 @@ multi_rarefy <- function(
     stop("Please install 'phyloseq' to use this function.")
   }
 
-  .phyloseq_class_check(physeq)
+  .phyloseq_class_check(physeq_obj)
 
   if (!is.numeric(depth_level) || depth_level <= 0) {
     cli::cli_alert_danger("depth_level must be a positive number")
@@ -94,7 +94,7 @@ multi_rarefy <- function(
   }
 
   # Prepare data ----
-  otu_mat <- .extract_otu_matrix(physeq, samples_as_rows = TRUE)
+  otu_mat <- .extract_otu_matrix(physeq_obj, samples_as_rows = TRUE)
 
   ## Filter samples by depth ----
   n_samples_before <- nrow(otu_mat)
@@ -120,7 +120,7 @@ multi_rarefy <- function(
   cli::cli_alert_info("Rarefaction depth: {.val {depth_level}}")
   cli::cli_alert_info("Iterations: {.val {num_iter}}")
 
-  cli::cli_alert_info("taxa_are_rows: {phyloseq::taxa_are_rows(physeq)}")
+  cli::cli_alert_info("taxa_are_rows: {phyloseq::taxa_are_rows(physeq_obj)}")
 
   cli::cli_alert_info(
     "OTU matrix/df rownames head: {paste(head(rownames(otu_mat)), collapse = ', ')}"

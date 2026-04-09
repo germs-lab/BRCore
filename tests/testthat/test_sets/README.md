@@ -49,7 +49,7 @@ source("vignettes/BRCore-vignette.R")
 test_vignette_data <- list(
   test_bcse_metrics = bcse_metrics,
   test_rarefaction_plot = rarefaction_plot,
-  test_bcse_rarefied_otutable = bcse_rarefied_otutable,
+  test_bcse_rarefied_otutable = bcse_rarefied_list,
   test_bcse_rare = bcse_rare,
   test_bcse_rare_core = bcse_rare_core,
   test_bcse_identified_core = bcse_identified_core,

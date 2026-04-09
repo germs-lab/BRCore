@@ -5,7 +5,7 @@ test_that("phyloseq object correctly created", {
 
   otu_table_rare <-
     multi_rarefy(
-      physeq = bcse,
+      physeq_obj = bcse,
       depth_level = 200,
       num_iter = 3,
       threads = 1,

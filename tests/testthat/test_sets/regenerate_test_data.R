@@ -31,7 +31,7 @@ test_rarefaction_plot <- plot_rarefaction_metrics(test_bcse_metrics)
 # Use single thread for consistency with test expectations
 cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(
-  physeq = bcse,
+  physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
   threads = 1, # Single thread for consistency with CI test configuration
@@ -41,8 +41,8 @@ test_bcse_rarefied_otutable <- multi_rarefy(
 # Step 5: Update OTU table
 cat("Updating OTU table...\n")
 test_bcse_rare <- update_otu_table(
-  physeq = bcse,
-  otu_rare = test_bcse_rarefied_otutable
+  physeq_obj = bcse,
+  rarefied_otus = test_bcse_rarefied_otutable
 )
 
 # Step 6: Identify core microbiome

@@ -12,6 +12,13 @@
 #' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
 #' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative abundance in the ranking score. `0` (default) uses occupancy/composite only. `1` ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
 #' @param max_otus Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)
+#' @param depth_level Integer. The sequencing depth used for normalization in
+#' Bray-Curtis calculations. If data is rarefied, this is automatically set
+#' to the rarefaction depth. For unrarefied data, samples with depth below
+#' this threshold are excluded from pairwise comparisons.
+#' @param num_iter Integer. Number of subsampling iterations used when
+#' calculating average dissimilarity for unrarefied data (default 100).
+#' Ignored if data is already rarefied.
 #' @param seed Optional integer to set the RNG seed for reproducibility.
 #'
 #' @return A list with:
@@ -97,6 +104,8 @@ identify_core <- function(
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
+  depth_level = 1000,
+  num_iter = 100,
   seed = NULL
 ) {
   # input checks ---------------------------------
@@ -108,29 +117,25 @@ identify_core <- function(
     set.seed(seed)
   }
 
-  if (!inherits(physeq_obj, "phyloseq")) {
-    cli::cli_abort(
-      "{.arg physeq_obj} must be a 'phyloseq' object.\nYou've supplied a {class(physeq_obj)[1]} vector."
-    )
-  }
-
-  cli::cli_alert_success("Input phyloseq object is valid!")
+  .phyloseq_class_check(physeq_obj)
 
   # define arguments ---------------------------------
 
   # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))
+  is_rarefied <- abs(min_sum - max_sum) < 1e-6
 
-  if (abs(min_sum - max_sum) < 1e-6) {
-    nReads <- round(min_sum) # Use rounded value for display
-    cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
+  if (is_rarefied) {
+    depth_level <- round(min_sum) # Use rounded value for display
+    cli::cli_alert_info("otu_table() is rarefied at a depth of: {depth_level}")
   } else {
-    stop("The otu_table() is not rarefied!")
+    cli::cli_alert_warning(
+      "The otu_table() is not rarefied! \n Using depth_level={depth_level} for normalization in BC calculations. \n Consider rarefying your data or adjusting depth_level accordingly."
+    )
   }
 
-  otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
-    as("matrix")
+  otu <- .extract_otu_matrix(physeq_obj, samples_as_rows = FALSE)
   map <- sample_data(physeq_obj) |> as("data.frame")
   map$sample_id <- rownames(map)
 
@@ -278,7 +283,7 @@ identify_core <- function(
 
   # BC accumulation ---------------------------------
   # cumulative BC across samples while adding taxa in rank order
-  # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
+  # pairwise BC on *current* subset of taxa, normalized by depth_level, matching your formula
 
   # start with the first ranked OTU
   cli::cli_alert_info(
@@ -292,7 +297,12 @@ identify_core <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- .calculate_bc(start_matrix, nReads)
+  bc_vec <- .calculate_bc(
+    start_matrix,
+    depth_level,
+    num_iterations = num_iter,
+    is_rarefied = is_rarefied
+  )
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -317,7 +327,12 @@ identify_core <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      bc_vec <- .calculate_bc(start_matrix, nReads)
+      bc_vec <- .calculate_bc(
+        start_matrix,
+        depth_level,
+        num_iterations = num_iter,
+        is_rarefied = is_rarefied
+      )
 
       BCaddition <- left_join(
         BCaddition,
@@ -380,6 +395,14 @@ identify_core <- function(
 
   elbow <- which.max(BC_ranked$elbow_slope_diffs)
 
+  # FALLBACK: if elbow is empty, NA, or 0, default to 1
+  if (length(elbow) == 0 || is.na(elbow) || elbow == 0) {
+    cli::cli_warn(
+      "Elbow calculation failed (possibly due to low variation). Defaulting to 1."
+    )
+    elbow <- 1
+  }
+
   # threshold cut based on multiplicative increase
   thr <- 1 + increase_value
   valid_increases <- which(BC_ranked$IncreaseBC >= thr)
@@ -441,12 +464,13 @@ identify_core <- function(
 #' Calculate Bray-Curtis Dissimilarity Between Sample Pairs
 #'
 #' This function calculates the Bray-Curtis dissimilarity between all pairs of samples in a matrix.
-#' The dissimilarity is normalized by the total number of reads (`nReads`) to account for differences
+#' The dissimilarity is normalized by the total number of reads (`depth_level`) to account for differences
 #' in sequencing depth.
 #'
 #' @param matrix A numeric matrix or data frame where rows represent taxa (e.g., ASVs) and columns
 #'   represent samples. The column names of the matrix are used to generate pairwise sample names.
-#' @param nReads A numeric value representing the total number of reads used for normalization.
+#' @param depth_level A numeric value representing the total number of reads used for normalization.
+#' @param num_iterations
 #'   Typically, this is the minimum or average sequencing depth across samples.
 #' @return A list containing:
 #'   \itemize{
@@ -459,7 +483,12 @@ identify_core <- function(
 #' @noRd
 #' @keywords internal
 
-.calculate_bc <- function(matrix, nReads) {
+.calculate_bc <- function(
+  matrix,
+  depth_level,
+  num_iterations,
+  is_rarefied = TRUE
+) {
   if (nrow(matrix) == 0) {
     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
     return(list(values = numeric(0), names = character(0)))
@@ -472,14 +501,53 @@ identify_core <- function(
     return(list(values = numeric(0), names = character(0)))
   }
 
-  sample_pairs <- utils::combn(ncol(matrix), 2)
-  pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(matrix)[x], collapse = " - ")
-  })
+  # Conditional handling for rarefied vs unrarefied data
+  if (is_rarefied) {
+    # Data already rarefied - use vegdist directly without subsampling
+    sample_pairs <- utils::combn(ncol(matrix), 2)
+    pair_labels <- apply(sample_pairs, 2, function(x) {
+      paste(colnames(matrix)[x], collapse = " - ")
+    })
 
-  bc_values <- apply(sample_pairs, 2, function(x) {
-    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
-  })
+    bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
+
+    # Per-pair normalization vegdist used
+    pair_sums <- apply(sample_pairs, 2, function(x) {
+      sum(matrix[, x[1]]) + sum(matrix[, x[2]])
+    })
+
+    # Reverse vegdist normalization and apply our own
+    bc_values <- bc_vegan * pair_sums / (2 * depth_level)
+  } else {
+    # Unrarefied data - filter samples by depth FIRST
+    floating_depth <- depth_level * 0.9999999 # account for floating-point precision
+
+    keep_samples <- colSums(matrix) >= floating_depth #ASV/OTUs should be columns
+
+    filtered_matrix <- matrix[, keep_samples, drop = FALSE]
+
+    if (ncol(filtered_matrix) < 2) {
+      return(list(values = numeric(0), names = character(0)))
+    }
+
+    # NOW compute sample pairs from the filtered matrix
+    sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
+    pair_labels <- apply(sample_pairs, 2, function(x) {
+      paste(colnames(filtered_matrix)[x], collapse = " - ")
+    })
+
+    # Use avgdist with rarefaction
+    bc_values <- as.vector(
+      suppressWarnings(
+        vegan::avgdist(
+          t(filtered_matrix),
+          sample = depth_level,
+          iterations = num_iterations,
+          dmethod = "bray"
+        )
+      )
+    )
+  }
 
   list(
     values = bc_values,

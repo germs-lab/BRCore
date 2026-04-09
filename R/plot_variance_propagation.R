@@ -28,7 +28,7 @@
 #' subset_samples(Crop %in% c("Poplar", "Switchgrass"))
 #' bcse_rarefied_otutable_filt <-
 #'  multi_rarefy(
-#'        physeq = bcse_filt,
+#'        physeq_obj = bcse_filt,
 #'        depth_level = 1000,
 #'        num_iter = 100,
 #'        .as_array = FALSE,
@@ -36,7 +36,7 @@
 #'    )
 #'
 #'plot_variance_propagation(
-#'    physeq   = bcse_filt,
+#'    physeq_obj   = bcse_filt,
 #'    rarefied = bcse_rarefied_otutable_filt,
 #'    q        = 1,
 #'    group_var = "Crop",
@@ -220,14 +220,14 @@ plot_variance_propagation <- function(
 
 #' Validate that group variables exist in sample data
 #'
-#' @param physeq A phyloseq object
+#' @param physeq_obj A phyloseq object
 #' @param group_var Character, grouping variable name
 #' @param group_color Character, color variable name (optional)
 #' @return Invisible NULL (errors if validation fails)
 #' @keywords internal
 #' @noRd
-.validate_group_vars <- function(physeq, group_var, group_color = NULL) {
-  sample_df <- as(phyloseq::sample_data(physeq), "data.frame")
+.validate_group_vars <- function(physeq_obj, group_var, group_color = NULL) {
+  sample_df <- as(phyloseq::sample_data(physeq_obj), "data.frame")
 
   if (!group_var %in% colnames(sample_df)) {
     cli::cli_abort(

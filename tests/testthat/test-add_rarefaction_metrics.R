@@ -12,13 +12,13 @@ test_that("add_rarefaction_metrics works with phyloseq object", {
     row.names = paste0("Sample", 1:10)
   )
 
-  physeq <- phyloseq::phyloseq(
+  physeq_obj <- phyloseq::phyloseq(
     phyloseq::otu_table(otu_mat, taxa_are_rows = TRUE),
     phyloseq::sample_data(sample_df)
   )
 
   # Run function
-  result <- add_rarefaction_metrics(physeq)
+  result <- add_rarefaction_metrics(physeq_obj)
 
   # Check it's still phyloseq
   expect_s4_class(result, "phyloseq")

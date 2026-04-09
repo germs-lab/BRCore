@@ -68,7 +68,7 @@ test_that("plot_variance_propagation returns ggplot with list input", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -94,7 +94,7 @@ test_that("plot works with q = 1 (Shannon)", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -120,7 +120,7 @@ test_that("plot works with q = 2 (Simpson)", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -148,7 +148,7 @@ test_that("plot_variance_propagation returns ggplot with array input", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = TRUE,
@@ -179,7 +179,7 @@ test_that("plot has correct facets (Raw vs Rarefied)", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -208,7 +208,7 @@ test_that("plot y-axis label reflects q value", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -239,7 +239,7 @@ test_that("plot handles rarefied subset of samples", {
   bcse_sub <- phyloseq::subset_samples(bcse, Crop == "Switchgrass")
 
   rarefied <- multi_rarefy(
-    physeq = bcse_sub,
+    physeq_obj = bcse_sub,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -266,7 +266,7 @@ test_that("plot_variance_propagation errors with vector q", {
   data("bcse", package = "BRCore")
 
   rarefied <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,

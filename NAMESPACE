@@ -2,13 +2,11 @@
 
 export("%>%")
 export(.calculate_bc)
-export(.calculate_bc_)
 export(add_rarefaction_metrics)
 export(detect_hpc_type)
 export(fit_neutral_model)
 export(get_available_cores)
 export(identify_core)
-export(identify_core_avgdist)
 export(is_hpc_environment)
 export(multi_rarefy)
 export(plot_abundance_occupancy)

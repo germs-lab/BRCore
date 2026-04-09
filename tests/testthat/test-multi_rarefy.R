@@ -4,7 +4,7 @@ test_that("Test if default behaviour is correct", {
   data("bcse", package = "BRCore")
 
   otu_table_rare <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = TRUE,
@@ -63,7 +63,7 @@ test_that("multi_rarefy outputs all rarefaction iterations when .as_array = FALS
 
   num_iterations <- 3
   rarefied_data <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = num_iterations,
     .as_array = FALSE,
@@ -134,7 +134,7 @@ test_that("multi_rarefy with .as_array = TRUE returns 3D array", {
 
   num_iterations <- 5
   rarefied_array <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = num_iterations,
     .as_array = TRUE,
@@ -165,7 +165,7 @@ test_that("multi_rarefy list and array have consistent dimensions", {
 
   # Same parameters for both
   rarefied_list <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -173,7 +173,7 @@ test_that("multi_rarefy list and array have consistent dimensions", {
   )
 
   rarefied_array <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = TRUE,
@@ -194,7 +194,7 @@ test_that("multi_rarefy removes zero-abundance taxa independently per iteration"
   data("bcse", package = "BRCore")
 
   rarefied_data <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
     .as_array = FALSE,
@@ -219,7 +219,7 @@ test_that("multi_rarefy handles low-depth samples correctly", {
 
   # Use high depth to force some samples to be removed
   rarefied_data <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 50000,
     num_iter = 2,
     .as_array = FALSE,
@@ -243,7 +243,7 @@ test_that("multi_rarefy single iteration returns data frame (not list)", {
 
   # Single iteration with .as_array = FALSE should return data frame
   rarefied_single <- multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 1,
     .as_array = FALSE,

@@ -1,19 +1,19 @@
 # R/utils-otu-extraction.R
 
 #' Check if input is a phyloseq object
-#' @param physeq An object to check
+#' @param physeq_obj An object to check
 #' @return Invisible NULL (errors if not a
 #' phyloseq object)
 #' @keywords internal
 #' @noRd
 
-.phyloseq_class_check <- function(physeq) {
-  if (inherits(physeq, "phyloseq")) {
+.phyloseq_class_check <- function(physeq_obj) {
+  if (inherits(physeq_obj, "phyloseq")) {
     cli::cli_alert_success("Input phyloseq object is valid!")
   }
-  if (!inherits(physeq, "phyloseq")) {
+  if (!inherits(physeq_obj, "phyloseq")) {
     cli::cli_abort(
-      "Input must be a 'phyloseq' object, not a {.cls {class(physeq)}}"
+      "Input must be a 'phyloseq' object, not a {.cls {class(physeq_obj)}}"
     )
   }
 }
@@ -21,18 +21,18 @@
 
 #' Extract OTU matrix from phyloseq object
 #'
-#' @param physeq A phyloseq object
+#' @param physeq_obj A phyloseq object
 #' @return A matrix with samples as rows and taxa as columns
 #' @keywords internal
 #' @noRd
-.extract_otu_matrix <- function(physeq, samples_as_rows = TRUE) {
-  suppressMessages(.phyloseq_class_check(physeq))
+.extract_otu_matrix <- function(physeq_obj, samples_as_rows = TRUE) {
+  suppressMessages(.phyloseq_class_check(physeq_obj))
 
-  otu_mat <- as(phyloseq::otu_table(physeq), "matrix")
+  otu_mat <- as(phyloseq::otu_table(physeq_obj), "matrix")
 
-  if (phyloseq::taxa_are_rows(physeq) && samples_as_rows) {
+  if (phyloseq::taxa_are_rows(physeq_obj) && samples_as_rows) {
     otu_mat <- t(otu_mat)
-  } else if (!phyloseq::taxa_are_rows(physeq) && !samples_as_rows) {
+  } else if (!phyloseq::taxa_are_rows(physeq_obj) && !samples_as_rows) {
     otu_mat <- t(otu_mat)
   }
 

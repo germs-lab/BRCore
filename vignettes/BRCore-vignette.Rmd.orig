@@ -117,7 +117,7 @@ developed by Sanders in 1968 it has been adopted widely in ecology research.
 ```{r rarefy bcse, echo=TRUE}
 bcse_rarefied_otutable <-
   multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 100,
     threads = 8,
@@ -140,7 +140,7 @@ calculated before.
 
 ```{r replace otu table, echo=TRUE}
 bcse_rare <-
-  update_otu_table(physeq = bcse, otu_rare = bcse_rarefied_otutable)
+  update_otu_table(physeq_obj = bcse, otu_rare = bcse_rarefied_otutable)
 
 print(bcse_rare)
 sample_sums(bcse_rare)

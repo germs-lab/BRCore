@@ -35,7 +35,7 @@ bcse_filt <- bcse \%>\%
 subset_samples(Crop \%in\% c("Poplar", "Switchgrass"))
 bcse_rarefied_otutable_filt <-
  multi_rarefy(
-       physeq = bcse_filt,
+       physeq_obj = bcse_filt,
        depth_level = 1000,
        num_iter = 100,
        .as_array = FALSE,
@@ -43,7 +43,7 @@ bcse_rarefied_otutable_filt <-
    )
 
 plot_variance_propagation(
-   physeq   = bcse_filt,
+   physeq_obj   = bcse_filt,
    rarefied = bcse_rarefied_otutable_filt,
    q        = 1,
    group_var = "Crop",
