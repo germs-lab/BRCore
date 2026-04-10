@@ -106,7 +106,7 @@ test_that("2: Vignette workflow produces consistent results", {
     physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 100,
-    threads = get_available_cores(),
+    .as_array = FALSE,
     set_seed = 7642
   )
 

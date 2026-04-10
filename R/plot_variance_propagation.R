@@ -1,12 +1,10 @@
 #' Variance propagation diagnostic for rarefaction
 #'
-#' This function evaluate the variance generated during multiple rarefaction iterations.
-#' It compares raw vs rarefied diversity metrics calculated at each iterations.
+#' This function evaluate the variance generated during multiple rarefaction by plotting comparing raw vs. rarefied alpha diversity metrics calculated at each iterations. It is possible to plot observed richness (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting the `q` parameter to "richness" or `q` = 0, "shannon" or `q` = 1, or "shannon" or `q` = 2. The plot is faceted by method (raw vs rarefied) and colored by a specified grouping variable from the sample data.
 #'
 #' @param physeq_obj Raw phyloseq object
 #' @param rarefied Output from multi_rarefy(). Either a list of dataframes or and array.
 #' @param q Hill number order (q = 0 for richness, q = 1 for Shannon, q = 2 for Simpson)
-#' @param distance "bray" or "jaccard" (beta only)
 #' @param group_var A grouping variable to use gor grouping as in the sample_data()
 #' @param group_color A color variable to use present in the sample_data()
 #'
@@ -67,6 +65,8 @@ plot_variance_propagation <- function(
 
   otu_raw <- otu_raw[common_samples, , drop = FALSE]
   metadata <- metadata[common_samples, , drop = FALSE]
+
+  .validate_group_vars(physeq_obj, group_var, group_color)
 
   cli::cli_alert_info("Hill number order selected, q= {.val {q}}")
 
@@ -135,8 +135,25 @@ plot_variance_propagation <- function(
     ) +
     labs(
       x = group_var,
-      y = paste0("Hill number (q = ", q, ")"),
-      title = "Raw vs Rarefied Alpha Diversity"
+      # y = paste0("Hill number (q = ", q, ")"),
+      title = "Raw vs Rarefied Alpha Diversity",
+      y = if (is.numeric(q)) {
+        switch(
+          as.character(q),
+          "0" = "Hill Number: (q = 0)",
+          "1" = "Hill Number: (q = 1)",
+          "2" = "Hill Number: (q = 2)",
+          paste0("General Hill Number (q = ", q, ")")
+        )
+      } else {
+        switch(
+          q,
+          "richness" = "Observed Richness  ≡ (q = 0)",
+          "shannon" = "Shannon Diversity ≡ (q = 1)",
+          "simpson" = "Simpson Diversity ≡ (q = 2)",
+          paste0("Hill Number: ", q)
+        )
+      }
     )
 
   cli::cli_alert_info("Comparison plot generated!")
@@ -167,8 +184,7 @@ plot_variance_propagation <- function(
   if (is.numeric(q)) {
     q_val <- q
   } else {
-    index <- match.arg(q, INDICES)
-    q_val <- switch(index, richness = 0, shannon = 1, simpson = 2)
+    q_val <- match.arg(q, INDICES)
   }
 
   # Handle matrix (rows = samples) or vector input
@@ -184,24 +200,45 @@ plot_variance_propagation <- function(
     x[x == 0] <- NA
   }
 
-  # Compute Hill number based on q
-  if (q_val == 0) {
-    # Richness: count non-zero species
+  # Compute diversity based on q
+  if (q_val == 0 || q_val == "richness") {
+    # Richness: count non-zero species (same regardless of hill_form)
     if (length(dim(x)) > 1) {
-      H <- rowSums(!is.na(x))
+      H <- rowSums(!is.na(x)) # Count non-NA values
     } else {
       H <- sum(!is.na(x))
     }
-  } else if (q_val == 1) {
-    # Shannon: exp(-sum(p * log(p)))
+  } else if (q_val == 1 || q_val == "shannon") {
+    # Shannon
     x_log <- x * log(x)
     if (length(dim(x)) > 1) {
-      H <- exp(-rowSums(x_log, na.rm = TRUE))
+      H <- -rowSums(x_log, na.rm = TRUE)
     } else {
-      H <- exp(-sum(x_log, na.rm = TRUE))
+      H <- -sum(x_log, na.rm = TRUE)
+    }
+
+    # Convert to Hill number if requested
+    if (q_val == 1) {
+      H <- exp(H)
+    }
+  } else if (q_val == 2 || q_val == "simpson") {
+    # Simpson
+    x_sq <- x^2
+    if (length(dim(x)) > 1) {
+      H <- rowSums(x_sq, na.rm = TRUE)
+    } else {
+      H <- sum(x_sq, na.rm = TRUE)
+    }
+
+    if (q_val == 2) {
+      #Inverse Simpson concentration: 1 / sum(p^2)
+      H <- 1 / H
+    } else {
+      # Simpson index: 1 - sum(p^2)
+      H <- 1 - H
     }
   } else {
-    # General Hill number: (sum(p^q))^(1/(1-q))
+    # General Hill number not 0,1,2: (sum(p^q))^(1/(1-q))
     x_pow <- x^q_val
     if (length(dim(x)) > 1) {
       H <- rowSums(x_pow, na.rm = TRUE)^(1 / (1 - q_val))

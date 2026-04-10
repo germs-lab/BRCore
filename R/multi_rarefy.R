@@ -180,6 +180,8 @@ multi_rarefy <- function(
     })
   }
 
+  avg_taxa_removed <- NULL
+
   if (.as_array) {
     n_samples_removed <- n_samples_before - n_samp
     removed_samples <- setdiff(original_sample_ids, rownames(otu_mat))

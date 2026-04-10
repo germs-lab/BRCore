@@ -181,7 +181,14 @@ test_that("multi_rarefy list and array have consistent dimensions", {
   )
 
   # Array dimensions should match list dimensions
-  non_zero_cols <- sum(apply(rarefied_array[,, 1], 2, sum) != 0) - 1
+  expect_equal(dim(rarefied_array)[1], nrow(rarefied_list[[1]]))
+  expect_equal(
+    length(intersect(
+      colnames(rarefied_list[[1]]),
+      colnames(rarefied_array[,, 1])
+    )),
+    1178L
+  )
 
   expect_equal(dim(rarefied_array)[1], nrow(rarefied_list[[1]]))
   expect_equal(non_zero_cols, ncol(rarefied_list[[1]]))
@@ -250,8 +257,8 @@ test_that("multi_rarefy single iteration returns data frame (not list)", {
     set_seed = 999
   )
 
-  # Should be a list with one element
-  expect_type(rarefied_single, "list")
+  # Should be a DF
+  expect_s3_class(rarefied_single, "data.frame")
 
   # Length of taxa should match original (minus any removed)
   expect_equal(length(rarefied_single), phyloseq::otu_table(bcse) |> nrow())

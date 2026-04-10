@@ -40,24 +40,24 @@ print(rarefaction_plot)
 
 
 ## ----rarefy bcse, echo=TRUE-----------------------------------------------------------
-bcse_rarefied_otutable <-
+bcse_rarefied_list <-
   multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 100,
-    threads = 2,
+    .as_array = FALSE,
     set_seed = 7642
   )
 
 
 ## ----verify success rarefaction, echo=TRUE--------------------------------------------
-rowSums(bcse_rarefied_otutable)
-bcse_rarefied_otutable[1:10, 1:10]
+rowSums(bcse_rarefied_list[[1]])
+bcse_rarefied_list[[1]][1:10, 1:10]
 
 
 ## ----replace otu table, echo=TRUE-----------------------------------------------------
 bcse_rare <-
-  update_otu_table(physeq = bcse, otu_rare = bcse_rarefied_otutable)
+  update_otu_table(physeq_obj = bcse, bcse_rarefied_list, iteration = 1)
 
 print(bcse_rare)
 sample_sums(bcse_rare)
@@ -65,9 +65,10 @@ sample_sums(bcse_rare)
 
 ## ----identify core microbiome, echo=TRUE----------------------------------------------
 bcse_rare_core <- identify_core(
-  physeq_obj = bcse_rare,
+  physeq_obj = bcse,
   priority_var = "Crop",
   increase_value = 0.02,
+  num_iter = 100,
   abundance_weight = 0,
   seed = 2134
 )

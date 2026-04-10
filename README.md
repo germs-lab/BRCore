@@ -71,7 +71,6 @@ bcse_rarefied <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
-  threads = 4,
   set_seed = 7642
 )
 
