@@ -33,25 +33,28 @@ cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 100,
-  threads = 1, # Single thread for consistency with CI test configuration
+  num_iter = 10,
+  .as_array = FALSE,
   set_seed = 7642
 )
 
-# Step 5: Update OTU table
+# Step 5: Update OTU table (optional)
 cat("Updating OTU table...\n")
 test_bcse_rare <- update_otu_table(
   physeq_obj = bcse,
-  rarefied_otus = test_bcse_rarefied_otutable
+  rarefied_otus = test_bcse_rarefied_otutable,
+  iteration = 1
 )
 
 # Step 6: Identify core microbiome
 cat("Identifying core microbiome...\n")
 test_bcse_rare_core <- identify_core(
-  physeq_obj = test_bcse_rare,
+  physeq_obj = bcse,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
+  depth_level = 1000,
+  num_iter = 10,
   seed = 2134
 )
 

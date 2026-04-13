@@ -8,11 +8,11 @@ test_that("phyloseq object correctly created", {
       physeq_obj = bcse,
       depth_level = 200,
       num_iter = 3,
-      threads = 1,
+      .as_array = FALSE,
       set_seed = 123
     )
 
-  test_bcse_rare <- update_otu_table(bcse, otu_table_rare)
+  test_bcse_rare <- update_otu_table(bcse, otu_table_rare, iteration = 1)
   read_counts <- sample_sums(test_bcse_rare)
 
   expect_true(class(test_bcse_rare) == "phyloseq")
