@@ -98,7 +98,9 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
 
   # fit model ----
   obs.np <- sncm.fit(spp, core_taxa, stats = FALSE, pool = NULL)
-  sta.np <- sncm.fit(spp, core_taxa, stats = TRUE, pool = NULL)
+  sta.np <- suppressMessages(
+    sncm.fit(spp, core_taxa, stats = TRUE, pool = NULL)
+  ) # Avoid printing of model fitting messages again, see sncm.fit() for details
 
   if (is.null(rownames(obs.np))) {
     cli::cli_abort(
@@ -135,7 +137,7 @@ fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
   )
   class(out) <- c("fit_neutral_model", class(out))
 
-  cli::cli_alert_success("Analysis complete!")
+  cli::cli_alert_success("Model fitting complete!")
 
   out
 }
