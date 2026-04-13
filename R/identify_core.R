@@ -108,7 +108,7 @@ identify_core <- function(
   num_iter = 100,
   seed = NULL
 ) {
-  # input checks ---------------------------------
+  # input checks ----
   cli::cli_text("\nSeed used: {seed}\n")
 
   if (is.null(seed)) {
@@ -119,7 +119,7 @@ identify_core <- function(
 
   .phyloseq_class_check(physeq_obj)
 
-  # define arguments ---------------------------------
+  # define arguments ----
 
   # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
   min_sum <- min(sample_sums(physeq_obj))
@@ -156,11 +156,11 @@ identify_core <- function(
     )
   }
 
-  # core prioritizing variable ---------------------------------
+  # core prioritizing variable ----
   data_var <- priority_var
   cli::cli_alert_success("Core prioritizing variable: {data_var}")
 
-  # validate abundance_weight ---------------------------------
+  # validate abundance_weight ----
   if (
     !is.numeric(abundance_weight) ||
       length(abundance_weight) != 1L ||
@@ -175,7 +175,7 @@ identify_core <- function(
     abundance_weight <- max(0, min(1, abundance_weight))
   }
 
-  # abundance occupancy ---------------------------------
+  # abundance occupancy ----
   # occupancy and mean rel. abundance
   otu_PA <- 1 * (otu > 0)
   otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
@@ -188,7 +188,7 @@ identify_core <- function(
   occ_abun <- data.frame(otu_occ = otu_occ, otu_rel = otu_rel) |>
     tibble::rownames_to_column("otu")
 
-  # PresenceSum ---------------------------------
+  # PresenceSum ----
 
   PresenceSum <- data.frame(
     otu = as.factor(rownames(otu)),
@@ -212,7 +212,7 @@ identify_core <- function(
       .groups = "drop"
     )
 
-  # Rank and weight in abundance ---------------------------------
+  # Rank and weight in abundance ----
   otu_ranked <- occ_abun |>
     left_join(PresenceSum, by = "otu")
 
@@ -281,7 +281,7 @@ identify_core <- function(
 
   otu_ranked_ordered <- otu_ranked$otu
 
-  # BC accumulation ---------------------------------
+  # BC accumulation ----
   # cumulative BC across samples while adding taxa in rank order
   # pairwise BC on *current* subset of taxa, normalized by depth_level, matching your formula
 
@@ -368,7 +368,7 @@ identify_core <- function(
     arrange(MeanBC) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
-  # multiplicative increase between successive ranks
+  # increase method: multiplicative increase between successive ranks ----
   if (nrow(BC_ranked) >= 2) {
     Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
     increaseDF <- data.frame(
@@ -380,7 +380,7 @@ identify_core <- function(
   }
   BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
-  # elbow by forward-backward slope difference
+  # elbow method: by forward-backward slope difference ----
   elbow_slope_differences <- function(pos) {
     left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
     right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
@@ -413,19 +413,7 @@ identify_core <- function(
     1
   }
 
-  # identified core sets ---------------------------------
-
-  # elbow_core <- otu_ranked |>
-  #    tibble::rownames_to_column("otu_order") |>
-  #    mutate(otu_order = as.numeric(.data$otu_order)) |>
-  #    filter(.data$otu_order <= elbow) |>
-  #    pull(.data$otu)
-
-  # increase_core <- otu_ranked |>
-  #    tibble::rownames_to_column("otu_order") |>
-  #    mutate(otu_order = as.numeric(.data$otu_order)) |>
-  #    filter(.data$otu_order <= lastCall) |>
-  #    pull(.data$otu)
+  # identified core sets ----
 
   elbow_core <- otu_ranked_ordered[seq_len(elbow)]
   cli::cli_alert_success(
@@ -436,7 +424,7 @@ identify_core <- function(
     "% increase method identified {.val {length(increase_core)}} core OTUs"
   )
 
-  # return ---------------------------------
+  # return ----
   out <- list(
     bray_curtis_ranked = BC_ranked,
     otu_ranked = otu_ranked,
