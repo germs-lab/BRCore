@@ -50,6 +50,8 @@ plot_variance_propagation <- function(
   group_var,
   group_color
 ) {
+  .validate_group_vars(physeq_obj, group_var, group_color)
+
   cli::cli_h1("Rarefaction Variance Propagation Visualization")
 
   # Extract raw OTU
