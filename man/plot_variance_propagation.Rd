@@ -16,15 +16,12 @@ plot_variance_propagation(physeq_obj, rarefied, q = 0, group_var, group_color)
 \item{group_var}{A grouping variable to use gor grouping as in the sample_data()}
 
 \item{group_color}{A color variable to use present in the sample_data()}
-
-\item{distance}{"bray" or "jaccard" (beta only)}
 }
 \value{
 ggplot object comparing raw vs rarefied diversity distributions across iterations.
 }
 \description{
-This function evaluate the variance generated during multiple rarefaction iterations.
-It compares raw vs rarefied diversity metrics calculated at each iterations.
+This function evaluate the variance generated during multiple rarefaction by plotting comparing raw vs. rarefied alpha diversity metrics calculated at each iterations. It is possible to plot observed richness (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting the \code{q} parameter to "richness" or \code{q} = 0, "shannon" or \code{q} = 1, or "shannon" or \code{q} = 2. The plot is faceted by method (raw vs rarefied) and colored by a specified grouping variable from the sample data.
 }
 \examples{
 \donttest{

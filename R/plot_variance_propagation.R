@@ -89,6 +89,10 @@ plot_variance_propagation <- function(
 
   iter_list <- .get_iter_list(rarefied)
 
+  # Check rarefied depth
+  rarefied_depths <- sapply(iter_list, function(mat) {
+    rowSums(as.matrix(mat))[1]
+  })
   rare_df <- lapply(seq_along(iter_list), function(i) {
     mat <- as.matrix(iter_list[[i]])
 
@@ -106,7 +110,8 @@ plot_variance_propagation <- function(
   all_df <- bind_rows(
     mutate(raw_df, iter = NA_integer_),
     mutate(rare_df, iter = rep(seq_len(n_iter), each = length(common_samples)))
-  ) %>%
+  ) |>
+    mutate(method = factor(method, levels = c("Raw", "Rarefied"))) |>
     left_join(
       metadata[, c("sample_id", group_var, group_color)],
       by = "sample_id"
@@ -137,13 +142,20 @@ plot_variance_propagation <- function(
       x = group_var,
       # y = paste0("Hill number (q = ", q, ")"),
       title = "Raw vs Rarefied Alpha Diversity",
+      subtitle = paste0(
+        "Rarefied to depth of ",
+        rarefied_depths[1],
+        ", over ",
+        n_iter,
+        " iterations"
+      ),
       y = if (is.numeric(q)) {
         switch(
           as.character(q),
-          "0" = "Hill Number: (q = 0)",
-          "1" = "Hill Number: (q = 1)",
-          "2" = "Hill Number: (q = 2)",
-          paste0("General Hill Number (q = ", q, ")")
+          "0" = "Hill number (q = 0)",
+          "1" = "Hill number (q = 1)",
+          "2" = "Hill number (q = 2)",
+          paste0("General Hill number (q = ", q, ")")
         )
       } else {
         switch(
@@ -151,7 +163,7 @@ plot_variance_propagation <- function(
           "richness" = "Observed Richness  ≡ (q = 0)",
           "shannon" = "Shannon Diversity ≡ (q = 1)",
           "simpson" = "Simpson Diversity ≡ (q = 2)",
-          paste0("Hill Number: ", q)
+          paste0("Hill number ", q)
         )
       }
     )
