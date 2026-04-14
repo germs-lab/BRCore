@@ -15,7 +15,7 @@ The same object (\code{phyloseq} or \code{data.frame}) with new
 columns:
 \itemize{
 \item \code{read_num}
-\item \code{singlton_num}
+\item \code{singleton_num}
 \item \code{goods_cov}
 \item \code{outlier}
 }

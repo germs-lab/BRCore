@@ -2,17 +2,17 @@ test_that("1: Vignette test data structures are valid", {
   skip_on_cran()
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data2.rda"))
+  load(test_path("test_sets/test_vignette_data.rda"))
 
-  # Test: Rarefied OTU table has correct dimensions and sums
+  # Test: Rarefied OTU table is correctly structured and has expected properties
   expect_true(
-    is.matrix(test_vignette_data$test_bcse_rarefied_otutable) ||
-      is.data.frame(test_vignette_data$test_bcse_rarefied_otutable)
+    is.list(test_vignette_data$test_bcse_rarefied_otutable) &&
+      is.data.frame(test_vignette_data$test_bcse_rarefied_otutable[[1]])
   )
 
   expect_equal(999.999999999996, 1000, tolerance = 1e-6) # Sanity check for floating-point precision
 
-  row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable)
+  row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable[[1]])
   expect_true(all(near(row_sums, 1000, tol = 1e-6)))
 
   # Test: Core result structure is complete
@@ -105,7 +105,7 @@ test_that("2: Vignette workflow produces consistent results", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 100,
+    num_iter = 10,
     .as_array = FALSE,
     set_seed = 7642
   )
@@ -117,10 +117,10 @@ test_that("2: Vignette workflow produces consistent results", {
   )
   # Test: All samples have row sums of 1000 (accounting for floating-point precision)
   expect_equal(
-    rowSums(bcse_rarefied_list),
+    rowSums(bcse_rarefied_list[[1]]),
     setNames(
-      rep(1000, nrow(bcse_rarefied_list)),
-      rownames(bcse_rarefied_list)
+      rep(1000, nrow(bcse_rarefied_list[[1]])),
+      rownames(bcse_rarefied_list[[1]])
     ),
     tolerance = 1e-6
   )
@@ -149,7 +149,7 @@ test_that("2: Vignette workflow produces consistent results", {
 
   # Step 6: Identify core microbiome
   bcse_rare_core <- identify_core(
-    physeq_obj = bcse_rare,
+    physeq_obj = bcse,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,

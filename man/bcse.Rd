@@ -3,7 +3,8 @@
 \docType{data}
 \name{bcse}
 \alias{bcse}
-\title{16S amplicon dataset from the GLBRC Biofuel Cropping System Experiment (BCSE) at Michigan State University, Kellogg Biological Station}
+\title{16S amplicon dataset from the GLBRC Biofuel Cropping System Experiment
+(BCSE) at Michigan State University, Kellogg Biological Station}
 \format{
 An object class "phyloseq".
 }

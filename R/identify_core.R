@@ -3,15 +3,23 @@
 #' @description
 #' This function identifies core microbial taxa based on abundance-occupancy
 #' distributions and their contributions to Bray-Curtis similarity between
-#' biological samples. Core taxa are selected using either a "last % increase" or
-#' "elbow" method implementing the method developed by Shade
+#' biological samples. Core taxa are selected using either a "last % increase"
+#' or "elbow" method implementing the method developed by Shade
 #' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 #'
-#' @param physeq_obj A `phyloseq` object with at least `otu_table` and `sample_data`.
-#' @param priority_var The column name in the `sample_data` (e.g. "sampling_date", "site") that is used for prioritizing the core microbiome.
-#' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
-#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative abundance in the ranking score. `0` (default) uses occupancy/composite only. `1` ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
-#' @param max_otus Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)
+#' @param physeq_obj A `phyloseq` object with at least `otu_table` and
+#' `sample_data`.
+#' @param priority_var The column name in the `sample_data` (e.g.
+#' sampling_date", "site") that is used for prioritizing the core microbiome.
+#' @param increase_value Increase value (numeric, scalar) used in the
+#' calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
+#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
+#' abundance in the ranking score. `0` (default) uses occupancy/composite only.
+#' `1` ranks purely by abundance. Values in between blend the two (e.g.,
+#' abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
+#' @param max_otus Optional integer to limit analysis to the top N ranked OTUs.
+#' If NULL (default), all OTUs are analyzed. Useful for large datasets
+#' (>5000 OTUs)
 #' @param depth_level Integer. The sequencing depth used for normalization in
 #' Bray-Curtis calculations. If data is rarefied, this is automatically set
 #' to the rarefaction depth. For unrarefied data, samples with depth below
@@ -23,20 +31,30 @@
 #'
 #' @return A list with:
 #' \itemize{
-#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis similarity across sample pairs (`MeanBC`) at each cumulative `rank`, normalized proportion
-#'   (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric (`elbow_slope_diffs`).
+#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis
+#'  similarity across sample pairs (`MeanBC`) at each cumulative `rank`,
+#'  normalized proportion (`proportionBC`), the multiplicative `IncreaseBC`,
+#' and the elbow metric (`elbow_slope_diffs`).
+#' (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric
+#' (`elbow_slope_diffs`).
 #'   \item \code{otu_ranked} tibble with ranked OTU/ASVs .
 #'   \item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy
 #'      (`otu_occ`), and mean relative abundance (`otu_rel`).
-#'   \item \code{priority_var} character, the variable used for prioritizing the core.
+#'   \item \code{priority_var} character, the variable used for prioritizing
+#' the core.
 #'   \item \code{elbow} core set identified by elbow method (integer).
-#'   \item \code{bc_increase} core set identified by last % BC-increase (integer).
-#'   \item \code{increase_value} increase value (numeric, scalar) used in the calculation (e.g. 0.02).
-#'   \item \code{elbow_core} core OTU/ASVs using elbow method (character vector).
-#'   \item \code{increase_core} core OTU/ASVs using last % BC-increase method (character vector).
+#'   \item \code{bc_increase} core set identified by last % BC-increase
+#' (integer).
+#'   \item \code{increase_value} increase value (numeric, scalar) used in the
+#' calculation (e.g. 0.02).
+#'   \item \code{elbow_core} core OTU/ASVs using elbow method (character
+#' vector).
+#'   \item \code{increase_core} core OTU/ASVs using last % BC-increase method
+#'  (character vector).
 #'   \item \code{otu_table} otu_table counts (otu x samples) used (data.frame).
 #'   \item \code{sample_metadata} samples metadata (data.frame).
-#'   \item \code{taxonomy_table} taxonomy if present (data.frame); otherwise NULL.
+#'   \item \code{taxonomy_table} taxonomy if present (data.frame); otherwise
+#'  NULL.
 #' }
 #'
 #' @details
@@ -64,7 +82,8 @@
 #'
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy
 #' distributions to prioritize plant core microbiome membership. Current
-#' Opinion in Microbiology, 49:50-58 DOI:https://doi.org/10.1016/j.mib.2019.09.008
+#' Opinion in Microbiology, 49:50-58
+#' doi:https://doi.org/10.1016/j.mib.2019.09.008
 #'
 #' @section Dependencies:
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
@@ -83,7 +102,8 @@
 #' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
-#' # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
+#' # Example using your switchgrass phyloseq object and grouping variable
+#' # 'sampling_date'
 #' data("switchgrass", package = "BRCore")
 #'
 #' res <- identify_core(

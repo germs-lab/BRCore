@@ -1,4 +1,4 @@
-# R/utils-otu-extraction.R
+# R/utils-otu_class_checks.R
 
 #' Check if input is a phyloseq object
 #' @param physeq_obj An object to check
@@ -22,6 +22,8 @@
 #' Extract OTU matrix from phyloseq object
 #'
 #' @param physeq_obj A phyloseq object
+#' @param samples_as_rows Logical, return matrix with samples as rows and taxa
+#' as columns (default TRUE)
 #' @return A matrix with samples as rows and taxa as columns
 #' @keywords internal
 #' @noRd
@@ -30,9 +32,7 @@
 
   otu_mat <- as(phyloseq::otu_table(physeq_obj), "matrix")
 
-  if (phyloseq::taxa_are_rows(physeq_obj) && samples_as_rows) {
-    otu_mat <- t(otu_mat)
-  } else if (!phyloseq::taxa_are_rows(physeq_obj) && !samples_as_rows) {
+  if (phyloseq::taxa_are_rows(physeq_obj) == samples_as_rows) {
     otu_mat <- t(otu_mat)
   }
 

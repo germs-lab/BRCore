@@ -46,7 +46,8 @@
 #' @source Internal test dataset.
 "bean"
 
-#' 16S amplicon dataset from the GLBRC Biofuel Cropping System Experiment (BCSE) at Michigan State University, Kellogg Biological Station
+#' 16S amplicon dataset from the GLBRC Biofuel Cropping System Experiment
+#' (BCSE) at Michigan State University, Kellogg Biological Station
 #'
 #' @description A phyloseq containing 2861 97% sequence similarity OTUs
 #' (Operational Taxonomic Units) across 50 samples. Samples are for the leaf

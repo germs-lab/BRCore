@@ -26,10 +26,43 @@ test_that("add_rarefaction_metrics works with phyloseq object", {
   # Check new columns added
   sample_data <- as.data.frame(phyloseq::sample_data(result))
   expect_true("read_num" %in% colnames(sample_data))
-  expect_true("singlton_num" %in% colnames(sample_data))
+  expect_true("singleton_num" %in% colnames(sample_data))
   expect_true("goods_cov" %in% colnames(sample_data))
   expect_true("outlier" %in% colnames(sample_data))
 
   # Check we still have 10 samples
   expect_equal(nrow(sample_data), 10)
+})
+
+test_that("add_rarefaction_metrics works with a data.frame input", {
+  otu_df <- as.data.frame(
+    as(phyloseq::otu_table(bcse), "matrix")
+  )
+
+  result <- add_rarefaction_metrics(data = otu_df)
+
+  expect_s3_class(result, "data.frame")
+  expect_true(all(
+    c("read_num", "singleton_num", "goods_cov", "outlier") %in% names(result)
+  ))
+  expect_equal(nrow(result), nrow(otu_df))
+})
+
+test_that("add_rarefaction_metrics data.frame output has correct metric values", {
+  otu_df <- as.data.frame(
+    as(phyloseq::otu_table(bcse), "matrix")
+  )
+
+  result <- add_rarefaction_metrics(data = otu_df)
+
+  expect_true(all(result$read_num > 0))
+  expect_true(all(result$singleton_num >= 0))
+  expect_true(all(result$goods_cov >= 0 & result$goods_cov <= 100))
+})
+
+test_that("add_rarefaction_metrics rejects invalid input", {
+  expect_error(
+    add_rarefaction_metrics(data = matrix(1:10, nrow = 2)),
+    "phyloseq object or a data.frame"
+  )
 })
