@@ -2,7 +2,11 @@ test_that("1: Vignette test data structures are valid", {
   skip_on_cran()
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Test: Rarefied OTU table is correctly structured and has expected properties
   expect_true(
@@ -70,7 +74,11 @@ test_that("2: Vignette workflow produces consistent results", {
   skip_if_not_installed("viridis")
 
   # Load reference data from saved vignette run
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Run the vignette workflow step by step
   library(phyloseq)
@@ -248,7 +256,11 @@ test_that("3: Vignette core distribution plots are consistent", {
   skip_if_not_installed("viridis")
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Recreate necessary objects for plotting
   data("bcse", package = "BRCore")
@@ -380,7 +392,11 @@ test_that("4: Vignette neutral model fitting is consistent", {
   skip_if_not_installed("tidyverse")
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Recreate necessary objects
   data("bcse", package = "BRCore")

@@ -174,8 +174,13 @@ test_vignette_data <- list(
 
 # Save the test data
 output_file <- "tests/testthat/test_sets/test_vignette_data.rda"
-cat(paste0("Saving to ", output_file, "...\n"))
-save(test_vignette_data, file = output_file)
+out_path <- getOption(
+  "brcore_test_data_path",
+  default = output_file
+)
+
+cat(paste0("Saving to ", out_path, "...\n"))
+save(test_vignette_data, file = out_path)
 
 cat("\n=== Done! ===\n")
 cat("Reference data has been regenerated.\n")
