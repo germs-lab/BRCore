@@ -13,5 +13,5 @@ if (nzchar(Sys.getenv("CI"))) {
     test_path("test_sets/test_vignette_data.rda")
   )
   options(brcore_test_data_path = rda_path)
-  source(rda_path, local = TRUE)
+  source(test_path("test_sets/regenerate_test_data.R"), local = TRUE)
 }
