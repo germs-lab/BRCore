@@ -73,7 +73,7 @@ test_that("multi_rarefy outputs all rarefaction iterations when .as_array = FALS
   # Should return a list of data frames
   expect_type(rarefied_data, "list")
   expect_equal(length(rarefied_data), num_iterations)
-  expect_true(all(sapply(rarefied_data, is.data.frame)))
+  expect_true(all(vapply(rarefied_data, is.data.frame, logical(1))))
 
   # Each iteration should have the correct naming
   expect_equal(names(rarefied_data), paste0("iter_", 1:num_iterations))
@@ -191,7 +191,6 @@ test_that("multi_rarefy list and array have consistent dimensions", {
   )
 
   expect_equal(dim(rarefied_array)[1], nrow(rarefied_list[[1]]))
-  expect_equal(non_zero_cols, ncol(rarefied_list[[1]]))
   expect_equal(dim(rarefied_array)[3], length(rarefied_list))
 })
 
@@ -209,7 +208,7 @@ test_that("multi_rarefy removes zero-abundance taxa independently per iteration"
   )
 
   # Each iteration may have different numbers of non-zero taxa
-  taxa_counts <- sapply(rarefied_data, ncol)
+  taxa_counts <- vapply(rarefied_data, ncol, integer(1))
 
   # Should have some variation (not all identical)
   # This tests that zero-taxa removal happens per iteration

@@ -49,7 +49,7 @@
 #'   set_seed = 7642
 #' )
 #'
-#' rowSums(otu_table_rare)
+#' rowSums(otu_table_rare[[1]])
 #' }
 #'
 #' @export
@@ -187,7 +187,7 @@ multi_rarefy <- function(
     removed_samples <- setdiff(original_sample_ids, rownames(otu_mat))
     n_taxa_removed <- n_taxa - dim(processed_data)[2]
   } else {
-    n_taxa_after <- min(sapply(processed_data, ncol))
+    n_taxa_after <- min(vapply(processed_data, ncol, integer(1)))
 
     n_samples_after <- nrow(processed_data[[1]])
     n_samples_removed <- n_samples_before - n_samples_after
@@ -200,7 +200,7 @@ multi_rarefy <- function(
 
     n_taxa_removed <- n_taxa_before - n_taxa_after
 
-    avg_taxa_removed <- mean(sapply(processed_data, ncol))
+    avg_taxa_removed <- mean(vapply(processed_data, ncol, double(1)))
   }
   .report_rarefaction_results(
     n_samples_removed = n_samples_removed,
@@ -228,14 +228,26 @@ multi_rarefy <- function(
 #' @keywords internal
 .sparsity_count <- function(dataframe) {
   if (inherits(dataframe, "list")) {
-    min_zeros <- min(sapply(dataframe, function(df) sum(df == 0)))
-    min_total <- min(sapply(dataframe, function(df) nrow(df) * ncol(df)))
+    min_zeros <- min(vapply(dataframe, function(df) sum(df == 0), integer(1)))
+    min_total <- min(vapply(
+      dataframe,
+      function(df) nrow(df) * ncol(df),
+      integer(1)
+    ))
 
-    max_zeros <- max(sapply(dataframe, function(df) sum(df == 0)))
-    max_total <- max(sapply(dataframe, function(df) nrow(df) * ncol(df)))
+    max_zeros <- max(vapply(dataframe, function(df) sum(df == 0), integer(1)))
+    max_total <- max(vapply(
+      dataframe,
+      function(df) nrow(df) * ncol(df),
+      integer(1)
+    ))
 
-    avg_zeros <- mean(sapply(dataframe, function(df) sum(df == 0)))
-    avg_total <- mean(sapply(dataframe, function(df) nrow(df) * ncol(df)))
+    avg_zeros <- mean(vapply(dataframe, function(df) sum(df == 0), double(1)))
+    avg_total <- mean(vapply(
+      dataframe,
+      function(df) nrow(df) * ncol(df),
+      double(1)
+    ))
   } else {
     original_zeros <- sum(dataframe == 0)
     original_total <- nrow(dataframe) * ncol(dataframe)
@@ -392,11 +404,11 @@ multi_rarefy <- function(
     cli::cli_end()
   } else {
     summary_stats <- list(
-      min_taxa = min(sapply(processed_data, ncol)),
-      max_taxa = max(sapply(processed_data, ncol)),
-      avg_taxa = mean(sapply(processed_data, ncol)),
-      min_samples = min(sapply(processed_data, nrow)),
-      max_samples = max(sapply(processed_data, nrow))
+      min_taxa = min(vapply(processed_data, ncol, integer(1))),
+      max_taxa = max(vapply(processed_data, ncol, integer(1))),
+      avg_taxa = mean(vapply(processed_data, ncol, double(1))),
+      min_samples = min(vapply(processed_data, nrow, integer(1))),
+      max_samples = max(vapply(processed_data, nrow, integer(1)))
     )
 
     cli::cli_alert_success(

@@ -56,7 +56,7 @@ otu_table_rare <- multi_rarefy(
   set_seed = 7642
 )
 
-rowSums(otu_table_rare)
+rowSums(otu_table_rare[[1]])
 }
 
 }

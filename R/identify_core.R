@@ -465,7 +465,6 @@ identify_core <- function(
 #'     \item \code{values}: A numeric vector of Bray-Curtis dissimilarity values for each sample pair.
 #'     \item \code{names}: A character vector of pairwise sample names (e.g., "Sample1-Sample2").
 #'   }
-#' @import utils
 #' @export
 #'
 #' @noRd

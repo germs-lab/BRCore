@@ -22,7 +22,7 @@
 #' library(phyloseq)
 #' library(BRCore)
 #' # Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
-#' bcse_filt <- bcse %>%
+#' bcse_filt <- bcse |>
 #' subset_samples(Crop %in% c("Poplar", "Switchgrass"))
 #' bcse_rarefied_otutable_filt <-
 #'  multi_rarefy(
@@ -39,7 +39,7 @@
 #'    q        = 1,
 #'    group_var = "Crop",
 #'    group_color = "Plot"
-#') + scale_color_viridis_d(option = "turbo")
+#')
 #' }
 #'
 #' @export
@@ -50,12 +50,14 @@ plot_variance_propagation <- function(
   group_var,
   group_color
 ) {
+  # Validate inputs
+  .phyloseq_class_check(physeq_obj)
   .validate_group_vars(physeq_obj, group_var, group_color)
 
   cli::cli_h1("Rarefaction Variance Propagation Visualization")
 
   # Extract raw OTU
-  .phyloseq_class_check(physeq_obj)
+
   otu_raw <- .extract_otu_matrix(physeq_obj, samples_as_rows = TRUE)
 
   metadata <- data.frame(phyloseq::sample_data(physeq_obj))
@@ -92,9 +94,13 @@ plot_variance_propagation <- function(
   iter_list <- .get_iter_list(rarefied)
 
   # Check rarefied depth
-  rarefied_depths <- sapply(iter_list, function(mat) {
-    rowSums(as.matrix(mat))[1]
-  })
+  rarefied_depths <- vapply(
+    iter_list,
+    function(mat) {
+      rowSums(as.matrix(mat))[1]
+    },
+    double(1)
+  )
   rare_df <- lapply(seq_along(iter_list), function(i) {
     mat <- as.matrix(iter_list[[i]])
 
@@ -113,7 +119,7 @@ plot_variance_propagation <- function(
     mutate(raw_df, iter = NA_integer_),
     mutate(rare_df, iter = rep(seq_len(n_iter), each = length(common_samples)))
   ) |>
-    mutate(method = factor(method, levels = c("Raw", "Rarefied"))) |>
+    mutate(method = factor(.data$method, levels = c("Raw", "Rarefied"))) |>
     left_join(
       metadata[, c("sample_id", group_var, group_color)],
       by = "sample_id"
@@ -121,10 +127,10 @@ plot_variance_propagation <- function(
 
   p <- ggplot(
     all_df,
-    aes(x = .data[[group_var]], y = value, color = .data[[group_color]])
+    aes(x = .data[[group_var]], y = .data$value, color = .data[[group_color]])
   ) +
     geom_jitter(width = 0.15, height = 0, alpha = 0.7, size = 0.8) +
-    facet_wrap(~method) +
+    facet_wrap(~ .data$method) +
     theme_classic() +
     theme(
       strip.text = element_text(size = 10, face = "bold"),
@@ -162,9 +168,9 @@ plot_variance_propagation <- function(
       } else {
         switch(
           q,
-          "richness" = "Observed Richness  ≡ (q = 0)",
-          "shannon" = "Shannon Diversity ≡ (q = 1)",
-          "simpson" = "Simpson Diversity ≡ (q = 2)",
+          "richness" = "Observed Richness",
+          "shannon" = "Shannon Diversity Index",
+          "simpson" = "Simpson Diversity Index",
           paste0("Hill number ", q)
         )
       }

@@ -28,7 +28,7 @@ This function evaluate the variance generated during multiple rarefaction by plo
 library(phyloseq)
 library(BRCore)
 # Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
-bcse_filt <- bcse \%>\%
+bcse_filt <- bcse |>
 subset_samples(Crop \%in\% c("Poplar", "Switchgrass"))
 bcse_rarefied_otutable_filt <-
  multi_rarefy(
@@ -45,7 +45,7 @@ plot_variance_propagation(
    q        = 1,
    group_var = "Crop",
    group_color = "Plot"
-) + scale_color_viridis_d(option = "turbo")
+)
 }
 
 }
