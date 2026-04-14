@@ -148,10 +148,12 @@ identify_core <- function(
 
   if (is_rarefied) {
     depth_level <- round(min_sum) # Use rounded value for display
-    cli::cli_alert_info("otu_table() is rarefied at a depth of: {depth_level}")
+    cli::cli_alert_info(
+      "otu_table() is rarefied at a depth of: {.val {depth_level}}"
+    )
   } else {
     cli::cli_alert_warning(
-      "The otu_table() is not rarefied! \n Using depth_level={depth_level} for normalization in BC calculations. \n Consider rarefying your data or adjusting depth_level accordingly."
+      "The otu_table() is not rarefied! \n Using depth_level={.val {depth_level}} for rarefaction and normalization in Bray-Curtis calculations. \n Adjust depth_level according to your objectives."
     )
   }
 
