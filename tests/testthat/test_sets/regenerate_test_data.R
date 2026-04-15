@@ -181,6 +181,7 @@ if (nzchar(Sys.getenv("CI"))) {
 } else {
   out_path <- "tests/testthat/test_sets/test_vignette_data.rda"
 }
+dir.create(dirname(out_path), recursive = TRUE, showWarnings = FALSE)
 
 cat(paste0("Saving to ", out_path, "...\n"))
 save(test_vignette_data, file = out_path)
