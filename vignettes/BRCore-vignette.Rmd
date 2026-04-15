@@ -1,6 +1,12 @@
 ---
 title: "Introduction to BRCore"
-output: rmarkdown::html_vignette
+author: "By Bolívar Aponte Rolón and Gian Maria Niccolo Benucci"
+date: "Last modified: 13 April, 2026"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+
 vignette: >
   %\VignetteIndexEntry{Introduction to BRCore}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,35 +26,20 @@ link-citations: true
 }
 </style>
 
-# Load R libraries
+## Load R libraries
 
 
 ``` r
-library(BRCore)
-
-if (requireNamespace("phyloseq", quietly = TRUE)) {
-  library(phyloseq)
-} else {
-  message("Package 'phyloseq' not installed; some examples will be skipped.")
-}
-
-if (requireNamespace("tidyverse", quietly = TRUE)) {
-  library(tidyverse)
-} else {
-  message(
-    "Package 'tidyverse' not installed; some code chunks will be skipped or use base R."
+invisible(
+  lapply(
+    c("BRCore", "phyloseq", "tidyverse", "viridis"),
+    library,
+    character.only = TRUE
   )
-}
-
-if (requireNamespace("viridis", quietly = TRUE)) {
-  library(viridis)
-} else {
-  message(
-    "Package 'viridis' not installed; some code chunks will be skipped or use base R."
-  )
-}
+)
 ```
 
+## Datasets included
 The `BRCore` R package comes with a few datasets. Three 16S datasets: `switchgrass`, 
 `mimulus`, and `bean`, from @Shade2019Abundance; a 16S dataset, called `bcse`, from leaves 
 of ten different cropping systems in the Bioenergy Crop Research Experiment 
@@ -94,7 +85,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x556b76193820> 
+#>   .. .. .. .. .. ..$ :<environment: 0x62ac2e48d1e8> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -108,8 +99,9 @@ str(bcse)
 #>   .. .. ..@ metadata       : list()
 ```
 
-# Preprocessing
+# Data Exploration and Parameter Selection for Core Identification
 
+## Rarefaction metrics and visualization
 We are not going to talk about the importance of rarefaction as it is not the goal
 of this vignette, but if you are interested you should read @Schloss2024Rarefaction, 
 @Schloss2024Waste, @Hong2022Rarefy, and @Weiss2017Normalization as a start.
@@ -139,14 +131,8 @@ bcse_metrics
 ``` r
 rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Processing 50 samples
-#> 
-ℹ Generating rarefaction diagnostic plots
-
-                                         
-✔ Rarefaction diagnostic plots generated successfully
-#> ℹ Generating rarefaction diagnostic plots
-
-✔ Generating rarefaction diagnostic plots [813ms]
+#> ℹ Generating rarefaction diagnostic plots                                         ✔ Rarefaction diagnostic plots generated successfully
+#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [749ms]
 print(rarefaction_plot)
 ```
 
@@ -168,92 +154,132 @@ are from common taxa, suggesting sufficient sampling, while low coverage indicat
 many rare, potentially missed, taxa. 
 </div>
 
-# Perform mutiple rarefaction
-
+## Rarefy the data and explore variance propagation
 The best way to rarefy your data is to use the multiple rarefaction approach. Originally
 developed by Sanders in 1968 it has been adopted widely in ecology research. 
 
 
 ``` r
-bcse_rarefied_otutable <-
+bcse_rarefied_list <-
   multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 100,
-    threads = 8,
+    num_iter = 10,
+    .as_array = FALSE,
     set_seed = 7642
   )
-#> Seed used: 7642
+#> 
+#> ── Multiple Rarefaction ────────────────────────────────────────────────────────────────────────────────
+#> 
+#> ── Input Validation ──
+#> 
+#> ✔ Input phyloseq object is valid!
+#> ℹ Seed: 7642
+#> ℹ Input (matrix/df dim): 47 samples x 2861 taxa
+#> ℹ Rarefaction depth: 1000
+#> ℹ Iterations: 10
+#> ℹ taxa_are_rows: TRUE
+#> ℹ OTU matrix/df rownames head: bcse50, bcse69, bcse73, bcse191, bcse82, bcse102
+#> ℹ OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78
+#> ℹ Row sums summary: Min=1193, Max=107643, Median=25209
+#> 
+#> ── Rarefaction Results ──
+#> 
+#> ── Sample Removal
+#> ! 3 samples removed (depth < 1000)
+#> ! Samples removed: "bcse108, bcse105, bcse110"
+#> 
+#> ── Taxa Removal
+#> ℹ Original taxa input: 2861
+#> ! Max: 1822 taxa removed (zero abundance) in viable samples (depth_level >= 1000).
+#> ! When using `.as_array = FALSE`, taxa removed may differ across iterations.
+#> 
+#> ── Data Sparsity
+#> ℹ Returning list of data frames for each iteration.
+#>   • Rarefied matrix (across 10 iterations):
+#>     • Min: 44988 zeros (92.13% sparsity) out of 48833 entries
+#>     • Max: 47965 zeros (92.52% sparsity) out of 51841 entries
+#>     • Avg: 46579.7 zeros (92.36% sparsity) out of 50431 entries
+#> 
+#> ── Final Data Dimensions
+#> ✔ Output: 10 iterations with 50 unique samples
+#>   • Samples per iteration:
+#>     • Min: 47
+#>     • Max: 47
+#>   • Non-zero taxa per iteration:
+#>     • Min: 1039
+#>     • Max: 1103
+#>     • Avg: 1073
 ```
 
 We can then inspect that everything looks good before going further.
 
 
 ``` r
-rowSums(bcse_rarefied_otutable)
-#> bcse100 bcse101 bcse102 bcse103 bcse104 bcse106 bcse107 bcse109 bcse111 bcse191 bcse192  bcse49  bcse50  bcse51  bcse57 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse58  bcse59  bcse61  bcse62  bcse63  bcse65  bcse66  bcse67  bcse68  bcse69  bcse70  bcse71  bcse72  bcse73  bcse75 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse76  bcse77  bcse78  bcse79  bcse80  bcse81  bcse82  bcse83  bcse85  bcse86  bcse87  bcse88  bcse95  bcse96  bcse97 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse98  bcse99 
-#>    1000    1000
-bcse_rarefied_otutable[1:10, 1:10]
-#>         OTU_427 OTU_11 OTU_253 OTU_148  OTU_3 OTU_78 OTU_58 OTU_152 OTU_16 OTU_35
-#> bcse100     0.0   0.00       0   10.91 191.70   0.00   0.00    0.00   1.18      0
-#> bcse101     0.0   0.00       0    0.00 146.35   0.00   0.00    0.00   0.24      0
-#> bcse102     0.0   0.00       0    0.00  99.65   0.00   0.00    0.00   0.14      0
-#> bcse103     0.0   0.09       0    0.00 121.97   0.00   0.00    0.00   0.28      0
-#> bcse104     0.0   0.00       0    0.08  76.69   0.00   0.00    0.00   1.19      0
-#> bcse106     0.0   0.00       0    1.46 335.31   0.00   0.00    0.00   0.00      0
-#> bcse107     0.6   0.62       0    0.61 166.35   3.02   3.63    0.61   1.69      0
-#> bcse109     0.0   0.32       0    0.65 170.70   0.26   0.00    0.00   4.41      0
-#> bcse111     0.0   0.00       0    0.15 201.20   0.00   0.00    0.00   0.16      0
-#> bcse191     0.0   0.00       0    7.39 248.33   0.00   0.00    0.00   0.24      0
+rowSums(bcse_rarefied_list)
+#> Error in rowSums(bcse_rarefied_list): 'x' must be an array of at least two dimensions
+bcse_rarefied_list[1:10, 1:10]
+#> Error in bcse_rarefied_list[1:10, 1:10]: incorrect number of dimensions
 ```
 
-### Recreate a phyloseq object with rarefied `otu_table()` 
+Now let's see how much variance we have across the 10 iterations of rarefaction. We can use the `plot_rarefaction_variance()` function to visualize this variance in Alpha diversity across samples and iterations and compare rarefied vs. non-rarefied data (raw).
 
-We can then use the `do_phyloseq()` function to replace the `otu_table()` with the 
-rarefied table you just created. Or, you can create a new object with rarefied table
-calculated before.
+``` r
+rarefaction_variance_plot <- plot_variance_propagation(
+  physeq_obj = bcse,
+  rarefied = bcse_rarefied_list,
+  q = 0,
+  group_var = "Crop",
+  group_color = "Plot"
+)
+#> 
+#> ── Rarefaction Variance Propagation Visualization ──────────────────────────────────────────────────────
+#> ✔ Input phyloseq object is valid!
+#> ℹ Hill number order selected, q= 0
+#> ℹ Number of rarefaction iterations, n_iter= 10
+#> ℹ Comparison plot generated!
+rarefaction_variance_plot
+```
+
+![plot of chunk fig2_rarefaction_variance](images/fig2_rarefaction_variance-1.png)
+
+**Figure 2** Variance in Alpha diversity across 10 iterations of rarefaction. Poinst represent samples. The x-axis represent the grouping variable, in this case "Crop". The y-axis represent the Alpha diversity (q = 0, i.e. richness) of the samples. The color of the points represent the "Plot" variable, which is a nested variable within "Crop".
+
+Once you have observed the plot_rarefaction_metrics and plot_variance_propagation, you can decide if the rarefaction depth is good for your data and if the variance across iterations is acceptable for your analysis. You will need this cut-off for `identify_core()` function, so make sure to choose a depth that retains enough samples and diversity while minimizing variance across iterations. 
+
+### OPTIONAL: Recreate a phyloseq object with rarefied `otu_table()` 
+
+The main function of this package, `identify_core()`, handles the iterations and rareactions internally, so it can be used with the original phyloseq object. The results from `multi_rarefy()` and `add_rarefaction_metrics()` and `plot_rarefaction_metrics()` are meant to explor and inform the chosen parameters for `identify_core()`. Alternatively, you can update the OTU/ASV in your phyloseq object with a specific rarefied iteration from `multi_rarefy()` and perform the analyses with this new object. The choice is up to you and depends on your preferences and the specific goals of your analysis.
+
+The `update_otu_table()` function allows for replacing the `otu_table()` with the rarefied table you prefer.
 
 
 ``` r
-bcse_rare <-
-  update_otu_table(physeq = bcse, otu_rare = bcse_rarefied_otutable)
-#> Sample names from the original phyloseq object (otu_table):
-#>  [1] "bcse50"  "bcse69"  "bcse73"  "bcse191" "bcse82"  "bcse102" "bcse111" "bcse86"  "bcse97"  "bcse88"  "bcse104"
-#> [12] "bcse108" "bcse81"  "bcse77"  "bcse78"  "bcse96"  "bcse66"  "bcse57"  "bcse75"  "bcse101" "bcse192" "bcse98" 
-#> [23] "bcse105" "bcse106" "bcse76"  "bcse103" "bcse51"  "bcse63"  "bcse68"  "bcse109" "bcse65"  "bcse58"  "bcse107"
-#> [34] "bcse62"  "bcse59"  "bcse99"  "bcse49"  "bcse85"  "bcse79"  "bcse72"  "bcse80"  "bcse71"  "bcse110" "bcse95" 
-#> [45] "bcse67"  "bcse61"  "bcse100" "bcse87"  "bcse83"  "bcse70"
-#> Sample names in the rarefied OTU table (data.frame) after reordering to match phyloseq:
-#>  [1] "bcse50"  "bcse69"  "bcse73"  "bcse191" "bcse82"  "bcse102" "bcse111" "bcse86"  "bcse97"  "bcse88"  "bcse104"
-#> [12] "NA"      "bcse81"  "bcse77"  "bcse78"  "bcse96"  "bcse66"  "bcse57"  "bcse75"  "bcse101" "bcse192" "bcse98" 
-#> [23] "NA.1"    "bcse106" "bcse76"  "bcse103" "bcse51"  "bcse63"  "bcse68"  "bcse109" "bcse65"  "bcse58"  "bcse107"
-#> [34] "bcse62"  "bcse59"  "bcse99"  "bcse49"  "bcse85"  "bcse79"  "bcse72"  "bcse80"  "bcse71"  "NA.2"    "bcse95" 
-#> [45] "bcse67"  "bcse61"  "bcse100" "bcse87"  "bcse83"  "bcse70"
-#> ! Phyloseq object and rarefied otu_tables sample names are NOT identical. Check below samples removed by rarefaction.
-#> ! Samples removed due to rarefaction: bcse108, bcse105, bcse110
-#> ✔ Analysis complete!
-
-print(bcse_rare)
+bcse_updated_rare <- update_otu_table(
+  physeq_obj = bcse,
+  rarefied_otus = bcse_rarefied_list,
+  iteration = 1 # Speficify which iteration to use for the updated OTU table
+)
+#> ℹ Extracting iteration 1 from list of 10 iterations.
+#> ! Phyloseq object and rarefied otu_table sample names are NOT identical. Check samples removed by rarefaction below.
+#> ! 3 samples removed due to rarefaction: "bcse108, bcse105, bcse110"
+#> ℹ Building phyloseq object with 47 samples and 1046 taxa
+#> ✔ Update complete!
+print(bcse_updated_rare)
 #> phyloseq-class experiment-level object
-#> otu_table()   OTU Table:         [ 2723 taxa and 47 samples ]
+#> otu_table()   OTU Table:         [ 1046 taxa and 47 samples ]
 #> sample_data() Sample Data:       [ 47 samples by 3 sample variables ]
-#> tax_table()   Taxonomy Table:    [ 2723 taxa by 10 taxonomic ranks ]
-#> refseq()      DNAStringSet:      [ 2723 reference sequences ]
-sample_sums(bcse_rare)
-#>  bcse50  bcse69  bcse73 bcse191  bcse82 bcse102 bcse111  bcse86  bcse97  bcse88 bcse104  bcse81  bcse77  bcse78  bcse96 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse66  bcse57  bcse75 bcse101 bcse192  bcse98 bcse106  bcse76 bcse103  bcse51  bcse63  bcse68 bcse109  bcse65  bcse58 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#> bcse107  bcse62  bcse59  bcse99  bcse49  bcse85  bcse79  bcse72  bcse80  bcse71  bcse95  bcse67  bcse61 bcse100  bcse87 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse83  bcse70 
-#>    1000    1000
+#> tax_table()   Taxonomy Table:    [ 1046 taxa by 10 taxonomic ranks ]
+#> refseq()      DNAStringSet:      [ 1046 reference sequences ]
+sample_sums(bcse_updated_rare)
+#>  bcse50  bcse69  bcse73 bcse191  bcse82 bcse102 bcse111  bcse86  bcse97  bcse88 bcse104  bcse81  bcse77 
+#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
+#>  bcse78  bcse96  bcse66  bcse57  bcse75 bcse101 bcse192  bcse98 bcse106  bcse76 bcse103  bcse51  bcse63 
+#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
+#>  bcse68 bcse109  bcse65  bcse58 bcse107  bcse62  bcse59  bcse99  bcse49  bcse85  bcse79  bcse72  bcse80 
+#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
+#>  bcse71  bcse95  bcse67  bcse61 bcse100  bcse87  bcse83  bcse70 
+#>    1000    1000    1000    1000    1000    1000    1000    1000
 ```
 
 # Core analysis
@@ -265,26 +291,33 @@ variable we want to use to calculate the core, in this case is "Crop". The resul
 object will contain several metrics for the core set of ASV/OTUs calculated across
 the variable `Crop`.
 
+*We continue with the original phyloseq object for consistency with the vignette workflow.*
+
 
 ``` r
 bcse_rare_core <- identify_core(
-  physeq_obj = bcse_rare,
+  physeq_obj = bcse,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
+  depth_level = 1000,
+  num_iter = 10,
   seed = 2134
 )
 #> Seed used: 2134
 #> ✔ Input phyloseq object is valid!
-#> ℹ otu_table() is rarefied at a depth of: 1000
+#> ! The otu_table() is not rarefied! 
+#> Using depth_level=1000 for normalization in BC calculations. 
+#> Consider rarefying your data or adjusting depth_level accordingly.
 #> ✔ Core prioritizing variable: Crop
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2025-12-22 22:08:02.668628
-#> ✔ Elbow method identified 9 core OTUs
-#> ✔ % increase method identified 33 core OTUs
+#> ℹ Ranked by Index only.
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-13 16:19:21.97478
+#> ✔ Elbow method identified 2 core OTUs
+#> ✔ % increase method identified 21 core OTUs
 #> ✔ Analysis complete!
 ```
 
-### *How the is the core identified?*
+## *How the is the core identified?*
 
 As shown by @Shade2019Abundance, an interesting way explore the abundance and 
 occupancy inclusion thresholds used to define the core microbiome is to evaluate how 
@@ -329,52 +362,52 @@ The output is a list of 13 named items.
 ``` r
 str(bcse_rare_core)
 #> List of 13
-#>  $ bray_curtis_ranked : tibble [2,723 × 5] (S3: tbl_df/tbl/data.frame)
-#>   ..$ rank             : Factor w/ 2723 levels "1","10","100",..: 1 1112 1947 2058 2169 2280 2391 2502 2613 2 ...
-#>   ..$ MeanBC           : num [1:2723] 0.0749 0.0781 0.0894 0.105 0.1066 ...
-#>   ..$ proportionBC     : num [1:2723] 0.122 0.127 0.146 0.171 0.174 ...
-#>   ..$ IncreaseBC       : num [1:2723] 0 1.04 1.14 1.18 1.01 ...
-#>   ..$ elbow_slope_diffs: num [1:2723] -0.000198 0.001431 0.004644 0.007354 0.006155 ...
-#>  $ otu_ranked         :'data.frame':	2723 obs. of  8 variables:
-#>   ..$ otu    : chr [1:2723] "OTU_3" "OTU_116" "OTU_12" "OTU_21" ...
-#>   ..$ otu_occ: num [1:2723] 1 1 1 1 1 1 1 1 1 1 ...
-#>   ..$ otu_rel: num [1:2723] 0.21718 0.00453 0.01767 0.03347 0.00268 ...
-#>   ..$ sumF   : num [1:2723] 10 10 10 10 10 10 10 10 10 10 ...
-#>   ..$ sumG   : num [1:2723] 10 10 10 10 10 10 10 10 10 10 ...
-#>   ..$ nS     : int [1:2723] 20 20 20 20 20 20 20 20 20 20 ...
-#>   ..$ Index  : num [1:2723] 1 1 1 1 1 1 1 1 1 1 ...
-#>   ..$ rank   : num [1:2723] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ abundance_occupancy:'data.frame':	2723 obs. of  3 variables:
-#>   ..$ otu    : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   ..$ otu_occ: num [1:2723] 0.0851 0.4255 0.0426 0.7447 1 ...
-#>   ..$ otu_rel: num [1:2723] 2.66e-05 5.61e-04 4.89e-06 5.05e-03 2.17e-01 ...
+#>  $ bray_curtis_ranked : tibble [2,861 × 5] (S3: tbl_df/tbl/data.frame)
+#>   ..$ rank             : Factor w/ 2861 levels "1","10","100",..: 1112 2085 2196 2307 2418 2529 2640 2751 2 113 ...
+#>   ..$ MeanBC           : num [1:2861] 0.0672 0.1433 0.146 0.2007 0.2248 ...
+#>   ..$ proportionBC     : num [1:2861] 0.112 0.239 0.244 0.335 0.375 ...
+#>   ..$ IncreaseBC       : num [1:2861] 2.13 1.02 1.37 1.12 1.28 ...
+#>   ..$ elbow_slope_diffs: num [1:2861] -0.000186 0.037871 0.026107 0.033231 0.031392 ...
+#>  $ otu_ranked         :'data.frame':	2861 obs. of  8 variables:
+#>   ..$ otu    : chr [1:2861] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>   ..$ otu_occ: num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
+#>   ..$ otu_rel: num [1:2861] 0.21728 0.01799 0.03296 0.00278 0.05897 ...
+#>   ..$ sumF   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ sumG   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ nS     : int [1:2861] 20 20 20 20 20 20 20 20 20 20 ...
+#>   ..$ Index  : num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
+#>   ..$ rank   : num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
+#>  $ abundance_occupancy:'data.frame':	2861 obs. of  3 variables:
+#>   ..$ otu    : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ otu_occ: num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ otu_rel: num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...
 #>  $ priority_var       : chr "Crop"
 #>  $ abundance_weight   : num 0
-#>  $ elbow              : int 9
-#>  $ bc_increase        : int 33
+#>  $ elbow              : int 2
+#>  $ bc_increase        : int 21
 #>  $ increase_value     : num 0.02
-#>  $ elbow_core         : chr [1:9] "OTU_3" "OTU_116" "OTU_12" "OTU_21" ...
-#>  $ increase_core      : chr [1:33] "OTU_3" "OTU_116" "OTU_12" "OTU_21" ...
-#>  $ otu_table          : num [1:2723, 1:47] 0 0.01 0 0 257.1 ...
+#>  $ elbow_core         : chr [1:2] "OTU_3" "OTU_12"
+#>  $ increase_core      : chr [1:21] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>  $ otu_table          : int [1:2861, 1:50] 0 1 0 0 27777 0 7 2 119 0 ...
 #>   ..- attr(*, "dimnames")=List of 2
-#>   .. ..$ : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   .. ..$ : chr [1:47] "bcse50" "bcse69" "bcse73" "bcse191" ...
-#>  $ metadata           :'data.frame':	47 obs. of  4 variables:
-#>   ..$ Niche    : chr [1:47] "Leaf" "Leaf" "Leaf" "Leaf" ...
-#>   ..$ Crop     : chr [1:47] "Corn" "Sorghum" "Switchgrass" "Miscanthus" ...
-#>   ..$ Plot     : chr [1:47] "R2" "R4" "R5" "R5" ...
-#>   ..$ sample_id: chr [1:47] "bcse50" "bcse69" "bcse73" "bcse191" ...
-#>  $ taxonomy           :'data.frame':	2723 obs. of  10 variables:
-#>   ..$ OTU_ID   : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   ..$ Kingdom  : chr [1:2723] "Bacteria" "Bacteria" "Bacteria" "Bacteria" ...
-#>   ..$ Phylum   : chr [1:2723] "Myxococcota" "Actinobacteriota" "Proteobacteria" "Proteobacteria" ...
-#>   ..$ Class    : chr [1:2723] "Polyangia" "Actinobacteria" "Alphaproteobacteria" "Gammaproteobacteria" ...
-#>   ..$ Order    : chr [1:2723] "Polyangiales" "Streptomycetales" "Rhizobiales" "Enterobacterales" ...
-#>   ..$ Family   : chr [1:2723] "Polyangiaceae" "Streptomycetaceae" "Rhizobiaceae" "Enterobacteriaceae" ...
-#>   ..$ Genus    : chr [1:2723] "Aetherobacter" "Streptomyces" "Mesorhizobium" NA ...
-#>   ..$ Species  : chr [1:2723] "Uncultured_bacterium_3097" NA "Mesorhizobium_sophorae" NA ...
-#>   ..$ BestMatch: chr [1:2723] "Uncultured bacterium 3097" "Streptomyces" "Mesorhizobium sophorae" "Enterobacteriaceae" ...
-#>   ..$ Taxonomy : chr [1:2723] "OTU_427-Uncultured bacterium 3097" "OTU_11-Streptomyces" "OTU_253-Mesorhizobium sophorae" "OTU_148-Enterobacteriaceae" ...
+#>   .. ..$ : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   .. ..$ : chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...
+#>  $ metadata           :'data.frame':	50 obs. of  4 variables:
+#>   ..$ Niche    : chr [1:50] "Leaf" "Leaf" "Leaf" "Leaf" ...
+#>   ..$ Crop     : chr [1:50] "Corn" "Sorghum" "Switchgrass" "Miscanthus" ...
+#>   ..$ Plot     : chr [1:50] "R2" "R4" "R5" "R5" ...
+#>   ..$ sample_id: chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...
+#>  $ taxonomy           :'data.frame':	2861 obs. of  10 variables:
+#>   ..$ OTU_ID   : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ Kingdom  : chr [1:2861] "Bacteria" "Bacteria" "Bacteria" "Bacteria" ...
+#>   ..$ Phylum   : chr [1:2861] "Myxococcota" "Actinobacteriota" "Proteobacteria" "Proteobacteria" ...
+#>   ..$ Class    : chr [1:2861] "Polyangia" "Actinobacteria" "Alphaproteobacteria" "Gammaproteobacteria" ...
+#>   ..$ Order    : chr [1:2861] "Polyangiales" "Streptomycetales" "Rhizobiales" "Enterobacterales" ...
+#>   ..$ Family   : chr [1:2861] "Polyangiaceae" "Streptomycetaceae" "Rhizobiaceae" "Enterobacteriaceae" ...
+#>   ..$ Genus    : chr [1:2861] "Aetherobacter" "Streptomyces" "Mesorhizobium" NA ...
+#>   ..$ Species  : chr [1:2861] "Uncultured_bacterium_3097" NA "Mesorhizobium_sophorae" NA ...
+#>   ..$ BestMatch: chr [1:2861] "Uncultured bacterium 3097" "Streptomyces" "Mesorhizobium sophorae" "Enterobacteriaceae" ...
+#>   ..$ Taxonomy : chr [1:2861] "OTU_427-Uncultured bacterium 3097" "OTU_11-Streptomyces" "OTU_253-Mesorhizobium sophorae" "OTU_148-Enterobacteriaceae" ...
 #>  - attr(*, "class")= chr [1:2] "identify_core_result" "list"
 ```
 
@@ -398,9 +431,9 @@ bcse_identified_core <- plot_identified_core(
 print(bcse_identified_core)
 ```
 
-![plot of chunk fig2_identified_core](images/fig2_identified_core-1.png)
+![plot of chunk fig3_identified_core](images/fig3_identified_core-1.png)
 
-**Figure 2** Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. 
+**Figure 3** Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. 
 
 ### Visualize the abundance-occupancy curve 
 
@@ -421,9 +454,9 @@ plot_abund_occ_increase <- plot_abundance_occupancy(
 print(plot_abund_occ_increase)
 ```
 
-![plot of chunk fig3_plot_increase](images/fig3_plot_increase-1.png)
+![plot of chunk fig4_plot_increase](images/fig4_plot_increase-1.png)
 
-**Figure 3** Abundance-occupancy distribution and last 2% increase core set. 
+**Figure 4** Abundance-occupancy distribution and last 2% increase core set. 
 
 We can also visualize the core set detected with the `elbow` method.
 
@@ -443,9 +476,9 @@ plot_abund_occ_elbow +
 #> Adding another scale for fill, which will replace the existing scale.
 ```
 
-![plot of chunk fig4_plot_elbow](images/fig4_plot_elbow-1.png)
+![plot of chunk fig5_plot_elbow](images/fig5_plot_elbow-1.png)
 
-**Figure 4** Abundance-occupancy distribution and last elbow core set. 
+**Figure 5** Abundance-occupancy distribution and last elbow core set. 
 
 ### Visualize the core set across the variable used for detecting the core
 
@@ -475,9 +508,9 @@ plot_core_dist_bar <- plot_core_distribution(
 print(plot_core_dist_bar)
 ```
 
-![plot of chunk fig5_plot_type_bar](images/fig5_plot_type_bar-1.png)
+![plot of chunk fig6_plot_type_bar](images/fig6_plot_type_bar-1.png)
 
-**Figure 5** A bar plot won't work here, way too many variable levels.
+**Figure 6** A bar plot won't work here, way too many variable levels.
 
 
 ``` r
@@ -494,9 +527,9 @@ plot_core_dist_line <- plot_core_distribution(
 print(plot_core_dist_line)
 ```
 
-![plot of chunk fig6_plot_type_line](images/fig6_plot_type_line-1.png)
+![plot of chunk fig7_plot_type_line](images/fig7_plot_type_line-1.png)
 
-**Figure 6** A line plot may be a little better.
+**Figure 7** A line plot may be a little better.
 
 
 ``` r
@@ -549,9 +582,9 @@ plot_core_dist_heatmap <- plot_core_distribution(
 print(plot_core_dist_heatmap)
 ```
 
-![plot of chunk fig7_plot_type_heatmap](images/fig7_plot_type_heatmap-1.png)
+![plot of chunk fig8_plot_type_heatmap](images/fig8_plot_type_heatmap-1.png)
 
-**Figure 7** A heatmap, is definitely more compact and shows well enough the average 
+**Figure 8** A heatmap, is definitely more compact and shows well enough the average 
 occupancy across samples in each variable level.
 
 # Fitting Neutral Model 
@@ -582,8 +615,12 @@ bcse_rare_core_neutral_fit <- fit_neutral_model(
   abundance_occupancy = bcse_rare_core$abundance_occupancy
 )
 #> Waiting for profiling to be done...
-#> Waiting for profiling to be done...
-#> ✔ Analysis complete!
+#> ℹ Neutral model fitting:
+#> • Average individuals per community (N): 40276.38
+#> • Binomial model using rounded N: 40276
+#> • Poisson model using N: 40276.38
+#> • Maximum likelihood estimation using N: 40276.38, and starting parameters: mu = 0, sigma = 0.1
+#> ✔ Model fitting complete!
 ```
 
 What we get is
@@ -593,45 +630,45 @@ What we get is
 str(bcse_rare_core_neutral_fit)
 #> List of 2
 #>  $ goodness_of_fit :'data.frame':	1 obs. of  24 variables:
-#>   ..$ m         : num 0.63
-#>   ..$ m.ci      : num 0.0827
-#>   ..$ m.mle     : num 0.63
-#>   ..$ maxLL     : num -1790
-#>   ..$ binoLL    : num -2656
-#>   ..$ poisLL    : num -2657
-#>   ..$ Rsqr      : num 0.415
-#>   ..$ Rsqr.bino : num 0.607
-#>   ..$ Rsqr.pois : num 0.607
-#>   ..$ RMSE      : num 0.125
-#>   ..$ RMSE.bino : num 0.103
-#>   ..$ RMSE.pois : num 0.103
-#>   ..$ AIC       : num -3576
-#>   ..$ BIC       : num -3565
-#>   ..$ AIC.bino  : num -5309
-#>   ..$ BIC.bino  : num -5297
-#>   ..$ AIC.pois  : num -5309
-#>   ..$ BIC.pois  : num -5298
-#>   ..$ N         : num 1000
-#>   ..$ Samples   : num 47
-#>   ..$ Richness  : num 2723
-#>   ..$ Detect    : num 0.001
-#>   ..$ above.pred: num 0.246
-#>   ..$ below.pred: num 0.00992
-#>  $ model_prediction:'data.frame':	2723 obs. of  14 variables:
-#>   ..$ otu       : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   ..$ otu_occ   : num [1:2723] 0.0851 0.4255 0.0426 0.7447 1 ...
-#>   ..$ otu_rel   : num [1:2723] 2.66e-05 5.61e-04 4.89e-06 5.05e-03 2.17e-01 ...
-#>   ..$ membership: chr [1:2723] "Not core" "Not core" "Not core" "Not core" ...
-#>   ..$ p         : num [1:2723] 2.66e-05 5.61e-04 4.89e-06 5.05e-03 2.17e-01 ...
-#>   ..$ freq      : num [1:2723] 0.0851 0.4255 0.0426 0.7447 1 ...
-#>   ..$ freq.pred : num [1:2723] 0.00725 0.17879 0.00132 0.98128 1 ...
-#>   ..$ pred.lwr  : num [1:2723] 5.50e-04 9.50e-02 2.07e-05 8.93e-01 9.24e-01 ...
-#>   ..$ pred.upr  : num [1:2723] 0.0884 0.3111 0.078 0.997 1 ...
-#>   ..$ bino.pred : num [1:2723] 0.02625 0.42937 0.00488 0.99368 1 ...
-#>   ..$ bino.lwr  : num [1:2723] 0.005364 0.298538 0.000261 0.913188 0.924442 ...
-#>   ..$ bino.upr  : num [1:2723] 0.1187 0.5709 0.0843 0.9996 1 ...
-#>   ..$ y         : chr [1:2723] NA NA NA NA ...
-#>   ..$ fit_class : chr [1:2723] "As predicted" "Above prediction" "As predicted" "Below prediction" ...
+#>   ..$ m         : num 0.0205
+#>   ..$ m.ci      : num 0.00186
+#>   ..$ m.mle     : num 0.0205
+#>   ..$ maxLL     : num -2279
+#>   ..$ binoLL    : num -720
+#>   ..$ poisLL    : num -720
+#>   ..$ Rsqr      : num 0.528
+#>   ..$ Rsqr.bino : num -0.833
+#>   ..$ Rsqr.pois : num -0.833
+#>   ..$ RMSE      : num 0.109
+#>   ..$ RMSE.bino : num 0.215
+#>   ..$ RMSE.pois : num 0.215
+#>   ..$ AIC       : num -4554
+#>   ..$ BIC       : num -4542
+#>   ..$ AIC.bino  : num -1435
+#>   ..$ BIC.bino  : num -1423
+#>   ..$ AIC.pois  : num -1435
+#>   ..$ BIC.pois  : num -1423
+#>   ..$ N         : num 40276
+#>   ..$ Samples   : num 50
+#>   ..$ Richness  : num 2861
+#>   ..$ Detect    : num 2.48e-05
+#>   ..$ above.pred: num 0.165
+#>   ..$ below.pred: num 0.035
+#>  $ model_prediction:'data.frame':	2861 obs. of  14 variables:
+#>   ..$ otu       : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ otu_occ   : num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ otu_rel   : num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...
+#>   ..$ membership: chr [1:2861] "Not core" "Not core" "Not core" "Not core" ...
+#>   ..$ p         : num [1:2861] 3.48e-06 6.31e-05 2.48e-06 7.98e-03 2.54e-01 ...
+#>   ..$ freq      : num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ freq.pred : num [1:2861] 0.00951 0.16077 0.0068 1 1 ...
+#>   ..$ pred.lwr  : num [1:2861] 0.000953 0.083916 0.000514 0.928652 0.928652 ...
+#>   ..$ pred.upr  : num [1:2861] 0.088 0.286 0.0835 1 1 ...
+#>   ..$ bino.pred : num [1:2861] 0.1306 0.9211 0.0952 1 1 ...
+#>   ..$ bino.lwr  : num [1:2861] 0.0632 0.8131 0.0405 0.9287 0.9287 ...
+#>   ..$ bino.upr  : num [1:2861] 0.251 0.969 0.208 1 1 ...
+#>   ..$ y         : chr [1:2861] NA NA NA NA ...
+#>   ..$ fit_class : chr [1:2861] "As predicted" "Above prediction" "As predicted" "Below prediction" ...
 #>  - attr(*, "class")= chr [1:2] "fit_neutral_model" "list"
 ```
 
@@ -647,9 +684,9 @@ plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
 print(plot_bcse_neutral_fit)
 ```
 
-![plot of chunk fig8_plot_neutral_fit](images/fig8_plot_neutral_fit-1.png)
+![plot of chunk fig9_plot_neutral_fit](images/fig9_plot_neutral_fit-1.png)
 
-**Figure 8** Neutral model of abundance-occupancy distributions for the `bcse` 
+**Figure 9** Neutral model of abundance-occupancy distributions for the `bcse` 
 dataset. *R*^2^ is a standard r-square statistics of goodness of fit
 (*R*^2^ = 1 − SS~err~/SS~total~) while *m* is the immigration parameter and 
 represents the probability that a given individual in a sample originated from 
@@ -687,9 +724,10 @@ sessionInfo()
 #> BLAS/LAPACK: /usr/lib/libopenblas.so.0.3;  LAPACK version 3.12.0
 #> 
 #> locale:
-#>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8        LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8   
-#>  [6] LC_MESSAGES=C.UTF-8    LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C           LC_TELEPHONE=C        
-#> [11] LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
+#>  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8       
+#>  [4] LC_COLLATE=en_US.UTF-8     LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+#>  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+#> [10] LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 #> 
 #> time zone: America/Chicago
 #> tzcode source: system (glibc)
@@ -698,37 +736,45 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] BRCore_1.0.0      viridis_0.6.5     viridisLite_0.4.2 lubridate_1.9.4   forcats_1.0.0     stringr_1.6.0    
-#>  [7] dplyr_1.1.4       purrr_1.2.0       readr_2.1.5       tidyr_1.3.1       tibble_3.3.0      ggplot2_4.0.1    
-#> [13] tidyverse_2.0.0   phyloseq_1.54.0   here_1.0.1        knitr_1.50        devtools_2.4.5    usethis_3.1.0    
+#>  [1] BRCore_1.0.2      knitr_1.50        viridis_0.6.5     viridisLite_0.4.2 lubridate_1.9.4  
+#>  [6] forcats_1.0.0     stringr_1.6.0     dplyr_1.1.4       purrr_1.2.0       readr_2.1.5      
+#> [11] tidyr_1.3.1       tibble_3.3.0      ggplot2_4.0.1     tidyverse_2.0.0   phyloseq_1.54.0  
+#> [16] here_1.0.1        testthat_3.2.3    devtools_2.4.5    usethis_3.1.0    
 #> 
 #> loaded via a namespace (and not attached):
-#>   [1] RColorBrewer_1.1-3  sys_3.4.3           rstudioapi_0.17.1   jsonlite_2.0.0      magrittr_2.0.4     
-#>   [6] farver_2.1.2        rmarkdown_2.30      fs_1.6.6            vctrs_0.6.5         multtest_2.66.0    
-#>  [11] memoise_2.0.1       askpass_1.2.1       base64enc_0.1-3     rstatix_0.7.3       htmltools_0.5.9    
-#>  [16] curl_7.0.0          broom_1.0.11        Rhdf5lib_1.32.0     Formula_1.2-5       rhdf5_2.54.1       
-#>  [21] parallelly_1.45.1   desc_1.4.3          htmlwidgets_1.6.4   testthat_3.2.3      plyr_1.8.9         
-#>  [26] cachem_1.1.0        commonmark_1.9.2    igraph_2.2.1        mime_0.13           lifecycle_1.0.4    
-#>  [31] minpack.lm_1.2-4    iterators_1.0.14    pkgconfig_2.0.3     Matrix_1.7-2        R6_2.6.1           
-#>  [36] fastmap_1.2.0       rcmdcheck_1.4.0     shiny_1.10.0        digest_0.6.39       colorspace_2.1-2   
-#>  [41] ps_1.8.1            S4Vectors_0.48.0    rprojroot_2.0.4     pkgload_1.4.0       Hmisc_5.2-4        
-#>  [46] ggpubr_0.6.2        vegan_2.7-2         labeling_0.4.3      timechange_0.3.0    abind_1.4-8        
-#>  [51] mgcv_1.9-4          compiler_4.5.2      remotes_2.5.0       withr_3.0.2         htmlTable_2.4.3    
-#>  [56] S7_0.2.1            backports_1.5.0     carData_3.0-5       pkgbuild_1.4.6      ggsignif_0.6.4     
-#>  [61] MASS_7.3-64         openssl_2.3.2       sessioninfo_1.2.3   biomformat_1.38.0   ggsci_4.1.0        
-#>  [66] permute_0.9-8       tools_4.5.2         foreign_0.8-88      ape_5.8-1           httpuv_1.6.15      
-#>  [71] nnet_7.3-20         glue_1.8.0          callr_3.7.6         nlme_3.1-167        rhdf5filters_1.22.0
-#>  [76] promises_1.3.2      grid_4.5.2          checkmate_2.3.3     cluster_2.1.8       reshape2_1.4.5     
-#>  [81] ade4_1.7-23         generics_0.1.4      gtable_0.3.6        tzdb_0.4.0          data.table_1.17.8  
-#>  [86] hms_1.1.3           xml2_1.3.6          car_3.1-3           XVector_0.50.0      BiocGenerics_0.56.0
-#>  [91] ggrepel_0.9.6       foreach_1.5.2       pillar_1.11.1       later_1.4.1         splines_4.5.2      
-#>  [96] lattice_0.22-7      survival_3.8-3      tidyselect_1.2.1    Biostrings_2.78.0   miniUI_0.1.1.1     
-#> [101] gridExtra_2.3       IRanges_2.44.0      Seqinfo_1.0.0       stats4_4.5.2        xfun_0.54          
-#> [106] Biobase_2.70.0      credentials_2.0.2   brio_1.1.5          stringi_1.8.7       xopen_1.0.1        
-#> [111] evaluate_1.0.5      codetools_0.2-20    cli_3.6.5           rpart_4.1.24        xtable_1.8-4       
-#> [116] roxygen2_7.3.3      processx_3.8.5      gert_2.1.5          Rcpp_1.1.0          parallel_4.5.2     
-#> [121] ellipsis_0.3.2      prettyunits_1.2.0   profvis_0.4.0       urlchecker_1.0.1    scales_1.4.0       
-#> [126] crayon_1.5.3        rlang_1.1.6         cowplot_1.2.0
+#>   [1] splines_4.5.2       later_1.4.1         minpack.lm_1.2-4    rpart_4.1.24       
+#>   [5] lifecycle_1.0.4     rstatix_0.7.3       gert_2.1.5          rprojroot_2.0.4    
+#>   [9] processx_3.8.5      lattice_0.22-7      MASS_7.3-64         credentials_2.0.2  
+#>  [13] backports_1.5.0     magrittr_2.0.4      Hmisc_5.2-4         rmarkdown_2.30     
+#>  [17] remotes_2.5.0       httpuv_1.6.15       askpass_1.2.1       sessioninfo_1.2.3  
+#>  [21] pkgbuild_1.4.6      cowplot_1.2.0       RColorBrewer_1.1-3  ade4_1.7-23        
+#>  [25] abind_1.4-8         pkgload_1.4.0       BiocGenerics_0.56.0 nnet_7.3-20        
+#>  [29] IRanges_2.44.0      S4Vectors_0.48.0    ggrepel_0.9.6       vegan_2.7-2        
+#>  [33] parallelly_1.45.1   commonmark_1.9.2    permute_0.9-8       codetools_0.2-20   
+#>  [37] xml2_1.3.6          tidyselect_1.2.1    farver_2.1.2        stats4_4.5.2       
+#>  [41] base64enc_0.1-3     Seqinfo_1.0.0       roxygen2_7.3.3      diffobj_0.3.5      
+#>  [45] jsonlite_2.0.0      multtest_2.66.0     ellipsis_0.3.2      Formula_1.2-5      
+#>  [49] survival_3.8-3      iterators_1.0.14    systemfonts_1.2.1   foreach_1.5.2      
+#>  [53] tools_4.5.2         ragg_1.5.2          Rcpp_1.1.0          glue_1.8.0         
+#>  [57] gridExtra_2.3       xfun_0.54           mgcv_1.9-4          withr_3.0.2        
+#>  [61] fastmap_1.2.0       xopen_1.0.1         rhdf5filters_1.22.0 openssl_2.3.2      
+#>  [65] callr_3.7.6         digest_0.6.39       timechange_0.3.0    rcmdcheck_1.4.0    
+#>  [69] R6_2.6.1            mime_0.13           textshaping_1.0.0   colorspace_2.1-2   
+#>  [73] generics_0.1.4      ggsci_4.1.0         data.table_1.17.8   prettyunits_1.2.0  
+#>  [77] htmlwidgets_1.6.4   pkgconfig_2.0.3     gtable_0.3.6        S7_0.2.1           
+#>  [81] XVector_0.50.0      sys_3.4.3           brio_1.1.5          htmltools_0.5.9    
+#>  [85] carData_3.0-5       profvis_0.4.0       biomformat_1.38.0   scales_1.4.0       
+#>  [89] Biobase_2.70.0      rstudioapi_0.17.1   tzdb_0.4.0          reshape2_1.4.5     
+#>  [93] checkmate_2.3.3     nlme_3.1-167        curl_7.0.0          cachem_1.1.0       
+#>  [97] rhdf5_2.54.1        parallel_4.5.2      miniUI_0.1.1.1      foreign_0.8-88     
+#> [101] desc_1.4.3          pillar_1.11.1       grid_4.5.2          vctrs_0.6.5        
+#> [105] urlchecker_1.0.1    promises_1.3.2      ggpubr_0.6.2        car_3.1-3          
+#> [109] xtable_1.8-4        cluster_2.1.8       waldo_0.6.1         htmlTable_2.4.3    
+#> [113] evaluate_1.0.5      cli_3.6.5           compiler_4.5.2      rlang_1.1.6        
+#> [117] crayon_1.5.3        ggsignif_0.6.4      labeling_0.4.3      ps_1.8.1           
+#> [121] plyr_1.8.9          fs_1.6.6            stringi_1.8.7       Biostrings_2.78.0  
+#> [125] Matrix_1.7-2        hms_1.1.3           Rhdf5lib_1.32.0     shiny_1.10.0       
+#> [129] igraph_2.2.1        broom_1.0.11        memoise_2.0.1       ape_5.8-1
 ```
 
 # References

@@ -36,3 +36,71 @@ test_that("GlobalPatterns pipeline -> fit_neutral_model basic structure", {
     expect_silent(ggplot2::ggplot_build(p))
   }
 })
+
+test_that("fit_neutral_model errors on invalid otu_table type", {
+  expect_error(
+    fit_neutral_model(
+      otu_table = list(a = 1, b = 2),
+      core_set = "ASV1",
+      abundance_occupancy = data.frame(otu = "ASV1")
+    ),
+    "matrix or data.frame"
+  )
+})
+
+test_that("fit_neutral_model errors on NULL core_set", {
+  otu <- matrix(
+    1:12,
+    nrow = 3,
+    dimnames = list(
+      c("S1", "S2", "S3"),
+      c("ASV1", "ASV2", "ASV3", "ASV4")
+    )
+  )
+  expect_error(
+    fit_neutral_model(
+      otu_table = otu,
+      core_set = NULL,
+      abundance_occupancy = data.frame(otu = c("ASV1", "ASV2"))
+    ),
+    "non-empty character vector"
+  )
+})
+
+test_that("fit_neutral_model errors on empty core_set", {
+  otu <- matrix(
+    1:12,
+    nrow = 3,
+    dimnames = list(
+      c("S1", "S2", "S3"),
+      c("ASV1", "ASV2", "ASV3", "ASV4")
+    )
+  )
+  expect_error(
+    fit_neutral_model(
+      otu_table = otu,
+      core_set = character(0),
+      abundance_occupancy = data.frame(otu = c("ASV1", "ASV2"))
+    ),
+    "non-empty character vector"
+  )
+})
+
+test_that("fit_neutral_model errors when abundance_occupancy lacks 'otu' column", {
+  otu <- matrix(
+    1:12,
+    nrow = 3,
+    dimnames = list(
+      c("S1", "S2", "S3"),
+      c("ASV1", "ASV2", "ASV3", "ASV4")
+    )
+  )
+  expect_error(
+    fit_neutral_model(
+      otu_table = otu,
+      core_set = c("ASV1"),
+      abundance_occupancy = data.frame(taxon = c("ASV1", "ASV2"))
+    ),
+    "otu"
+  )
+})

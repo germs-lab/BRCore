@@ -31,27 +31,30 @@ test_rarefaction_plot <- plot_rarefaction_metrics(test_bcse_metrics)
 # Use single thread for consistency with test expectations
 cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(
-  physeq = bcse,
+  physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 100,
-  threads = 1, # Single thread for consistency with CI test configuration
+  num_iter = 10,
+  .as_array = FALSE,
   set_seed = 7642
 )
 
-# Step 5: Update OTU table
+# Step 5: Update OTU table (optional)
 cat("Updating OTU table...\n")
 test_bcse_rare <- update_otu_table(
-  physeq = bcse,
-  otu_rare = test_bcse_rarefied_otutable
+  physeq_obj = bcse,
+  rarefied_otus = test_bcse_rarefied_otutable,
+  iteration = 1
 )
 
 # Step 6: Identify core microbiome
 cat("Identifying core microbiome...\n")
 test_bcse_rare_core <- identify_core(
-  physeq_obj = test_bcse_rare,
+  physeq_obj = bcse,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
+  depth_level = 1000,
+  num_iter = 10,
   seed = 2134
 )
 
@@ -170,9 +173,18 @@ test_vignette_data <- list(
 )
 
 # Save the test data
-output_file <- "tests/testthat/test_sets/test_vignette_data.rda"
-cat(paste0("Saving to ", output_file, "...\n"))
-save(test_vignette_data, file = output_file)
+if (nzchar(Sys.getenv("CI"))) {
+  out_path <- getOption(
+    "brcore_test_data_path",
+    default = "tests/testthat/test_sets/test_vignette_data.rda"
+  )
+} else {
+  out_path <- "tests/testthat/test_sets/test_vignette_data.rda"
+}
+dir.create(dirname(out_path), recursive = TRUE, showWarnings = FALSE)
+
+cat(paste0("Saving to ", out_path, "...\n"))
+save(test_vignette_data, file = out_path)
 
 cat("\n=== Done! ===\n")
 cat("Reference data has been regenerated.\n")

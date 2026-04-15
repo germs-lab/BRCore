@@ -64,15 +64,14 @@ bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
 # Perform multiple rarefaction
 bcse_rarefied <- multi_rarefy(
-  physeq = bcse,
+  physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
-  threads = 4,
   set_seed = 7642
 )
 
 # Update phyloseq object with rarefied data
-bcse_rare <- update_otu_table(physeq = bcse, otu_rare = bcse_rarefied)
+bcse_rare <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied)
 
 # Identify core microbiome
 bcse_core <- identify_core(

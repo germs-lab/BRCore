@@ -3,33 +3,58 @@
 #' @description
 #' This function identifies core microbial taxa based on abundance-occupancy
 #' distributions and their contributions to Bray-Curtis similarity between
-#' biological samples. Core taxa are selected using either a "last % increase" or
-#' "elbow" method implementing the method developed by Shade
+#' biological samples. Core taxa are selected using either a "last % increase"
+#' or "elbow" method implementing the method developed by Shade
 #' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 #'
-#' @param physeq_obj A `phyloseq` object with at least `otu_table` and `sample_data`.
-#' @param priority_var The column name in the `sample_data` (e.g. "sampling_date", "site") that is used for prioritizing the core microbiome.
-#' @param increase_value Increase value (numeric, scalar) used in the calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
-#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative abundance in the ranking score. `0` (default) uses occupancy/composite only. `1` ranks purely by abundance. Values in between blend the two (e.g., abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
-#' @param max_otus Optional integer to limit analysis to the top N ranked OTUs. If NULL (default), all OTUs are analyzed. Useful for large datasets (>5000 OTUs)
+#' @param physeq_obj A `phyloseq` object with at least `otu_table` and
+#' `sample_data`.
+#' @param priority_var The column name in the `sample_data` (e.g.
+#' sampling_date", "site") that is used for prioritizing the core microbiome.
+#' @param increase_value Increase value (numeric, scalar) used in the
+#' calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
+#' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
+#' abundance in the ranking score. `0` (default) uses occupancy/composite only.
+#' `1` ranks purely by abundance. Values in between blend the two (e.g.,
+#' abundance_weight = 0.3 gives 70% occupancy/composite + 30% abundance).
+#' @param max_otus Optional integer to limit analysis to the top N ranked OTUs.
+#' If NULL (default), all OTUs are analyzed. Useful for large datasets
+#' (>5000 OTUs)
+#' @param depth_level Integer. The sequencing depth used for normalization in
+#' Bray-Curtis calculations. If data is rarefied, this is automatically set
+#' to the rarefaction depth. For unrarefied data, samples with depth below
+#' this threshold are excluded from pairwise comparisons.
+#' @param num_iter Integer. Number of subsampling iterations used when
+#' calculating average dissimilarity for unrarefied data (default 100).
+#' Ignored if data is already rarefied.
 #' @param seed Optional integer to set the RNG seed for reproducibility.
 #'
 #' @return A list with:
 #' \itemize{
-#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis similarity across sample pairs (`MeanBC`) at each cumulative `rank`, normalized proportion
-#'   (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric (`elbow_slope_diffs`).
+#'   \item \code{bray_curtis_ranked} tibble with `rank`, mean Bray-Curtis
+#'  similarity across sample pairs (`MeanBC`) at each cumulative `rank`,
+#'  normalized proportion (`proportionBC`), the multiplicative `IncreaseBC`,
+#' and the elbow metric (`elbow_slope_diffs`).
+#' (`proportionBC`), the multiplicative `IncreaseBC`, and the elbow metric
+#' (`elbow_slope_diffs`).
 #'   \item \code{otu_ranked} tibble with ranked OTU/ASVs .
 #'   \item \code{abundance_occupancy} tibble with OTU/ASVs names, occupancy
 #'      (`otu_occ`), and mean relative abundance (`otu_rel`).
-#'   \item \code{priority_var} character, the variable used for prioritizing the core.
+#'   \item \code{priority_var} character, the variable used for prioritizing
+#' the core.
 #'   \item \code{elbow} core set identified by elbow method (integer).
-#'   \item \code{bc_increase} core set identified by last % BC-increase (integer).
-#'   \item \code{increase_value} increase value (numeric, scalar) used in the calculation (e.g. 0.02).
-#'   \item \code{elbow_core} core OTU/ASVs using elbow method (character vector).
-#'   \item \code{increase_core} core OTU/ASVs using last % BC-increase method (character vector).
+#'   \item \code{bc_increase} core set identified by last % BC-increase
+#' (integer).
+#'   \item \code{increase_value} increase value (numeric, scalar) used in the
+#' calculation (e.g. 0.02).
+#'   \item \code{elbow_core} core OTU/ASVs using elbow method (character
+#' vector).
+#'   \item \code{increase_core} core OTU/ASVs using last % BC-increase method
+#'  (character vector).
 #'   \item \code{otu_table} otu_table counts (otu x samples) used (data.frame).
 #'   \item \code{sample_metadata} samples metadata (data.frame).
-#'   \item \code{taxonomy_table} taxonomy if present (data.frame); otherwise NULL.
+#'   \item \code{taxonomy_table} taxonomy if present (data.frame); otherwise
+#'  NULL.
 #' }
 #'
 #' @details
@@ -57,7 +82,8 @@
 #'
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy
 #' distributions to prioritize plant core microbiome membership. Current
-#' Opinion in Microbiology, 49:50-58 DOI:https://doi.org/10.1016/j.mib.2019.09.008
+#' Opinion in Microbiology, 49:50-58
+#' doi:https://doi.org/10.1016/j.mib.2019.09.008
 #'
 #' @section Dependencies:
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
@@ -76,7 +102,8 @@
 #' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
-#' # Example using your switchgrass phyloseq object and grouping variable 'sampling_date'
+#' # Example using your switchgrass phyloseq object and grouping variable
+#' # 'sampling_date'
 #' data("switchgrass", package = "BRCore")
 #'
 #' res <- identify_core(
@@ -97,9 +124,11 @@ identify_core <- function(
   increase_value = 0.02,
   abundance_weight = 0,
   max_otus = NULL,
+  depth_level = 1000,
+  num_iter = 100,
   seed = NULL
 ) {
-  # input checks ---------------------------------
+  # input checks ----
   cli::cli_text("\nSeed used: {seed}\n")
 
   if (is.null(seed)) {
@@ -108,29 +137,27 @@ identify_core <- function(
     set.seed(seed)
   }
 
-  if (!inherits(physeq_obj, "phyloseq")) {
-    cli::cli_abort(
-      "{.arg physeq_obj} must be a 'phyloseq' object.\nYou've supplied a {class(physeq_obj)[1]} vector."
-    )
-  }
+  .phyloseq_class_check(physeq_obj)
 
-  cli::cli_alert_success("Input phyloseq object is valid!")
-
-  # define arguments ---------------------------------
+  # define arguments ----
 
   # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))
+  is_rarefied <- abs(min_sum - max_sum) < 1e-6
 
-  if (abs(min_sum - max_sum) < 1e-6) {
-    nReads <- round(min_sum) # Use rounded value for display
-    cli::cli_alert_info("otu_table() is rarefied at a depth of: {nReads}")
+  if (is_rarefied) {
+    depth_level <- round(min_sum) # Use rounded value for display
+    cli::cli_alert_info(
+      "otu_table() is rarefied at a depth of: {.val {depth_level}}"
+    )
   } else {
-    stop("The otu_table() is not rarefied!")
+    cli::cli_alert_warning(
+      "The otu_table() is not rarefied! \n Using depth_level={.val {depth_level}} for rarefaction and normalization in Bray-Curtis calculations. \n Adjust depth_level according to your objectives."
+    )
   }
 
-  otu <- otu_table(physeq_obj, taxa_are_rows = TRUE) |>
-    as("matrix")
+  otu <- .extract_otu_matrix(physeq_obj, samples_as_rows = FALSE)
   map <- sample_data(physeq_obj) |> as("data.frame")
   map$sample_id <- rownames(map)
 
@@ -151,11 +178,11 @@ identify_core <- function(
     )
   }
 
-  # core prioritizing variable ---------------------------------
+  # core prioritizing variable ----
   data_var <- priority_var
   cli::cli_alert_success("Core prioritizing variable: {data_var}")
 
-  # validate abundance_weight ---------------------------------
+  # validate abundance_weight ----
   if (
     !is.numeric(abundance_weight) ||
       length(abundance_weight) != 1L ||
@@ -170,7 +197,7 @@ identify_core <- function(
     abundance_weight <- max(0, min(1, abundance_weight))
   }
 
-  # abundance occupancy ---------------------------------
+  # abundance occupancy ----
   # occupancy and mean rel. abundance
   otu_PA <- 1 * (otu > 0)
   otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
@@ -183,7 +210,7 @@ identify_core <- function(
   occ_abun <- data.frame(otu_occ = otu_occ, otu_rel = otu_rel) |>
     tibble::rownames_to_column("otu")
 
-  # PresenceSum ---------------------------------
+  # PresenceSum ----
 
   PresenceSum <- data.frame(
     otu = as.factor(rownames(otu)),
@@ -207,7 +234,7 @@ identify_core <- function(
       .groups = "drop"
     )
 
-  # Rank and weight in abundance ---------------------------------
+  # Rank and weight in abundance ----
   otu_ranked <- occ_abun |>
     left_join(PresenceSum, by = "otu")
 
@@ -276,9 +303,9 @@ identify_core <- function(
 
   otu_ranked_ordered <- otu_ranked$otu
 
-  # BC accumulation ---------------------------------
+  # BC accumulation ----
   # cumulative BC across samples while adding taxa in rank order
-  # pairwise BC on *current* subset of taxa, normalized by nReads, matching your formula
+  # pairwise BC on *current* subset of taxa, normalized by depth_level, matching your formula
 
   # start with the first ranked OTU
   cli::cli_alert_info(
@@ -292,7 +319,12 @@ identify_core <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- .calculate_bc(start_matrix, nReads)
+  bc_vec <- .calculate_bc(
+    start_matrix,
+    depth_level,
+    num_iterations = num_iter,
+    is_rarefied = is_rarefied
+  )
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -317,7 +349,12 @@ identify_core <- function(
       )
       start_matrix <- rbind(start_matrix, add_matrix)
 
-      bc_vec <- .calculate_bc(start_matrix, nReads)
+      bc_vec <- .calculate_bc(
+        start_matrix,
+        depth_level,
+        num_iterations = num_iter,
+        is_rarefied = is_rarefied
+      )
 
       BCaddition <- left_join(
         BCaddition,
@@ -353,7 +390,7 @@ identify_core <- function(
     arrange(MeanBC) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
-  # multiplicative increase between successive ranks
+  # increase method: multiplicative increase between successive ranks ----
   if (nrow(BC_ranked) >= 2) {
     Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
     increaseDF <- data.frame(
@@ -365,7 +402,7 @@ identify_core <- function(
   }
   BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
-  # elbow by forward-backward slope difference
+  # elbow method: by forward-backward slope difference ----
   elbow_slope_differences <- function(pos) {
     left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
     right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
@@ -380,6 +417,14 @@ identify_core <- function(
 
   elbow <- which.max(BC_ranked$elbow_slope_diffs)
 
+  # FALLBACK: if elbow is empty, NA, or 0, default to 1
+  if (length(elbow) == 0 || is.na(elbow) || elbow == 0) {
+    cli::cli_warn(
+      "Elbow calculation failed (possibly due to low variation). Defaulting to 1."
+    )
+    elbow <- 1
+  }
+
   # threshold cut based on multiplicative increase
   thr <- 1 + increase_value
   valid_increases <- which(BC_ranked$IncreaseBC >= thr)
@@ -390,19 +435,7 @@ identify_core <- function(
     1
   }
 
-  # identified core sets ---------------------------------
-
-  # elbow_core <- otu_ranked |>
-  #    tibble::rownames_to_column("otu_order") |>
-  #    mutate(otu_order = as.numeric(.data$otu_order)) |>
-  #    filter(.data$otu_order <= elbow) |>
-  #    pull(.data$otu)
-
-  # increase_core <- otu_ranked |>
-  #    tibble::rownames_to_column("otu_order") |>
-  #    mutate(otu_order = as.numeric(.data$otu_order)) |>
-  #    filter(.data$otu_order <= lastCall) |>
-  #    pull(.data$otu)
+  # identified core sets ----
 
   elbow_core <- otu_ranked_ordered[seq_len(elbow)]
   cli::cli_alert_success(
@@ -413,7 +446,7 @@ identify_core <- function(
     "% increase method identified {.val {length(increase_core)}} core OTUs"
   )
 
-  # return ---------------------------------
+  # return ----
   out <- list(
     bray_curtis_ranked = BC_ranked,
     otu_ranked = otu_ranked,
@@ -441,25 +474,30 @@ identify_core <- function(
 #' Calculate Bray-Curtis Dissimilarity Between Sample Pairs
 #'
 #' This function calculates the Bray-Curtis dissimilarity between all pairs of samples in a matrix.
-#' The dissimilarity is normalized by the total number of reads (`nReads`) to account for differences
+#' The dissimilarity is normalized by the total number of reads (`depth_level`) to account for differences
 #' in sequencing depth.
 #'
 #' @param matrix A numeric matrix or data frame where rows represent taxa (e.g., ASVs) and columns
 #'   represent samples. The column names of the matrix are used to generate pairwise sample names.
-#' @param nReads A numeric value representing the total number of reads used for normalization.
+#' @param depth_level A numeric value representing the total number of reads used for normalization.
+#' @param num_iterations
 #'   Typically, this is the minimum or average sequencing depth across samples.
 #' @return A list containing:
 #'   \itemize{
 #'     \item \code{values}: A numeric vector of Bray-Curtis dissimilarity values for each sample pair.
 #'     \item \code{names}: A character vector of pairwise sample names (e.g., "Sample1-Sample2").
 #'   }
-#' @import utils
 #' @export
 #'
 #' @noRd
 #' @keywords internal
 
-.calculate_bc <- function(matrix, nReads) {
+.calculate_bc <- function(
+  matrix,
+  depth_level,
+  num_iterations,
+  is_rarefied = TRUE
+) {
   if (nrow(matrix) == 0) {
     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
     return(list(values = numeric(0), names = character(0)))
@@ -472,14 +510,53 @@ identify_core <- function(
     return(list(values = numeric(0), names = character(0)))
   }
 
-  sample_pairs <- utils::combn(ncol(matrix), 2)
-  pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(matrix)[x], collapse = " - ")
-  })
+  # Conditional handling for rarefied vs unrarefied data
+  if (is_rarefied) {
+    # Data already rarefied - use vegdist directly without subsampling
+    sample_pairs <- utils::combn(ncol(matrix), 2)
+    pair_labels <- apply(sample_pairs, 2, function(x) {
+      paste(colnames(matrix)[x], collapse = " - ")
+    })
 
-  bc_values <- apply(sample_pairs, 2, function(x) {
-    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * nReads)
-  })
+    bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
+
+    # Per-pair normalization vegdist used
+    pair_sums <- apply(sample_pairs, 2, function(x) {
+      sum(matrix[, x[1]]) + sum(matrix[, x[2]])
+    })
+
+    # Reverse vegdist normalization and apply our own
+    bc_values <- bc_vegan * pair_sums / (2 * depth_level)
+  } else {
+    # Unrarefied data - filter samples by depth FIRST
+    floating_depth <- depth_level * 0.9999999 # account for floating-point precision
+
+    keep_samples <- colSums(matrix) >= floating_depth #ASV/OTUs should be columns
+
+    filtered_matrix <- matrix[, keep_samples, drop = FALSE]
+
+    if (ncol(filtered_matrix) < 2) {
+      return(list(values = numeric(0), names = character(0)))
+    }
+
+    # NOW compute sample pairs from the filtered matrix
+    sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
+    pair_labels <- apply(sample_pairs, 2, function(x) {
+      paste(colnames(filtered_matrix)[x], collapse = " - ")
+    })
+
+    # Use avgdist with rarefaction
+    bc_values <- as.vector(
+      suppressWarnings(
+        vegan::avgdist(
+          t(filtered_matrix),
+          sample = depth_level,
+          iterations = num_iterations,
+          dmethod = "bray"
+        )
+      )
+    )
+  }
 
   list(
     values = bc_values,

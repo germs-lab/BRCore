@@ -5,16 +5,15 @@
 \title{Run multiple rarefaction for microbiome count tables}
 \usage{
 multi_rarefy(
-  physeq,
+  physeq_obj,
   depth_level,
   num_iter = 100,
-  .summarize = TRUE,
-  threads = get_available_cores(),
+  .as_array = FALSE,
   set_seed = NULL
 )
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object containing an OTU/ASV table.}
+\item{physeq_obj}{A \code{phyloseq} object containing an OTU/ASV table.}
 
 \item{depth_level}{An integer specifying the sequencing depth (number of
 OTUs/ASVs) to which samples should be rarefied.}
@@ -22,13 +21,14 @@ OTUs/ASVs) to which samples should be rarefied.}
 \item{num_iter}{An integer specifying the number of iterations to perform
 for rarefaction.}
 
-\item{.summarize}{A logical indicating whether to summarize the results by
-averaging across iterations (default = TRUE). If FALSE, the function will
-return the rarefied data frame for all iterations without summarization. #'   Sample names are returned as unique IDs with the "\emph{iter}#" suffix.}
+\item{.as_array}{A logical indicating whether to return the results as a 3D
+array or as a list of data frames. If \code{TRUE}, returns a 3D array with
+dimensions (samples x taxa x iterations). If \code{FALSE}, returns a list of
+data frames, one for each iteration, with samples as rows and taxa as
+columns. (default = FALSE)}
 
-\item{threads}{Number of threads (default = 4).}
-
-\item{set_seed}{An optional integer to set the random seed for reproducibility (default = NULL).}
+\item{set_seed}{An optional integer to set the random seed for
+reproducibility (default = NULL).}
 }
 \value{
 A data frame with taxa as rows and samples as columns. The values
@@ -49,15 +49,14 @@ data("bcse", package = "BRCore")
 
 # Example rarefaction (single iteration, single core to keep examples fast)
 otu_table_rare <- multi_rarefy(
-  physeq = bcse,
+  physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
-  .summarize = TRUE,
-  threads = 2,
+  .as_array = FALSE,
   set_seed = 7642
 )
 
-rowSums(otu_table_rare)
+rowSums(otu_table_rare[[1]])
 }
 
 }

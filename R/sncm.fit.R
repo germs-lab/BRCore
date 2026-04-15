@@ -67,6 +67,7 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
 
   # Calculate the number of individuals per community
   N <- base::mean(base::apply(spp, 1, sum))
+  N.int <- base::round(N)
 
   # Calculate the average relative abundance of each taxa across communities
   if (base::is.null(pool)) {
@@ -145,7 +146,7 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
 
   ## Calculate AIC for binomial model
   bino.LL <- function(mu, sigma) {
-    R <- freq - stats::pbinom(d, N, p, lower.tail = FALSE)
+    R <- freq - stats::pbinom(d, N.int, p, lower.tail = FALSE)
     R <- stats::dnorm(R, mu, sigma)
     -base::sum(base::log(R))
   }
@@ -159,7 +160,7 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   bic.bino <- stats::BIC(bino.mle)
 
   ## Goodness of fit for binomial model
-  bino.pred <- stats::pbinom(d, N, p, lower.tail = FALSE)
+  bino.pred <- stats::pbinom(d, N.int, p, lower.tail = FALSE)
   Rsqr.bino <- 1 -
     (base::sum((freq - bino.pred)^2)) /
       (base::sum((freq - base::mean(freq))^2))
@@ -206,6 +207,14 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
     method = "wilson",
     return.df = TRUE
   )
+
+  cli::cli_bullets(c(
+    "i" = "Neutral model fitting:",
+    "*" = "Average individuals per community (N): {.val {N}}",
+    "*" = "Binomial model using rounded N: {.val {N.int}}",
+    "*" = "Poisson model using N: {.val {N}}",
+    "*" = "Maximum likelihood estimation using N: {.val {N}}, and starting parameters: mu = 0, sigma = 0.1"
+  ))
 
   ## Results
   if (stats == TRUE) {

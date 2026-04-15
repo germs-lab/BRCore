@@ -1,6 +1,12 @@
 ---
 title: "Introduction to BRCore"
-output: rmarkdown::html_vignette
+author: "By Bolívar Aponte Rolón and Gian Maria Niccolo Benucci"
+date: "Last modified: `r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+
 vignette: >
   %\VignetteIndexEntry{Introduction to BRCore}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,6 +23,7 @@ knitr::opts_chunk$set(
   fig.height = 6,
   fig.path = "images/"
 )
+options(cli.progress_show_after = Inf) # Disable progress bar for cleaner output in vignette
 ```
 
 ```{css, echo=FALSE}
@@ -28,34 +35,19 @@ knitr::opts_chunk$set(
 }
 ```
 
-# Load R libraries
+## Load R libraries
 
 ```{r setup, echo=TRUE}
-library(BRCore)
-
-if (requireNamespace("phyloseq", quietly = TRUE)) {
-  library(phyloseq)
-} else {
-  message("Package 'phyloseq' not installed; some examples will be skipped.")
-}
-
-if (requireNamespace("tidyverse", quietly = TRUE)) {
-  library(tidyverse)
-} else {
-  message(
-    "Package 'tidyverse' not installed; some code chunks will be skipped or use base R."
+invisible(
+  lapply(
+    c("BRCore", "phyloseq", "tidyverse", "viridis"),
+    library,
+    character.only = TRUE
   )
-}
-
-if (requireNamespace("viridis", quietly = TRUE)) {
-  library(viridis)
-} else {
-  message(
-    "Package 'viridis' not installed; some code chunks will be skipped or use base R."
-  )
-}
+)
 ```
 
+## Datasets included
 The `BRCore` R package comes with a few datasets. Three 16S datasets: `switchgrass`, 
 `mimulus`, and `bean`, from @Shade2019Abundance; a 16S dataset, called `bcse`, from leaves 
 of ten different cropping systems in the Bioenergy Crop Research Experiment 
@@ -67,8 +59,9 @@ data("bcse", package = "BRCore")
 str(bcse)
 ```
 
-# Preprocessing
+# Data Exploration and Parameter Selection for Core Identification
 
+## Rarefaction metrics and visualization
 We are not going to talk about the importance of rarefaction as it is not the goal
 of this vignette, but if you are interested you should read @Schloss2024Rarefaction, 
 @Schloss2024Waste, @Hong2022Rarefy, and @Weiss2017Normalization as a start.
@@ -109,18 +102,17 @@ are from common taxa, suggesting sufficient sampling, while low coverage indicat
 many rare, potentially missed, taxa. 
 </div>
 
-# Perform mutiple rarefaction
-
+## Rarefy the data and explore variance propagation
 The best way to rarefy your data is to use the multiple rarefaction approach. Originally
 developed by Sanders in 1968 it has been adopted widely in ecology research. 
 
 ```{r rarefy bcse, echo=TRUE}
-bcse_rarefied_otutable <-
+bcse_rarefied_list <-
   multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 100,
-    threads = 8,
+    num_iter = 10,
+    .as_array = FALSE,
     set_seed = 7642
   )
 ```
@@ -128,22 +120,40 @@ bcse_rarefied_otutable <-
 We can then inspect that everything looks good before going further.
 
 ```{r verify success rarefaction, echo=TRUE}
-rowSums(bcse_rarefied_otutable)
-bcse_rarefied_otutable[1:10, 1:10]
+rowSums(bcse_rarefied_list)
+bcse_rarefied_list[1:10, 1:10]
 ```
 
-### Recreate a phyloseq object with rarefied `otu_table()` 
+Now let's see how much variance we have across the 10 iterations of rarefaction. We can use the `plot_rarefaction_variance()` function to visualize this variance in Alpha diversity across samples and iterations and compare rarefied vs. non-rarefied data (raw).
+```{r fig2_rarefaction_variance, echo=TRUE, fig.width=7, fig.height=6}
+rarefaction_variance_plot <- plot_variance_propagation(
+  physeq_obj = bcse,
+  rarefied = bcse_rarefied_list,
+  q = 0,
+  group_var = "Crop",
+  group_color = "Plot"
+)
+rarefaction_variance_plot
+```
 
-We can then use the `do_phyloseq()` function to replace the `otu_table()` with the 
-rarefied table you just created. Or, you can create a new object with rarefied table
-calculated before.
+**Figure 2** Variance in Alpha diversity across 10 iterations of rarefaction. Poinst represent samples. The x-axis represent the grouping variable, in this case "Crop". The y-axis represent the Alpha diversity (q = 0, i.e. richness) of the samples. The color of the points represent the "Plot" variable, which is a nested variable within "Crop".
+
+Once you have observed the plot_rarefaction_metrics and plot_variance_propagation, you can decide if the rarefaction depth is good for your data and if the variance across iterations is acceptable for your analysis. You will need this cut-off for `identify_core()` function, so make sure to choose a depth that retains enough samples and diversity while minimizing variance across iterations. 
+
+### OPTIONAL: Recreate a phyloseq object with rarefied `otu_table()` 
+
+The main function of this package, `identify_core()`, handles the iterations and rareactions internally, so it can be used with the original phyloseq object. The results from `multi_rarefy()` and `add_rarefaction_metrics()` and `plot_rarefaction_metrics()` are meant to explor and inform the chosen parameters for `identify_core()`. Alternatively, you can update the OTU/ASV in your phyloseq object with a specific rarefied iteration from `multi_rarefy()` and perform the analyses with this new object. The choice is up to you and depends on your preferences and the specific goals of your analysis.
+
+The `update_otu_table()` function allows for replacing the `otu_table()` with the rarefied table you prefer.
 
 ```{r replace otu table, echo=TRUE}
-bcse_rare <-
-  update_otu_table(physeq = bcse, otu_rare = bcse_rarefied_otutable)
-
-print(bcse_rare)
-sample_sums(bcse_rare)
+bcse_updated_rare <- update_otu_table(
+  physeq_obj = bcse,
+  rarefied_otus = bcse_rarefied_list,
+  iteration = 1 # Speficify which iteration to use for the updated OTU table
+)
+print(bcse_updated_rare)
+sample_sums(bcse_updated_rare)
 ```
 
 # Core analysis
@@ -155,17 +165,21 @@ variable we want to use to calculate the core, in this case is "Crop". The resul
 object will contain several metrics for the core set of ASV/OTUs calculated across
 the variable `Crop`.
 
+*We continue with the original phyloseq object for consistency with the vignette workflow.*
+
 ```{r identify core microbiome, echo=TRUE}
 bcse_rare_core <- identify_core(
-  physeq_obj = bcse_rare,
+  physeq_obj = bcse,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
+  depth_level = 1000,
+  num_iter = 10,
   seed = 2134
 )
 ```
 
-### *How the is the core identified?*
+## *How the is the core identified?*
 
 As shown by @Shade2019Abundance, an interesting way explore the abundance and 
 occupancy inclusion thresholds used to define the core microbiome is to evaluate how 
@@ -224,11 +238,11 @@ bcse_identified_core <- plot_identified_core(
 )
 ```
 
-```{r fig2_identified_core, echo=TRUE, fig.width=7, fig.height=6}
+```{r fig3_identified_core, echo=TRUE, fig.width=7, fig.height=6}
 print(bcse_identified_core)
 ```
 
-**Figure 2** Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. 
+**Figure 3** Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. 
 
 ### Visualize the abundance-occupancy curve 
 
@@ -243,11 +257,11 @@ plot_abund_occ_increase <- plot_abundance_occupancy(
 )
 ```
 
-```{r fig3_plot_increase, echo=TRUE, fig.width=7, fig.height=6}
+```{r fig4_plot_increase, echo=TRUE, fig.width=7, fig.height=6}
 print(plot_abund_occ_increase)
 ```
 
-**Figure 3** Abundance-occupancy distribution and last 2% increase core set. 
+**Figure 4** Abundance-occupancy distribution and last 2% increase core set. 
 
 We can also visualize the core set detected with the `elbow` method.
 
@@ -258,12 +272,12 @@ plot_abund_occ_elbow <- plot_abundance_occupancy(
 )
 ```
 
-```{r fig4_plot_elbow, echo=TRUE, fig.width=7, fig.height=6}
+```{r fig5_plot_elbow, echo=TRUE, fig.width=7, fig.height=6}
 plot_abund_occ_elbow +
   scale_fill_manual(values = c("darkgreen", "grey"))
 ```
 
-**Figure 4** Abundance-occupancy distribution and last elbow core set. 
+**Figure 5** Abundance-occupancy distribution and last elbow core set. 
 
 ### Visualize the core set across the variable used for detecting the core
 
@@ -287,11 +301,11 @@ plot_core_dist_bar <- plot_core_distribution(
 )
 ```
 
-```{r fig5_plot_type_bar, echo=TRUE}
+```{r fig6_plot_type_bar, echo=TRUE}
 print(plot_core_dist_bar)
 ```
 
-**Figure 5** A bar plot won't work here, way too many variable levels.
+**Figure 6** A bar plot won't work here, way too many variable levels.
 
 ```{r plot_type line, echo=TRUE, fig.width=7, fig.height=6}
 plot_core_dist_line <- plot_core_distribution(
@@ -302,11 +316,11 @@ plot_core_dist_line <- plot_core_distribution(
 )
 ```
 
-```{r fig6_plot_type_line, echo=TRUE}
+```{r fig7_plot_type_line, echo=TRUE}
 print(plot_core_dist_line)
 ```
 
-**Figure 6** A line plot may be a little better.
+**Figure 7** A line plot may be a little better.
 
 ```{r recode Crop for ease of plotting, echo=TRUE}
 bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
@@ -352,11 +366,11 @@ plot_core_dist_heatmap <- plot_core_distribution(
   viridis::scale_fill_viridis(option = "plasma", name = "Occupancy")
 ```
 
-```{r fig7_plot_type_heatmap, echo=TRUE}
+```{r fig8_plot_type_heatmap, echo=TRUE}
 print(plot_core_dist_heatmap)
 ```
 
-**Figure 7** A heatmap, is definitely more compact and shows well enough the average 
+**Figure 8** A heatmap, is definitely more compact and shows well enough the average 
 occupancy across samples in each variable level.
 
 # Fitting Neutral Model 
@@ -399,11 +413,11 @@ str(bcse_rare_core_neutral_fit)
 plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
 ```
 
-```{r fig8_plot_neutral_fit, echo=TRUE, fig.width=7, fig.height=6}
+```{r fig9_plot_neutral_fit, echo=TRUE, fig.width=7, fig.height=6}
 print(plot_bcse_neutral_fit)
 ```
 
-**Figure 8** Neutral model of abundance-occupancy distributions for the `bcse` 
+**Figure 9** Neutral model of abundance-occupancy distributions for the `bcse` 
 dataset. *R*^2^ is a standard r-square statistics of goodness of fit
 (*R*^2^ = 1 − SS~err~/SS~total~) while *m* is the immigration parameter and 
 represents the probability that a given individual in a sample originated from 

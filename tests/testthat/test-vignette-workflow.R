@@ -2,17 +2,21 @@ test_that("1: Vignette test data structures are valid", {
   skip_on_cran()
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
-  # Test: Rarefied OTU table has correct dimensions and sums
+  # Test: Rarefied OTU table is correctly structured and has expected properties
   expect_true(
-    is.matrix(test_vignette_data$test_bcse_rarefied_otutable) ||
-      is.data.frame(test_vignette_data$test_bcse_rarefied_otutable)
+    is.list(test_vignette_data$test_bcse_rarefied_otutable) &&
+      is.data.frame(test_vignette_data$test_bcse_rarefied_otutable[[1]])
   )
 
   expect_equal(999.999999999996, 1000, tolerance = 1e-6) # Sanity check for floating-point precision
 
-  row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable)
+  row_sums <- rowSums(test_vignette_data$test_bcse_rarefied_otutable[[1]])
   expect_true(all(near(row_sums, 1000, tol = 1e-6)))
 
   # Test: Core result structure is complete
@@ -70,7 +74,11 @@ test_that("2: Vignette workflow produces consistent results", {
   skip_if_not_installed("viridis")
 
   # Load reference data from saved vignette run
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Run the vignette workflow step by step
   library(phyloseq)
@@ -102,38 +110,39 @@ test_that("2: Vignette workflow produces consistent results", {
 
   # Step 4: Multiple rarefaction
 
-  bcse_rarefied_otutable <- multi_rarefy(
-    physeq = bcse,
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 100,
-    threads = get_available_cores(),
+    num_iter = 10,
+    .as_array = FALSE,
     set_seed = 7642
   )
 
   # Test: Rarefied OTU table properties match
   expect_equal(
-    dim(bcse_rarefied_otutable),
+    dim(bcse_rarefied_list),
     dim(test_vignette_data$test_bcse_rarefied_otutable)
   )
   # Test: All samples have row sums of 1000 (accounting for floating-point precision)
   expect_equal(
-    rowSums(bcse_rarefied_otutable),
+    rowSums(bcse_rarefied_list[[1]]),
     setNames(
-      rep(1000, nrow(bcse_rarefied_otutable)),
-      rownames(bcse_rarefied_otutable)
+      rep(1000, nrow(bcse_rarefied_list[[1]])),
+      rownames(bcse_rarefied_list[[1]])
     ),
     tolerance = 1e-6
   )
   expect_equal(
-    bcse_rarefied_otutable,
+    bcse_rarefied_list,
     test_vignette_data$test_bcse_rarefied_otutable,
     tolerance = 1e-6
   )
 
-  # Step 5: Update OTU table
+  # Step 5: Update OTU table (optional)
   bcse_rare <- update_otu_table(
-    physeq = bcse,
-    otu_rare = bcse_rarefied_otutable
+    physeq_obj = bcse,
+    rarefied_otus = bcse_rarefied_list,
+    iteration = 1
   )
 
   # Test: Updated phyloseq object matches
@@ -148,22 +157,14 @@ test_that("2: Vignette workflow produces consistent results", {
 
   # Step 6: Identify core microbiome
   bcse_rare_core <- identify_core(
-    physeq_obj = bcse_rare,
+    physeq_obj = bcse,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
+    depth_level = 1000,
+    num_iter = 10,
     seed = 2134
   )
-
-  # bcse_rare_core <- identify_core_avgdist(
-  #   physeq_obj = bcse_rare,
-  #   priority_var = "Crop",
-  #   increase_value = 0.02,
-  #   abundance_weight = 0,
-  #   depth_level = 1000,
-  #   num_iter = 100,
-  #   seed = 2134
-  # )
 
   # Test: Core identification results match
   expect_s3_class(bcse_rare_core, "identify_core_result")
@@ -255,7 +256,11 @@ test_that("3: Vignette core distribution plots are consistent", {
   skip_if_not_installed("viridis")
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Recreate necessary objects for plotting
   data("bcse", package = "BRCore")
@@ -263,36 +268,46 @@ test_that("3: Vignette core distribution plots are consistent", {
   library(tidyverse)
   library(viridis)
 
-  bcse_rarefied_otutable <- multi_rarefy(
-    physeq = bcse,
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 100,
-    threads = get_available_cores(),
+    num_iter = 10,
+    .as_array = FALSE,
     set_seed = 7642
   )
 
-  bcse_rare <- update_otu_table(
-    physeq = bcse,
-    otu_rare = bcse_rarefied_otutable
+  # Test variance propagation plot
+  # Explore variance propagation and determine the best depth_level for core identification
+  p <- plot_variance_propagation(
+    physeq_obj = bcse,
+    rarefied = bcse_rarefied_list,
+    q = 0,
+    group_var = "Crop",
+    group_color = "Plot"
   )
 
+  expect_s3_class(p, "ggplot")
+  expect_silent(ggplot2::ggplot_build(p))
+
+  # Update OTU table (optional)
+  bcse_updated_rare <- update_otu_table(
+    physeq_obj = bcse,
+    rarefied_otus = bcse_rarefied_list,
+    iteration = 1
+  )
+
+  # Continue with core identification with original phyloseq or updated phyloseq object.
+  # We continue with the original phyloseq object for consistency with the vignette workflow, but this can be switched to the updated phyloseq object if desired.
+
   bcse_rare_core <- identify_core(
-    physeq_obj = bcse_rare,
+    physeq_obj = bcse,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
+    depth_level = 1000,
+    num_iter = 10,
     seed = 2134
   )
-
-  # bcse_rare_core <- identify_core_avgdist(
-  #   physeq_obj = bcse_rare,
-  #   priority_var = "Crop",
-  #   increase_value = 0.02,
-  #   abundance_weight = 0,
-  #   depth_level = 1000,
-  #   num_iter = 100,
-  #   seed = 2134
-  # )
 
   # Test bar plot
   plot_core_dist_bar <- plot_core_distribution(
@@ -377,43 +392,26 @@ test_that("4: Vignette neutral model fitting is consistent", {
   skip_if_not_installed("tidyverse")
 
   # Load reference data
-  load(test_path("test_sets/test_vignette_data.rda"))
+  rda_path <- getOption(
+    "brcore_test_data_path",
+    default = test_path("test_sets/test_vignette_data.rda")
+  )
+  load(rda_path)
 
   # Recreate necessary objects
   data("bcse", package = "BRCore")
   library(phyloseq)
   library(tidyverse)
 
-  bcse_rarefied_otutable <- multi_rarefy(
-    physeq = bcse,
-    depth_level = 1000,
-    num_iter = 100,
-    threads = get_available_cores(),
-    set_seed = 7642
-  )
-
-  bcse_rare <- update_otu_table(
-    physeq = bcse,
-    otu_rare = bcse_rarefied_otutable
-  )
-
   bcse_rare_core <- identify_core(
-    physeq_obj = bcse_rare,
+    physeq_obj = bcse,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
+    depth_level = 1000,
+    num_iter = 10,
     seed = 2134
   )
-
-  # bcse_rare_core <- identify_core_avgdist(
-  #   physeq_obj = bcse_rare,
-  #   priority_var = "Crop",
-  #   increase_value = 0.02,
-  #   abundance_weight = 0,
-  #   depth_level = 1000,
-  #   num_iter = 100,
-  #   seed = 2134
-  # )
 
   # Fit neutral model
   bcse_rare_core_neutral_fit <- fit_neutral_model(

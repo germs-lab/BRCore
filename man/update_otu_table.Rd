@@ -4,32 +4,28 @@
 \alias{update_otu_table}
 \title{Add a rarefied otu_table to a phyloseq object}
 \usage{
-update_otu_table(physeq, otu_rare)
+update_otu_table(physeq_obj, rarefied_otus, iteration = NULL)
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object in which you want to add the rarefied OTU/ASV table.}
+\item{physeq_obj}{A \code{phyloseq} object in which you want to add the rarefied
+OTU/ASV table.}
 
-\item{otu_rare}{A rarefied otu_table dataframe. Can be either:
-\itemize{
-\item Summarized: one row per sample (from \code{multi_rarefy(.summarize = TRUE)})
-\item Unsummarized: multiple rows per sample with \verb{_iter_#} suffixes
-(from \code{multi_rarefy(.summarize = FALSE)}). The \code{sample_data} will be
-replicated to match each iteration row.
-}}
+\item{rarefied_otus}{A data frame, list of data frames, or 3D array output from
+\code{multi_rarefy()} containing the rarefied OTU/ASV tables.}
+
+\item{iteration}{Integer specifying which iteration to extract from a list
+or array. Required when \code{rarefied_otus} is a list or array. Ignored when
+\code{rarefied_otus} is a data frame.}
 }
 \value{
 A \code{phyloseq} object.
 }
 \description{
-This function imports a rarefied otu_table (or normalized) in a \code{phyloseq}
-object \code{otu_table()} layer. It handles both summarized output (from
-\code{multi_rarefy(.summarize = TRUE)}) and unsummarized output with iteration
-suffixes (from \code{multi_rarefy(.summarize = FALSE)}).
-}
-\details{
-When unsummarized output is provided, the \code{sample_data} is replicated to
-match the iteration rows. Each row retains its \verb{_iter_#} suffix so
-individual iterations can be distinguished downstream.
+This function updates a \code{phyloseq} object by replacing its OTU/ASV table
+with a rarefied version produced by \code{multi_rarefy()}. The rarefied table can
+be a data frame, a list of data frames (\code{.as_array = FALSE}), or a 3D array
+(\code{.as_array = TRUE}). When providing a list or array, specify which iteration
+to use via the \code{iteration} parameter.
 }
 \examples{
 \donttest{
@@ -37,42 +33,31 @@ library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# Perform multiple rarefaction (summarized)
-otu_table_rare <-
+# List output (.as_array = FALSE)
+otu_list <-
   multi_rarefy(
-    physeq = GlobalPatterns,
+    physeq_obj = GlobalPatterns,
     depth_level = 200,
     num_iter = 3,
-    threads = 1,
+    .as_array = FALSE,
     set_seed = 123
   )
 
-rarefied_GlobalPatterns <-
-  update_otu_table(
-    physeq = GlobalPatterns,
-    otu_rare = otu_table_rare
-  )
+# Extract iteration 2
+rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 
-sample_sums(rarefied_GlobalPatterns)
-
-# Also works with unsummarized output (keeps all iterations)
-otu_table_rare_full <-
+# Array output (.as_array = TRUE)
+otu_array <-
   multi_rarefy(
-    physeq = GlobalPatterns,
+    physeq_obj = GlobalPatterns,
     depth_level = 200,
     num_iter = 3,
-    .summarize = FALSE,
-    threads = 1,
+    .as_array = TRUE,
     set_seed = 123
   )
 
-rarefied_GlobalPatterns2 <-
-  update_otu_table(
-    physeq = GlobalPatterns,
-    otu_rare = otu_table_rare_full
-  )
-
-sample_sums(rarefied_GlobalPatterns2)
+# Extract iteration 1
+rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
 }
 
 }

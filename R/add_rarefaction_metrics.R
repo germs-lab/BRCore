@@ -11,7 +11,7 @@
 #'   columns:
 #' \itemize{
 #'   \item `read_num`
-#'   \item `singlton_num`
+#'   \item `singleton_num`
 #'   \item `goods_cov`
 #'   \item `outlier`
 #' }
@@ -57,6 +57,7 @@
 #' @importFrom dplyr group_by summarize mutate ungroup left_join
 #' @importFrom tidyr pivot_longer
 #' @importFrom stats IQR quantile
+#' @importFrom cli cli_abort
 #'
 #' @export
 add_rarefaction_metrics <- function(data) {
@@ -68,15 +69,12 @@ add_rarefaction_metrics <- function(data) {
 
   # Extract OTU table and transpose if needed
   if (inherits(data, "phyloseq")) {
-    otu_mat <- otu_table(data, taxa_are_rows = TRUE)
-    if (!taxa_are_rows(data)) {
-      otu_mat <- t(otu_mat)
-    }
+    otu_mat <- .extract_otu_matrix(data, samples_as_rows = FALSE)
     otu_df <- as.data.frame(otu_mat)
   } else if (inherits(data, "data.frame")) {
     otu_df <- as.data.frame(t(data))
   } else {
-    stop("Input must be a phyloseq object or a data.frame")
+    cli::cli_abort("Input must be a phyloseq object or a data.frame")
   }
 
   # Compute metrics
@@ -90,8 +88,8 @@ add_rarefaction_metrics <- function(data) {
     group_by(sample_id) |>
     summarize(
       read_num = sum(.data$seq_num),
-      singlton_num = sum(.data$seq_num == 1),
-      goods_cov = 100 * (1 - .data$singlton_num / .data$read_num)
+      singleton_num = sum(.data$seq_num == 1),
+      goods_cov = 100 * (1 - .data$singleton_num / .data$read_num)
     ) |>
     mutate(
       outlier = ifelse(
