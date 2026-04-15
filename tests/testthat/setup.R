@@ -8,10 +8,7 @@ if (!file.exists(rda_path)) {
 }
 
 if (nzchar(Sys.getenv("CI"))) {
-  rda_path <- file.path(
-    tempdir(),
-    test_path("test_sets/test_vignette_data.rda")
-  )
+  rda_path <- file.path(tempdir(), "test_sets/test_vignette_data.rda")
   options(brcore_test_data_path = rda_path)
   source(test_path("test_sets/regenerate_test_data.R"), local = TRUE)
 }

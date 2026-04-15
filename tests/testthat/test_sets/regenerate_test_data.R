@@ -174,12 +174,12 @@ test_vignette_data <- list(
 
 # Save the test data
 if (nzchar(Sys.getenv("CI"))) {
-  out_path <- file.path(tempdir(), "test_vignette_data.rda")
-} else {
   out_path <- getOption(
     "brcore_test_data_path",
     default = "tests/testthat/test_sets/test_vignette_data.rda"
   )
+} else {
+  out_path <- "tests/testthat/test_sets/test_vignette_data.rda"
 }
 
 cat(paste0("Saving to ", out_path, "...\n"))
