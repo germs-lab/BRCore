@@ -239,9 +239,10 @@ identify_core <- function(
     left_join(PresenceSum, by = "otu")
 
   rank_method <- if (abundance_weight > 0) {
-    paste0("Index + abundance (weight = ", abundance_weight, ")")
+      occupancy_weight <- 1 - abundance_weight
+      paste0("Occupancy: ", occupancy_weight, " and Abundance: ", abundance_weight) 
   } else {
-    "Index only"
+      "Index only"
   }
 
   if (abundance_weight == 0) {
@@ -251,7 +252,7 @@ identify_core <- function(
       arrange(desc(rank))
 
     cli::cli_alert_info(
-      "Ranked by {rank_method}."
+      "Ranked by {rank_method}"
     )
   } else {
     otu_ranked <- otu_ranked |>
@@ -274,7 +275,7 @@ identify_core <- function(
         otu_rel
       )
     cli::cli_alert_info(
-      "Ranked by {rank_method})."
+      "Ranked by {rank_method}"
     )
   }
 

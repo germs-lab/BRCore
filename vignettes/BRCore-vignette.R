@@ -53,9 +53,8 @@ bcse_rarefied_list <-
 
 
 ## ----verify success rarefaction, echo=TRUE------------------------------------------------------------
-rowSums(bcse_rarefied_list)
-bcse_rarefied_list[1:10, 1:10]
-
+class(bcse_rarefied_list)
+str(bcse_rarefied_list, max.level = 1)
 
 ## ----fig2_rarefaction_variance, echo=TRUE, fig.width=7, fig.height=6----------------------------------
 rarefaction_variance_plot <- plot_variance_propagation(
@@ -222,6 +221,26 @@ plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
 
 ## ----fig9_plot_neutral_fit, echo=TRUE, fig.width=7, fig.height=6--------------------------------------
 print(plot_bcse_neutral_fit)
+
+
+# Supplemental Information 
+
+bcse_rare_core_iter1 <- identify_core(
+    physeq_obj = bcse_updated_rare,
+    priority_var = "Crop",
+    increase_value = 0.02,
+    abundance_weight = 0,
+    seed = 2135
+)
+
+
+bcse_rare_core_iter1_w04 <- identify_core(
+    physeq_obj = bcse_updated_rare,
+    priority_var = "Crop",
+    increase_value = 0.02,
+    abundance_weight = 0.5,
+    seed = 2135
+)
 
 
 ## ----session info, echo=TRUE--------------------------------------------------------------------------
