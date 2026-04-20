@@ -389,7 +389,10 @@ identify_core <- function(
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     arrange(MeanBC) |>
-    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
+    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC)) |>
+    mutate(
+        pct_change_proportionBC = 100 * (proportionBC / lag(proportionBC) - 1)
+        )
 
   # increase method: multiplicative increase between successive ranks ----
   if (nrow(BC_ranked) >= 2) {
