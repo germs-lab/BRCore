@@ -1,0 +1,146 @@
+# Changelog
+
+## BRCore 2.0.0
+
+Date: 2026-04-13
+
+### Breaking Changes
+
+- [3a590aa](https://github.com/germs-lab/BRCore/commit/3a590aa0b3a1ebccf868ae1186804d64ccab7f21)
+  General update/refactor of tests to include new function parameters
+  and logic. Regenerated
+  `tests/testthat/test_sets/test_vignette_data.rda` reference dataset.
+- [2677cd2](https://github.com/germs-lab/BRCore/commit/2677cd23ecf5a35513fd6a40b5d6ee4a3bc76919)
+  Fixed binomial neutral model fitting:
+  [`pbinom()`](https://rdrr.io/r/stats/Binomial.html) now receives
+  `N.int`, an integer `size` argument (`round(N)`) instead of a
+  floating-point mean. This changes model output relative to prior
+  versions. We also added comprehensive messaging to inform user of
+  species (`N` or `N.int`) used in model fitting.
+- [200100b](https://github.com/germs-lab/BRCore/commit/200100b8306371cb1ca7aacf130f97bf056f66fb)
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  internal logic: Replaced `.single_rarefy()` with internal
+  [`vegan::rrarefy()`](https://vegandevs.github.io/vegan/reference/rarefy.html)
+  engine.
+- [34c41ca](https://github.com/germs-lab/BRCore/commit/34c41caa1477aa29dfa8dfde02c7d6324082c96c)
+  and
+  [114468c](https://github.com/germs-lab/BRCore/commit/114468cf60b6276e5cd9a3829ae43874a8e087bf)
+  Refactored
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  to output 3D array or list. This handling increased speed of
+  computation and eliminated the need for parallelization. CLI messages
+  were improved to handle these new types and present summary statistics
+  and information to users.
+- [79153ca](https://github.com/germs-lab/BRCore/commit/79153cabcdd93f44080566ea09d18f194afbae9d)
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  gained new internal logic (originally tested in
+  `identify_core_avgdist()`, see
+  [\#91](https://github.com/germs-lab/BRCore/pull/91) and
+  [704f2ee](https://github.com/germs-lab/BRCore/commit/704f2ee2216a6354113877713571a5dbd3b77322))
+  based on
+  [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html).
+  Rarefactions and iterations handled by
+  [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html).
+
+### New Features
+
+- [5c2c57e](https://github.com/germs-lab/BRCore/commit/5c2c57eaa574b61bfa8045ef4614d64413680a68)
+  and
+  [bfd74da](https://github.com/germs-lab/BRCore/commit/bfd74da34cd63c1ef59c491679fda49299cd7701)
+  Added
+  [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
+  to plot results from
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
+- [79153ca](https://github.com/germs-lab/BRCore/commit/79153cabcdd93f44080566ea09d18f194afbae9d)
+  [`update_otu_table()`](http://www.germslab.org/BRCore/reference/update_otu_table.md)
+  has new parameter `iteration` to handle results from
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
+- [e4ac648](https://github.com/germs-lab/BRCore/commit/e4ac648420ceaa6bb3d5d946e8f7170029e6f615)
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  now has a progress bar powered by
+  [`cli::cli_progress_bar()`](https://cli.r-lib.org/reference/cli_progress_bar.html)
+  in `.calculate_bc()`.
+
+### Smaller changes
+
+- [e4ac648](https://github.com/germs-lab/BRCore/commit/e4ac648420ceaa6bb3d5d946e8f7170029e6f615)
+  Extracted Bray-Curtis dissimilarity calculation into `.calculate_bc()`
+  internal helper.
+
+- Vignette updated to include
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  and
+  [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
+  as part of the Data Exploration and Parameter Selection section. This
+  new workflow allows users to determine the adequate sequence read
+  depth for their data and input that into
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md).
+
+## BRCore 1.0.2
+
+Date: 2026-02-25
+
+### Bug Fixes
+
+- Fixed
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  reproducibility across platforms using deterministic iteration seeds
+  for parallel processing and adding floating-point tolerance in
+  rarefaction.
+  - **Commits:**
+    [`0422317`](https://github.com/germs-lab/BRCore/commit/042231709ec858a2f5869886aba17f82bef2c938),
+    [`2341154`](https://github.com/germs-lab/BRCore/commit/23411546814a8bdf9c1346f22e42f1820b77c371),
+    [`a42d7a9`](https://github.com/germs-lab/BRCore/commit/a42d7a96e1931d99825fce1c66a4383d51e7b5c6)
+- Added floating point tolerance in
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  rarefaction validation
+  - **Commits:**
+    [`a687fa3`](https://github.com/germs-lab/BRCore/commit/a687fa38327dab62b9c7f666d25a59dc75722c05)
+
+### Improvements
+
+- Changed rarefaction engine
+  [`vegan::rrarefy()`](https://vegandevs.github.io/vegan/reference/rarefy.html)
+  to custom `.single_rarefy()` reducing reliance on external
+  dependencies.
+
+  - **Commits:**
+    [`d366614`](https://github.com/germs-lab/BRCore/commit/d366614b0a715ff3ddf2cdfed18ebe93d872962b),
+    [`76fbec2`](https://github.com/germs-lab/BRCore/commit/76fbec2b6e3e4f72e98ae6fc5bd2e7908cfd1045)
+
+- Enhanced CLI output in
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md):
+  improved input validation for
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  parameters
+
+  - **Commits::**
+    [`921dc51`](https://github.com/germs-lab/BRCore/commit/921dc51496fe22e65ac4a56eff11b53c515dc259)
+
+- Added comprehensive end-to-end workflow tests that replicate the
+  vignette workflow.
+
+  - **Notable Commits:**
+    [`3080641`](https://github.com/germs-lab/BRCore/commit/308064172ebb1b6c2f7a82374c78ba4b4b976bfb),
+    [`622b2a7`](https://github.com/germs-lab/BRCore/commit/622b2a7bac3673cd42216935f91ce3d5133f7d92),
+    [`3877398`](https://github.com/germs-lab/BRCore/commit/3877398ad5817f4c7faaffa49bacde4d779fca93)
+
+### Testing
+
+- Added 4 comprehensive test suites validating complete analysis
+  pipeline
+- Reference data regeneration workflow documented
+  - **Notable Commits:**
+    [`924ca44`](https://github.com/germs-lab/BRCore/commit/924ca44c4ee3b7bfce35e6a3f05ae3b59d5e069c),
+    [`cc8d81b`](https://github.com/germs-lab/BRCore/commit/cc8d81b32bdc01165374d42630244aea4b4116bd),
+    [`2341154`](https://github.com/germs-lab/BRCore/commit/23411546814a8bdf9c1346f22e42f1820b77c371)
+- All tests use appropriate floating-point tolerance
+
+**See PR [\#84](https://github.com/germs-lab/BRCore/issues/84) for more
+details**
+
+### Contributors
+
+[@Gian77](https://github.com/Gian77)
+[@jibarozzo](https://github.com/jibarozzo)
+[@Copilot](https://github.com/Copilot)
