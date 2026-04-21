@@ -64,7 +64,7 @@ plot_identified_core <- function(
     ) |>
     filter(rank_num <= 1.2 * lastCall) |>
     mutate(rank_fac = factor(rank_num, levels = rank_num))
-
+  
   # Calculate percentage label text
   percent_label <- paste0(round(increase_value * 100), "%")
 
@@ -187,5 +187,5 @@ plot_identified_core <- function(
   # panel.grid.major.x = element_line(color = "gray90", size = 0.3),
   # panel.grid.major.y = element_line(color = "gray90", size = 0.3))
 
-  return(p)
+  return(list(new_data, p))
 }

@@ -389,7 +389,7 @@ identify_core <- function(
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     arrange(MeanBC) |>
-    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
+    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC)) # MeanBC normalized to its own maximum, so it ranges from 0 to 1.
   
   # increase method: multiplicative increase between successive ranks ----
   if (nrow(BC_ranked) >= 2) {
@@ -403,6 +403,15 @@ identify_core <- function(
   }
   BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
+  # add OTU name, delta_pct_max_BC, is_core, last_2pct_cutoff ----
+  BC_ranked <- BC_ranked %>%
+      mutate(
+          rank_num = as.numeric(as.character(rank)),
+          otu_added = otu_ranked_ordered[rank_num],
+          delta_pct_max_BC = (IncreaseBC - 1) * 100, 
+          delta_pct_max_BC = ifelse(rank_num == 1, NA_real_, (IncreaseBC - 1) * 100)
+      )
+  
   # elbow method: by forward-backward slope difference ----
   elbow_slope_differences <- function(pos) {
     left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
@@ -436,6 +445,12 @@ identify_core <- function(
     1
   }
 
+  BC_ranked <- BC_ranked %>%
+      mutate(
+          is_core = rank_num <= lastCall,
+          last_2pct_cutoff = rank_num == lastCall
+      )
+  
   # identified core sets ----
 
   elbow_core <- otu_ranked_ordered[seq_len(elbow)]
