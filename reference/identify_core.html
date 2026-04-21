@@ -183,7 +183,7 @@ doi:https://doi.org/10.1016/j.mib.2019.09.008</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://dx.plos.org/10.1371/journal.pone.0061217" class="external-link">phyloseq</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BRCore</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/germs-lab/BRCore" class="external-link">BRCore</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example using your switchgrass phyloseq object and grouping variable</span></span></span>
 <span class="r-in"><span><span class="co"># 'sampling_date'</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"switchgrass"</span>, package <span class="op">=</span> <span class="st">"BRCore"</span><span class="op">)</span></span></span>
@@ -196,10 +196,11 @@ doi:https://doi.org/10.1016/j.mib.2019.09.008</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Seed used: 91825</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Input phyloseq object is valid!</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> otu_table() is rarefied at a depth of: 1000</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> otu_table() is rarefied at a depth of: <span style="color: #0000BB;">1000</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> No taxonomy found (or empty). Continuing without taxonomy.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Core prioritizing variable: sampling_date</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 12:00:23.380814</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Ranked by Index only</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 16:21:36.046654</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Elbow method identified <span style="color: #0000BB;">3</span> core OTUs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> % increase method identified <span style="color: #0000BB;">34</span> core OTUs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Analysis complete!</span>
@@ -252,7 +253,7 @@ doi:https://doi.org/10.1016/j.mib.2019.09.008</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Bolívar Aponte Rolón, Gian Maria Niccolo Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, Center for Advanced Bioenergy and Bioproducts Innovation, Great Lakes Bioenergy Research Center.</p>
+  <p>Developed by <a href="https://www.bolaponte.com/" class="external-link">Bolívar Aponte Rolón</a>, Gian Maria Niccolò Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, <a href="https://www.germslab.org/about/" class="external-link">Adina Howe</a>, <a href="https://cabbi.bio/" class="external-link">Center for Advanced Bioenergy and Bioproducts Innovation</a>, <a href="https://www.glbrc.org/" class="external-link">Great Lakes Bioenergy Research Center</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

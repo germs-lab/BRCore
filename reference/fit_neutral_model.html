@@ -120,7 +120,7 @@ doi: https://doi.org/10.1016/j.mib.2019.09.008</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://dx.plos.org/10.1371/journal.pone.0061217" class="external-link">phyloseq</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BRCore</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/germs-lab/BRCore" class="external-link">BRCore</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example using your switchgrass phyloseq object and grouping variable</span></span></span>
 <span class="r-in"><span><span class="co"># 'sampling_date'</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"switchgrass"</span>, package <span class="op">=</span> <span class="st">"BRCore"</span><span class="op">)</span></span></span>
@@ -132,21 +132,105 @@ doi: https://doi.org/10.1016/j.mib.2019.09.008</p>
 <span class="r-in"><span>  num_iter       <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>  seed           <span class="op">=</span> <span class="fl">092825</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in identify_core(physeq_obj = switchgrass, priority_var = "sampling_date",     increase_value = 0.02, num_iter = 1, seed = 92825):</span> unused argument (num_iter = 1)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Seed used: 92825</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Input phyloseq object is valid!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> otu_table() is rarefied at a depth of: <span style="color: #0000BB;">1000</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> No taxonomy found (or empty). Continuing without taxonomy.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Core prioritizing variable: sampling_date</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Ranked by Index only</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 16:21:17.924218</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Elbow method identified <span style="color: #0000BB;">3</span> core OTUs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> % increase method identified <span style="color: #0000BB;">34</span> core OTUs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Analysis complete!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">switchgrass_core_fit</span> <span class="op">&lt;-</span> <span class="fu">fit_neutral_model</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  otu_table <span class="op">=</span> <span class="va">switchgrass_core</span><span class="op">$</span><span class="va">otu_table</span>,</span></span>
 <span class="r-in"><span>  core_set <span class="op">=</span> <span class="va">switchgrass_core</span><span class="op">$</span><span class="va">increase_core</span>,</span></span>
 <span class="r-in"><span>  abundance_occupancy <span class="op">=</span> <span class="va">switchgrass_core</span><span class="op">$</span><span class="va">abundance_occupancy</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'switchgrass_core' not found</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Waiting for profiling to be done...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Neutral model fitting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Average individuals per community (N): <span style="color: #0000BB;">1000</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Binomial model using rounded N: <span style="color: #0000BB;">1000</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Poisson model using N: <span style="color: #0000BB;">1000</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">•</span> Maximum likelihood estimation using N: <span style="color: #0000BB;">1000</span>, and starting parameters: mu = 0,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   sigma = 0.1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Model fitting complete!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">switchgrass_core_fit</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'switchgrass_core_fit' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ goodness_of_fit :'data.frame':	1 obs. of  24 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ m         : num 0.159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ m.ci      : num 0.0234</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ m.mle     : num 0.159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ maxLL     : num -772</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ binoLL    : num -592</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ poisLL    : num -593</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Rsqr      : num 0.83</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Rsqr.bino : num 0.677</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Rsqr.pois : num 0.677</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ RMSE      : num 0.0811</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ RMSE.bino : num 0.112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ RMSE.pois : num 0.112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ AIC       : num -1541</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ BIC       : num -1532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ AIC.bino  : num -1181</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ BIC.bino  : num -1172</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ AIC.pois  : num -1181</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ BIC.pois  : num -1172</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ N         : num 1000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Samples   : num 43</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Richness  : num 706</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ Detect    : num 0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ above.pred: num 0.0751</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ below.pred: num 0.0269</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ model_prediction:'data.frame':	706 obs. of  14 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ otu       : chr [1:706] "OTU10713" "OTU7" "OTU1253" "OTU47" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ otu_occ   : num [1:706] 0.2093 0.9767 0.0698 1 0.9535 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ otu_rel   : num [1:706] 0.000233 0.046767 0.000419 0.016093 0.011953 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ membership: chr [1:706] "Not core" "Core" "Not core" "Core" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ p         : num [1:706] 0.000233 0.046767 0.000419 0.016093 0.011953 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ freq      : num [1:706] 0.2093 0.9767 0.0698 1 0.9535 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ freq.pred : num [1:706] 0.0519 1 0.0927 0.9978 0.9853 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ pred.lwr  : num [1:706] 0.0153 0.918 0.0366 0.914 0.8929 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ pred.upr  : num [1:706] 0.162 1 0.216 1 0.998 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bino.pred : num [1:706] 0.208 1 0.342 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bino.lwr  : num [1:706] 0.113 0.918 0.219 0.918 0.918 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ bino.upr  : num [1:706] 0.35 1 0.492 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ y         : chr [1:706] NA NA NA NA ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ fit_class : chr [1:706] "Above prediction" "As predicted" "As predicted" "Above prediction" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "class")= chr [1:2] "fit_neutral_model" "list"</span>
 <span class="r-in"><span><span class="va">switchgrass_core_fit</span><span class="op">$</span><span class="va">goodness_of_fit</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'switchgrass_core_fit' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           m       m.ci     m.mle     maxLL    binoLL    poisLL      Rsqr</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.1592442 0.02341531 0.1592708 -772.4055 -592.3505 -592.5881 0.8297342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Rsqr.bino Rsqr.pois       RMSE RMSE.bino RMSE.pois       AIC       BIC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.6769005 0.6771241 0.08108246 0.1116944 0.1116557 -1540.811 -1531.692</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    AIC.bino  BIC.bino  AIC.pois  BIC.pois    N Samples Richness Detect</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 -1180.701 -1171.582 -1181.176 -1172.057 1000      43      706  0.001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   above.pred below.pred</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.07507082 0.02691218</span>
 <span class="r-in"><span><span class="va">switchgrass_core_fit</span><span class="op">$</span><span class="va">model_prediction</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'switchgrass_core_fit' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        otu    otu_occ      otu_rel membership            p       freq</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 OTU10713 0.20930233 0.0002325581   Not core 0.0002325581 0.20930233</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     OTU7 0.97674419 0.0467674419       Core 0.0467674419 0.97674419</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  OTU1253 0.06976744 0.0004186047   Not core 0.0004186047 0.06976744</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    OTU47 1.00000000 0.0160930233       Core 0.0160930233 1.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   OTU192 0.95348837 0.0119534884       Core 0.0119534884 0.95348837</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   OTU275 0.62790698 0.0019767442   Not core 0.0019767442 0.62790698</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    freq.pred   pred.lwr  pred.upr bino.pred  bino.lwr  bino.upr    y</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.05194331 0.01527999 0.1620967 0.2075178 0.1129200 0.3500883 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 1.00000000 0.91799020 1.0000000 1.0000000 0.9179902 1.0000000 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.09272231 0.03659835 0.2156478 0.3420934 0.2185688 0.4915177 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.99780083 0.91400419 0.9999484 0.9999999 0.9179900 1.0000000 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.98533980 0.89291681 0.9981575 0.9999940 0.9179792 1.0000000 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.39707648 0.26514291 0.5458915 0.8617512 0.7288830 0.9352852 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          fit_class</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Above prediction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     As predicted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     As predicted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Above prediction</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     As predicted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 Above prediction</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -156,7 +240,7 @@ doi: https://doi.org/10.1016/j.mib.2019.09.008</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Bolívar Aponte Rolón, Gian Maria Niccolo Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, Center for Advanced Bioenergy and Bioproducts Innovation, Great Lakes Bioenergy Research Center.</p>
+  <p>Developed by <a href="https://www.bolaponte.com/" class="external-link">Bolívar Aponte Rolón</a>, Gian Maria Niccolò Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, <a href="https://www.germslab.org/about/" class="external-link">Adina Howe</a>, <a href="https://cabbi.bio/" class="external-link">Center for Advanced Bioenergy and Bioproducts Innovation</a>, <a href="https://www.glbrc.org/" class="external-link">Great Lakes Bioenergy Research Center</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

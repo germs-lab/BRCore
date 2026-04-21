@@ -74,7 +74,8 @@ switchgrass_core <- identify_core(
 #> ℹ otu_table() is rarefied at a depth of: 1000
 #> ℹ No taxonomy found (or empty). Continuing without taxonomy.
 #> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 12:00:38.530607
+#> ℹ Ranked by Index only
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 16:22:01.117887
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 34 core OTUs
 #> ✔ Analysis complete!

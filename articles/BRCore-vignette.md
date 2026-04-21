@@ -11,21 +11,6 @@ invisible(
     character.only = TRUE
   )
 )
-#> ── Attaching core tidyverse packages ─────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.6.0
-#> ✔ ggplot2   4.0.1     ✔ tibble    3.3.0
-#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-#> ✔ purrr     1.2.0     
-#> ── Conflicts ───────────────────────────── tidyverse_conflicts() ──
-#> ✖ readr::edition_get()   masks testthat::edition_get()
-#> ✖ dplyr::filter()        masks BRCore::filter(), stats::filter()
-#> ✖ purrr::is_null()       masks testthat::is_null()
-#> ✖ dplyr::lag()           masks stats::lag()
-#> ✖ readr::local_edition() masks testthat::local_edition()
-#> ✖ dplyr::matches()       masks tidyr::matches(), testthat::matches()
-#> ℹ Use the 
-#> Loading required package: viridisLite
 ```
 
 ### Datasets included
@@ -77,7 +62,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x57a8d9a9d860> 
+#>   .. .. .. .. .. ..$ :<environment: 0x5ff63b45e6d8> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -134,7 +119,7 @@ rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
 
-✔ Generating rarefaction diagnostic plots [1.1s]
+✔ Generating rarefaction diagnostic plots [1.4s]
 print(rarefaction_plot)
 ```
 
@@ -379,7 +364,7 @@ bcse_rare_core <- identify_core(
 #> Adjust depth_level according to your objectives.
 #> ✔ Core prioritizing variable: Crop
 #> ℹ Ranked by Index only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 09:46:35.360262
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 15:28:55.649374
 #> ✔ Elbow method identified 2 core OTUs
 #> ✔ % increase method identified 21 core OTUs
 #> ✔ Analysis complete!
@@ -835,7 +820,7 @@ bcse_rare_core_iter1 <- identify_core(
 #> ℹ otu_table() is rarefied at a depth of: 1000
 #> ✔ Core prioritizing variable: Crop
 #> ℹ Ranked by Index only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 09:56:00.939738
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 15:37:56.576808
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 25 core OTUs
 #> ✔ Analysis complete!

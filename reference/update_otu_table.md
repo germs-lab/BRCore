@@ -54,11 +54,55 @@ otu_list <-
     .as_array = FALSE,
     set_seed = 123
   )
-#> Error in multi_rarefy(physeq_obj = GlobalPatterns, depth_level = 200,     num_iter = 3, .as_array = FALSE, set_seed = 123): unused arguments (physeq_obj = GlobalPatterns, .as_array = FALSE)
+#> 
+#> ── Multiple Rarefaction ────────────────────────────────────────────────────────
+#> 
+#> ── Input Validation ──
+#> 
+#> ✔ Input phyloseq object is valid!
+#> ℹ Seed: 123
+#> ℹ Input (matrix/df dim): 26 samples x 19216 taxa
+#> ℹ Rarefaction depth: 200
+#> ℹ Iterations: 3
+#> ℹ taxa_are_rows: TRUE
+#> ℹ OTU matrix/df rownames head: CL3, CC1, SV1, M31Fcsw, M11Fcsw, M31Plmr
+#> ℹ OTU matrix/df colnames head: 549322, 522457, 951, 244423, 586076, 246140
+#> ℹ Row sums summary: Min=58688, Max=2357181, Median=1106849
+#> 
+#> ── Rarefaction Results ──
+#> 
+#> ── Sample Removal 
+#> ✔ No samples removed.
+#> 
+#> ── Taxa Removal 
+#> ℹ Original taxa input: 19216
+#> ! Max: 17740 taxa removed (zero abundance) in viable samples (depth_level >= 200).
+#> ! When using `.as_array = FALSE`, taxa removed may differ across iterations.
+#> 
+#> ── Data Sparsity 
+#> ℹ Returning list of data frames for each iteration.
+#> • Rarefied matrix (across 3 iterations):
+#>   • Min: 36251 zeros (94.46% sparsity) out of 38376 entries
+#>   • Max: 36677 zeros (94.55% sparsity) out of 38792 entries
+#>   • Avg: 36444 zeros (94.47% sparsity) out of 38575.3 entries
+#> 
+#> ── Final Data Dimensions 
+#> ✔ Output: 3 iterations with 26 unique samples
+#> • Samples per iteration:
+#>   • Min: 26
+#>   • Max: 26
+#> • Non-zero taxa per iteration:
+#>   • Min: 1476
+#>   • Max: 1492
+#>   • Avg: 1483.7
 
 # Extract iteration 2
 rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
-#> Error in update_otu_table(GlobalPatterns, otu_list, iteration = 2): unused argument (iteration = 2)
+#> ℹ Extracting iteration 2 from list of 3 iterations.
+#> ✔ Phyloseq object and rarefied otu_table sample names are identical.
+#> ✔ All samples kept after rarefaction at depth of: 200
+#> ℹ Building phyloseq object with 26 samples and 1476 taxa
+#> ✔ Update complete!
 
 # Array output (.as_array = TRUE)
 otu_array <-
@@ -69,10 +113,54 @@ otu_array <-
     .as_array = TRUE,
     set_seed = 123
   )
-#> Error in multi_rarefy(physeq_obj = GlobalPatterns, depth_level = 200,     num_iter = 3, .as_array = TRUE, set_seed = 123): unused arguments (physeq_obj = GlobalPatterns, .as_array = TRUE)
+#> 
+#> ── Multiple Rarefaction ────────────────────────────────────────────────────────
+#> 
+#> ── Input Validation ──
+#> 
+#> ✔ Input phyloseq object is valid!
+#> ℹ Seed: 123
+#> ℹ Input (matrix/df dim): 26 samples x 19216 taxa
+#> ℹ Rarefaction depth: 200
+#> ℹ Iterations: 3
+#> ℹ taxa_are_rows: TRUE
+#> ℹ OTU matrix/df rownames head: CL3, CC1, SV1, M31Fcsw, M11Fcsw, M31Plmr
+#> ℹ OTU matrix/df colnames head: 549322, 522457, 951, 244423, 586076, 246140
+#> ℹ Row sums summary: Min=58688, Max=2357181, Median=1106849
+#> 
+#> ── Rarefaction Results ──
+#> 
+#> ── Sample Removal 
+#> ✔ No samples removed.
+#> 
+#> ── Taxa Removal 
+#> ! No taxa removed. 
+#> When using `.as_array = TRUE`, taxa are not removed across iterations to 
+#> maintain consistent dimensions.
+#> 
+#> ── Data Sparsity 
+#> • Rarefied matrix (across 3 iterations):
+#>   • Min: 497450 zeros (99.57% sparsity) out of 499616 entries
+#>   • Max: 497497 zeros (99.58% sparsity) out of 499616 entries
+#>   • Avg: 497476.3 zeros (99.57% sparsity) out of 499616 entries
+#> 
+#> ── Final Data Dimensions 
+#> ✔ Output: 3 iterations with 26 samples
+#> • Array dimensions:
+#>   • Samples: 26
+#>   • Taxa: 19216
+#>   • Iterations: 3
+#> • Non-zero taxa per iteration:
+#>   • Min: 1468
+#>   • Max: 1511
+#>   • Avg: 1483
 
 # Extract iteration 1
 rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
-#> Error in update_otu_table(GlobalPatterns, otu_array, iteration = 1): unused argument (iteration = 1)
+#> ℹ Extracting iteration 1 from array with 3 iterations.
+#> ✔ Phyloseq object and rarefied otu_table sample names are identical.
+#> ✔ All samples kept after rarefaction at depth of: 200
+#> ℹ Building phyloseq object with 26 samples and 19216 taxa
+#> ✔ Update complete!
 # }
 ```

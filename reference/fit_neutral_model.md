@@ -80,20 +80,104 @@ switchgrass_core <- identify_core(
   num_iter       = 1,
   seed           = 092825
 )
-#> Error in identify_core(physeq_obj = switchgrass, priority_var = "sampling_date",     increase_value = 0.02, num_iter = 1, seed = 92825): unused argument (num_iter = 1)
+#> Seed used: 92825
+#> ✔ Input phyloseq object is valid!
+#> ℹ otu_table() is rarefied at a depth of: 1000
+#> ℹ No taxonomy found (or empty). Continuing without taxonomy.
+#> ✔ Core prioritizing variable: sampling_date
+#> ℹ Ranked by Index only
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 16:21:17.924218
+#> ✔ Elbow method identified 3 core OTUs
+#> ✔ % increase method identified 34 core OTUs
+#> ✔ Analysis complete!
 
 switchgrass_core_fit <- fit_neutral_model(
   otu_table = switchgrass_core$otu_table,
   core_set = switchgrass_core$increase_core,
   abundance_occupancy = switchgrass_core$abundance_occupancy
 )
-#> Error: object 'switchgrass_core' not found
+#> Waiting for profiling to be done...
+#> ℹ Neutral model fitting:
+#> • Average individuals per community (N): 1000
+#> • Binomial model using rounded N: 1000
+#> • Poisson model using N: 1000
+#> • Maximum likelihood estimation using N: 1000, and starting parameters: mu = 0,
+#>   sigma = 0.1
+#> ✔ Model fitting complete!
 
 str(switchgrass_core_fit)
-#> Error: object 'switchgrass_core_fit' not found
+#> List of 2
+#>  $ goodness_of_fit :'data.frame':    1 obs. of  24 variables:
+#>   ..$ m         : num 0.159
+#>   ..$ m.ci      : num 0.0234
+#>   ..$ m.mle     : num 0.159
+#>   ..$ maxLL     : num -772
+#>   ..$ binoLL    : num -592
+#>   ..$ poisLL    : num -593
+#>   ..$ Rsqr      : num 0.83
+#>   ..$ Rsqr.bino : num 0.677
+#>   ..$ Rsqr.pois : num 0.677
+#>   ..$ RMSE      : num 0.0811
+#>   ..$ RMSE.bino : num 0.112
+#>   ..$ RMSE.pois : num 0.112
+#>   ..$ AIC       : num -1541
+#>   ..$ BIC       : num -1532
+#>   ..$ AIC.bino  : num -1181
+#>   ..$ BIC.bino  : num -1172
+#>   ..$ AIC.pois  : num -1181
+#>   ..$ BIC.pois  : num -1172
+#>   ..$ N         : num 1000
+#>   ..$ Samples   : num 43
+#>   ..$ Richness  : num 706
+#>   ..$ Detect    : num 0.001
+#>   ..$ above.pred: num 0.0751
+#>   ..$ below.pred: num 0.0269
+#>  $ model_prediction:'data.frame':    706 obs. of  14 variables:
+#>   ..$ otu       : chr [1:706] "OTU10713" "OTU7" "OTU1253" "OTU47" ...
+#>   ..$ otu_occ   : num [1:706] 0.2093 0.9767 0.0698 1 0.9535 ...
+#>   ..$ otu_rel   : num [1:706] 0.000233 0.046767 0.000419 0.016093 0.011953 ...
+#>   ..$ membership: chr [1:706] "Not core" "Core" "Not core" "Core" ...
+#>   ..$ p         : num [1:706] 0.000233 0.046767 0.000419 0.016093 0.011953 ...
+#>   ..$ freq      : num [1:706] 0.2093 0.9767 0.0698 1 0.9535 ...
+#>   ..$ freq.pred : num [1:706] 0.0519 1 0.0927 0.9978 0.9853 ...
+#>   ..$ pred.lwr  : num [1:706] 0.0153 0.918 0.0366 0.914 0.8929 ...
+#>   ..$ pred.upr  : num [1:706] 0.162 1 0.216 1 0.998 ...
+#>   ..$ bino.pred : num [1:706] 0.208 1 0.342 1 1 ...
+#>   ..$ bino.lwr  : num [1:706] 0.113 0.918 0.219 0.918 0.918 ...
+#>   ..$ bino.upr  : num [1:706] 0.35 1 0.492 1 1 ...
+#>   ..$ y         : chr [1:706] NA NA NA NA ...
+#>   ..$ fit_class : chr [1:706] "Above prediction" "As predicted" "As predicted" "Above prediction" ...
+#>  - attr(*, "class")= chr [1:2] "fit_neutral_model" "list"
 switchgrass_core_fit$goodness_of_fit
-#> Error: object 'switchgrass_core_fit' not found
+#>           m       m.ci     m.mle     maxLL    binoLL    poisLL      Rsqr
+#> 1 0.1592442 0.02341531 0.1592708 -772.4055 -592.3505 -592.5881 0.8297342
+#>   Rsqr.bino Rsqr.pois       RMSE RMSE.bino RMSE.pois       AIC       BIC
+#> 1 0.6769005 0.6771241 0.08108246 0.1116944 0.1116557 -1540.811 -1531.692
+#>    AIC.bino  BIC.bino  AIC.pois  BIC.pois    N Samples Richness Detect
+#> 1 -1180.701 -1171.582 -1181.176 -1172.057 1000      43      706  0.001
+#>   above.pred below.pred
+#> 1 0.07507082 0.02691218
 switchgrass_core_fit$model_prediction |> head()
-#> Error: object 'switchgrass_core_fit' not found
+#>        otu    otu_occ      otu_rel membership            p       freq
+#> 1 OTU10713 0.20930233 0.0002325581   Not core 0.0002325581 0.20930233
+#> 2     OTU7 0.97674419 0.0467674419       Core 0.0467674419 0.97674419
+#> 3  OTU1253 0.06976744 0.0004186047   Not core 0.0004186047 0.06976744
+#> 4    OTU47 1.00000000 0.0160930233       Core 0.0160930233 1.00000000
+#> 5   OTU192 0.95348837 0.0119534884       Core 0.0119534884 0.95348837
+#> 6   OTU275 0.62790698 0.0019767442   Not core 0.0019767442 0.62790698
+#>    freq.pred   pred.lwr  pred.upr bino.pred  bino.lwr  bino.upr    y
+#> 1 0.05194331 0.01527999 0.1620967 0.2075178 0.1129200 0.3500883 <NA>
+#> 2 1.00000000 0.91799020 1.0000000 1.0000000 0.9179902 1.0000000 <NA>
+#> 3 0.09272231 0.03659835 0.2156478 0.3420934 0.2185688 0.4915177 <NA>
+#> 4 0.99780083 0.91400419 0.9999484 0.9999999 0.9179900 1.0000000 <NA>
+#> 5 0.98533980 0.89291681 0.9981575 0.9999940 0.9179792 1.0000000 <NA>
+#> 6 0.39707648 0.26514291 0.5458915 0.8617512 0.7288830 0.9352852 <NA>
+#>          fit_class
+#> 1 Above prediction
+#> 2     As predicted
+#> 3     As predicted
+#> 4 Above prediction
+#> 5     As predicted
+#> 6 Above prediction
 # }
 ```

@@ -79,7 +79,7 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://dx.plos.org/10.1371/journal.pone.0061217" class="external-link">phyloseq</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BRCore</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/germs-lab/BRCore" class="external-link">BRCore</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots</span></span></span>
 <span class="r-in"><span><span class="va">bcse_filt</span> <span class="op">&lt;-</span> <span class="va">bcse</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/subset_samples-methods.html" class="external-link">subset_samples</a></span><span class="op">(</span><span class="va">Crop</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Poplar"</span>, <span class="st">"Switchgrass"</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -91,7 +91,47 @@
 <span class="r-in"><span>       .as_array <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>       set_seed <span class="op">=</span> <span class="fl">7643</span></span></span>
 <span class="r-in"><span>   <span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in multi_rarefy(physeq_obj = bcse_filt, depth_level = 1000, num_iter = 100,     .as_array = FALSE, set_seed = 7643):</span> unused arguments (physeq_obj = bcse_filt, .as_array = FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Multiple Rarefaction</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Input Validation</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Input phyloseq object is valid!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Seed: <span style="color: #0000BB;">7643</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Input (matrix/df dim): <span style="color: #0000BB;">10</span> samples x <span style="color: #0000BB;">2861</span> taxa</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Rarefaction depth: <span style="color: #0000BB;">1000</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Iterations: <span style="color: #0000BB;">100</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> taxa_are_rows: TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> OTU matrix/df rownames head: bcse73, bcse102, bcse104, bcse77, bcse78, bcse75</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Row sums summary: Min=3146, Max=67815, Median=8685.5</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Rarefaction Results</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Sample Removal </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No samples removed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Taxa Removal </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Original taxa input: <span style="color: #0000BB;">2861</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Max: <span style="color: #0000BB;">2688</span> taxa removed (zero abundance) in viable samples (depth_level &gt;= <span style="color: #0000BB;">1000</span>).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> When using `.as_array = FALSE`, taxa removed may differ across iterations.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Data Sparsity </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Returning list of data frames for each iteration.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Rarefied matrix (across <span style="color: #0000BB;">100</span> iterations):</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">1145</span> zeros (<span style="color: #0000BB;">66.18</span>% sparsity) out of <span style="color: #0000BB;">1730</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">1483</span> zeros (<span style="color: #0000BB;">70.96</span>% sparsity) out of <span style="color: #0000BB;">2090</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">1336.3</span> zeros (<span style="color: #0000BB;">69</span>% sparsity) out of <span style="color: #0000BB;">1936.6</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Final Data Dimensions </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Output: <span style="color: #0000BB;">100</span> iterations with <span style="color: #0000BB;">10</span> unique samples</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Samples per iteration:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Non-zero taxa per iteration:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">173</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">209</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">193.7</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">plot_variance_propagation</span><span class="op">(</span></span></span>
 <span class="r-in"><span>   physeq_obj   <span class="op">=</span> <span class="va">bcse_filt</span>,</span></span>
@@ -100,7 +140,13 @@
 <span class="r-in"><span>   group_var <span class="op">=</span> <span class="st">"Crop"</span>,</span></span>
 <span class="r-in"><span>   group_color <span class="op">=</span> <span class="st">"Plot"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in plot_variance_propagation(physeq_obj = bcse_filt, rarefied = bcse_rarefied_otutable_filt,     q = 1, group_var = "Crop", group_color = "Plot"):</span> could not find function "plot_variance_propagation"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Input phyloseq object is valid!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Rarefaction Variance Propagation Visualization</span> <span style="color: #00BBBB;">──────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Hill number order selected, q= <span style="color: #0000BB;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Number of rarefaction iterations, n_iter= <span style="color: #0000BB;">100</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Comparison plot generated!</span>
+<span class="r-plt img"><img src="plot_variance_propagation-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -110,7 +156,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Bolívar Aponte Rolón, Gian Maria Niccolo Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, Center for Advanced Bioenergy and Bioproducts Innovation, Great Lakes Bioenergy Research Center.</p>
+  <p>Developed by <a href="https://www.bolaponte.com/" class="external-link">Bolívar Aponte Rolón</a>, Gian Maria Niccolò Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, <a href="https://www.germslab.org/about/" class="external-link">Adina Howe</a>, <a href="https://cabbi.bio/" class="external-link">Center for Advanced Bioenergy and Bioproducts Innovation</a>, <a href="https://www.glbrc.org/" class="external-link">Great Lakes Bioenergy Research Center</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -87,7 +87,7 @@ or array. Required when <code>rarefied_otus</code> is a list or array. Ignored w
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://dx.plos.org/10.1371/journal.pone.0061217" class="external-link">phyloseq</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BRCore</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/germs-lab/BRCore" class="external-link">BRCore</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">GlobalPatterns</span>, package <span class="op">=</span> <span class="st">"phyloseq"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># List output (.as_array = FALSE)</span></span></span>
@@ -99,11 +99,55 @@ or array. Required when <code>rarefied_otus</code> is a list or array. Ignored w
 <span class="r-in"><span>    .as_array <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>    set_seed <span class="op">=</span> <span class="fl">123</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in multi_rarefy(physeq_obj = GlobalPatterns, depth_level = 200,     num_iter = 3, .as_array = FALSE, set_seed = 123):</span> unused arguments (physeq_obj = GlobalPatterns, .as_array = FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Multiple Rarefaction</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Input Validation</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Input phyloseq object is valid!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Seed: <span style="color: #0000BB;">123</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Input (matrix/df dim): <span style="color: #0000BB;">26</span> samples x <span style="color: #0000BB;">19216</span> taxa</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Rarefaction depth: <span style="color: #0000BB;">200</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Iterations: <span style="color: #0000BB;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> taxa_are_rows: TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> OTU matrix/df rownames head: CL3, CC1, SV1, M31Fcsw, M11Fcsw, M31Plmr</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> OTU matrix/df colnames head: 549322, 522457, 951, 244423, 586076, 246140</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Row sums summary: Min=58688, Max=2357181, Median=1106849</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Rarefaction Results</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Sample Removal </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No samples removed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Taxa Removal </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Original taxa input: <span style="color: #0000BB;">19216</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Max: <span style="color: #0000BB;">17740</span> taxa removed (zero abundance) in viable samples (depth_level &gt;= <span style="color: #0000BB;">200</span>).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> When using `.as_array = FALSE`, taxa removed may differ across iterations.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Data Sparsity </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Returning list of data frames for each iteration.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Rarefied matrix (across <span style="color: #0000BB;">3</span> iterations):</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">36251</span> zeros (<span style="color: #0000BB;">94.46</span>% sparsity) out of <span style="color: #0000BB;">38376</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">36677</span> zeros (<span style="color: #0000BB;">94.55</span>% sparsity) out of <span style="color: #0000BB;">38792</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">36444</span> zeros (<span style="color: #0000BB;">94.47</span>% sparsity) out of <span style="color: #0000BB;">38575.3</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Final Data Dimensions </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Output: <span style="color: #0000BB;">3</span> iterations with <span style="color: #0000BB;">26</span> unique samples</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Samples per iteration:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">26</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">26</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Non-zero taxa per iteration:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">1476</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">1492</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">1483.7</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract iteration 2</span></span></span>
 <span class="r-in"><span><span class="va">rarefied_gp</span> <span class="op">&lt;-</span> <span class="fu">update_otu_table</span><span class="op">(</span><span class="va">GlobalPatterns</span>, <span class="va">otu_list</span>, iteration <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in update_otu_table(GlobalPatterns, otu_list, iteration = 2):</span> unused argument (iteration = 2)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Extracting iteration <span style="color: #0000BB;">2</span> from list of <span style="color: #0000BB;">3</span> iterations.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Phyloseq object and rarefied otu_table sample names are identical.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> All samples kept after rarefaction at depth of: <span style="color: #0000BB;">200</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Building phyloseq object with <span style="color: #0000BB;">26</span> samples and <span style="color: #0000BB;">1476</span> taxa</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Update complete!</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Array output (.as_array = TRUE)</span></span></span>
 <span class="r-in"><span><span class="va">otu_array</span> <span class="op">&lt;-</span></span></span>
@@ -114,11 +158,55 @@ or array. Required when <code>rarefied_otus</code> is a list or array. Ignored w
 <span class="r-in"><span>    .as_array <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>    set_seed <span class="op">=</span> <span class="fl">123</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in multi_rarefy(physeq_obj = GlobalPatterns, depth_level = 200,     num_iter = 3, .as_array = TRUE, set_seed = 123):</span> unused arguments (physeq_obj = GlobalPatterns, .as_array = TRUE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Multiple Rarefaction</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Input Validation</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Input phyloseq object is valid!</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Seed: <span style="color: #0000BB;">123</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Input (matrix/df dim): <span style="color: #0000BB;">26</span> samples x <span style="color: #0000BB;">19216</span> taxa</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Rarefaction depth: <span style="color: #0000BB;">200</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Iterations: <span style="color: #0000BB;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> taxa_are_rows: TRUE</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> OTU matrix/df rownames head: CL3, CC1, SV1, M31Fcsw, M11Fcsw, M31Plmr</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> OTU matrix/df colnames head: 549322, 522457, 951, 244423, 586076, 246140</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Row sums summary: Min=58688, Max=2357181, Median=1106849</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── <span style="font-weight: bold;">Rarefaction Results</span> ──</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Sample Removal </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No samples removed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Taxa Removal </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> No taxa removed. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> When using `.as_array = TRUE`, taxa are not removed across iterations to </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> maintain consistent dimensions.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Data Sparsity </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Rarefied matrix (across <span style="color: #0000BB;">3</span> iterations):</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">497450</span> zeros (<span style="color: #0000BB;">99.57</span>% sparsity) out of <span style="color: #0000BB;">499616</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">497497</span> zeros (<span style="color: #0000BB;">99.58</span>% sparsity) out of <span style="color: #0000BB;">499616</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">497476.3</span> zeros (<span style="color: #0000BB;">99.57</span>% sparsity) out of <span style="color: #0000BB;">499616</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Final Data Dimensions </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Output: <span style="color: #0000BB;">3</span> iterations with <span style="color: #0000BB;">26</span> samples</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Array dimensions:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Samples: <span style="color: #0000BB;">26</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Taxa: <span style="color: #0000BB;">19216</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Iterations: <span style="color: #0000BB;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> • Non-zero taxa per iteration:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">1468</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">1511</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">1483</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Extract iteration 1</span></span></span>
 <span class="r-in"><span><span class="va">rarefied_gp2</span> <span class="op">&lt;-</span> <span class="fu">update_otu_table</span><span class="op">(</span><span class="va">GlobalPatterns</span>, <span class="va">otu_array</span>, iteration <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in update_otu_table(GlobalPatterns, otu_array, iteration = 1):</span> unused argument (iteration = 1)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Extracting iteration <span style="color: #0000BB;">1</span> from array with <span style="color: #0000BB;">3</span> iterations.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Phyloseq object and rarefied otu_table sample names are identical.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> All samples kept after rarefaction at depth of: <span style="color: #0000BB;">200</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Building phyloseq object with <span style="color: #0000BB;">26</span> samples and <span style="color: #0000BB;">19216</span> taxa</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Update complete!</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -128,7 +216,7 @@ or array. Required when <code>rarefied_otus</code> is a list or array. Ignored w
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Bolívar Aponte Rolón, Gian Maria Niccolo Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, Center for Advanced Bioenergy and Bioproducts Innovation, Great Lakes Bioenergy Research Center.</p>
+  <p>Developed by <a href="https://www.bolaponte.com/" class="external-link">Bolívar Aponte Rolón</a>, Gian Maria Niccolò Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, <a href="https://www.germslab.org/about/" class="external-link">Adina Howe</a>, <a href="https://cabbi.bio/" class="external-link">Center for Advanced Bioenergy and Bioproducts Innovation</a>, <a href="https://www.glbrc.org/" class="external-link">Great Lakes Bioenergy Research Center</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

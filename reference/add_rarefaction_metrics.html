@@ -88,63 +88,63 @@ that appear only once.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://dx.plos.org/10.1371/journal.pone.0061217" class="external-link">phyloseq</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">BRCore</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/germs-lab/BRCore" class="external-link">BRCore</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># From an object class "phyloseq" with added alpha metrics</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"bcse"</span>, package <span class="op">=</span> <span class="st">"BRCore"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bcse_metrics</span> <span class="op">&lt;-</span> <span class="fu">add_rarefaction_metrics</span><span class="op">(</span>data <span class="op">=</span> <span class="va">bcse</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html" class="external-link">sample_data</a></span><span class="op">(</span><span class="va">bcse_metrics</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         Niche               Crop Plot read_num singlton_num goods_cov outlier</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse50   Leaf               Corn   R2   107643          160  99.85136      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse69   Leaf            Sorghum   R4    54331          190  99.65029      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse73   Leaf        Switchgrass   R5    67815           82  99.87908      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse191  Leaf         Miscanthus   R5    83152           96  99.88455      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse82   Leaf     Native Grasses   R2    32228          156  99.51595      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse102  Leaf             Poplar   R3     9621           52  99.45952      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse111  Leaf   Early Succession   R4     6699           43  99.35811      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse86   Leaf         Miscanthus   R3   100940           85  99.91579      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse97   Leaf   Early Succession   R3     4020           30  99.25373      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse88   Leaf         Miscanthus   R1    70532           90  99.87240      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse104  Leaf             Poplar   R1     7819           28  99.64190      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse108  Leaf            Prairie   R2      627           29  95.37480      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse81   Leaf     Native Grasses   R3     5532           66  98.80694      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse77   Leaf        Switchgrass   R2     6425           45  99.29961      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse78   Leaf        Switchgrass   R1    22305           93  99.58305      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse96   Leaf     Native Grasses   R4    19814           83  99.58110      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse66   Leaf    New Switchgrass   R2    18536          305  98.35455      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse57   Leaf Continuous Sorghum   R5    60437          169  99.72037      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse75   Leaf        Switchgrass   R4     3146           59  98.12460      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse101  Leaf             Poplar   R4     4529           27  99.40384      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse192  Leaf               Corn   R4    89228          161  99.81956      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse98   Leaf   Early Succession   R2     2649           40  98.49000      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse105  Leaf            Prairie   R5      151           19  87.41722      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse106  Leaf            Prairie   R4     1354           32  97.63663      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse76   Leaf        Switchgrass   R3     4936           33  99.33144      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse103  Leaf             Poplar   R2     9552           39  99.59171      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse51   Leaf               Corn   R1    94449          216  99.77131      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse63   Leaf               Corn   R5    91353          141  99.84565      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse68   Leaf            Sorghum   R5    78348          120  99.84684      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse109  Leaf            Prairie   R1     3229           80  97.52245      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse65   Leaf    New Switchgrass   R3     1193          165  86.16932      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse58   Leaf Continuous Sorghum   R4    53594          102  99.80968      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse107  Leaf            Prairie   R3     1725          313  81.85507      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse62   Leaf Continuous Sorghum   R1    79380           78  99.90174      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse59   Leaf Continuous Sorghum   R3    90635          261  99.71203      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse99   Leaf   Early Succession   R1    60638           59  99.90270      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse49   Leaf               Corn   R3    88058          109  99.87622      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse85   Leaf         Miscanthus   R4    75760           64  99.91552      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse79   Leaf    New Switchgrass   R5     4275          224  94.76023      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse72   Leaf            Sorghum   R1    76278          138  99.81908      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse80   Leaf    New Switchgrass   R4     1963          137  93.02089      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse71   Leaf            Sorghum   R2   102787           77  99.92509      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse110  Leaf   Early Succession   R5      944           27  97.13983      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse95   Leaf     Native Grasses   R5    21592           61  99.71749      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse67   Leaf    New Switchgrass   R1    24099          211  99.12444      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse61   Leaf Continuous Sorghum   R2    86626          114  99.86840      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse100  Leaf             Poplar   R5    16463           44  99.73273      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse87   Leaf         Miscanthus   R2    74457           56  99.92479      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse83   Leaf     Native Grasses   R1    25209          148  99.41291      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> bcse70   Leaf            Sorghum   R3    66743          145  99.78275      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         Niche               Crop Plot read_num singleton_num goods_cov outlier</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse50   Leaf               Corn   R2   107643           160  99.85136      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse69   Leaf            Sorghum   R4    54331           190  99.65029      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse73   Leaf        Switchgrass   R5    67815            82  99.87908      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse191  Leaf         Miscanthus   R5    83152            96  99.88455      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse82   Leaf     Native Grasses   R2    32228           156  99.51595      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse102  Leaf             Poplar   R3     9621            52  99.45952      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse111  Leaf   Early Succession   R4     6699            43  99.35811      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse86   Leaf         Miscanthus   R3   100940            85  99.91579      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse97   Leaf   Early Succession   R3     4020            30  99.25373      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse88   Leaf         Miscanthus   R1    70532            90  99.87240      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse104  Leaf             Poplar   R1     7819            28  99.64190      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse108  Leaf            Prairie   R2      627            29  95.37480      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse81   Leaf     Native Grasses   R3     5532            66  98.80694      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse77   Leaf        Switchgrass   R2     6425            45  99.29961      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse78   Leaf        Switchgrass   R1    22305            93  99.58305      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse96   Leaf     Native Grasses   R4    19814            83  99.58110      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse66   Leaf    New Switchgrass   R2    18536           305  98.35455      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse57   Leaf Continuous Sorghum   R5    60437           169  99.72037      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse75   Leaf        Switchgrass   R4     3146            59  98.12460      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse101  Leaf             Poplar   R4     4529            27  99.40384      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse192  Leaf               Corn   R4    89228           161  99.81956      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse98   Leaf   Early Succession   R2     2649            40  98.49000      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse105  Leaf            Prairie   R5      151            19  87.41722      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse106  Leaf            Prairie   R4     1354            32  97.63663      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse76   Leaf        Switchgrass   R3     4936            33  99.33144      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse103  Leaf             Poplar   R2     9552            39  99.59171      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse51   Leaf               Corn   R1    94449           216  99.77131      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse63   Leaf               Corn   R5    91353           141  99.84565      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse68   Leaf            Sorghum   R5    78348           120  99.84684      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse109  Leaf            Prairie   R1     3229            80  97.52245      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse65   Leaf    New Switchgrass   R3     1193           165  86.16932      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse58   Leaf Continuous Sorghum   R4    53594           102  99.80968      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse107  Leaf            Prairie   R3     1725           313  81.85507      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse62   Leaf Continuous Sorghum   R1    79380            78  99.90174      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse59   Leaf Continuous Sorghum   R3    90635           261  99.71203      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse99   Leaf   Early Succession   R1    60638            59  99.90270      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse49   Leaf               Corn   R3    88058           109  99.87622      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse85   Leaf         Miscanthus   R4    75760            64  99.91552      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse79   Leaf    New Switchgrass   R5     4275           224  94.76023      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse72   Leaf            Sorghum   R1    76278           138  99.81908      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse80   Leaf    New Switchgrass   R4     1963           137  93.02089      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse71   Leaf            Sorghum   R2   102787            77  99.92509      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse110  Leaf   Early Succession   R5      944            27  97.13983      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse95   Leaf     Native Grasses   R5    21592            61  99.71749      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse67   Leaf    New Switchgrass   R1    24099           211  99.12444      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse61   Leaf Continuous Sorghum   R2    86626           114  99.86840      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse100  Leaf             Poplar   R5    16463            44  99.73273      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse87   Leaf         Miscanthus   R2    74457            56  99.92479      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse83   Leaf     Native Grasses   R1    25209           148  99.41291      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> bcse70   Leaf            Sorghum   R3    66743           145  99.78275      NA</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># From a class "data.frame" count table object</span></span></span>
 <span class="r-in"><span></span></span>
@@ -180,17 +180,17 @@ that appear only once.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OTU_14409      0      0      0       0      0      0      0        2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OTU_11281      0      0      0       0      0      0      0        2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15187      0      0      0       0      0      0      0        2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           singlton_num goods_cov outlier</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15053            2         0      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_14114            1         0      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_9931             1         0      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_13974            0       100      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_10518            0       100      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_12854            2         0      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15056            0       100      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_14409            0       100      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_11281            0       100      NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15187            0       100      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           singleton_num goods_cov outlier</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15053             2         0      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_14114             1         0      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_9931              1         0      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_13974             0       100      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_10518             0       100      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_12854             2         0      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15056             0       100      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_14409             0       100      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_11281             0       100      NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> OTU_15187             0       100      NA</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -200,7 +200,7 @@ that appear only once.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Bolívar Aponte Rolón, Gian Maria Niccolo Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, Center for Advanced Bioenergy and Bioproducts Innovation, Great Lakes Bioenergy Research Center.</p>
+  <p>Developed by <a href="https://www.bolaponte.com/" class="external-link">Bolívar Aponte Rolón</a>, Gian Maria Niccolò Benucci, Brandon Kristy, Ashley Shade, Nejc Stopnisek, <a href="https://www.germslab.org/about/" class="external-link">Adina Howe</a>, <a href="https://cabbi.bio/" class="external-link">Center for Advanced Bioenergy and Bioproducts Innovation</a>, <a href="https://www.glbrc.org/" class="external-link">Great Lakes Bioenergy Research Center</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
