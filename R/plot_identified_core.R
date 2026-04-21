@@ -51,7 +51,6 @@
 #' @importFrom dplyr mutate filter
 #' @importFrom ggplot2 ggplot aes geom_point geom_vline annotate labs theme_classic theme element_text scale_x_continuous scale_y_continuous expansion
 #' @export
-
 plot_identified_core <- function(
   bray_curtis_ranked,
   elbow,
@@ -175,10 +174,10 @@ plot_identified_core <- function(
     theme(
       plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
       plot.subtitle = element_text(hjust = 0.5, size = 9)
-    ) +
+    ) #+
     # Scaling
-    scale_x_continuous(expand = expansion(mult = c(0.02, 0.02))) +
-    scale_y_continuous(expand = expansion(mult = c(0.02, 0.05)))
+    #scale_x_continuous(expand = expansion(mult = c(0.02, 0.02))) +
+    #scale_y_continuous(expand = expansion(mult = c(0.02, 0.05)))
 
   # To add some more fancy graphics later...
   # axis.title = element_text(size = 11),

@@ -392,6 +392,11 @@ identify_core <- function(
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC)) # MeanBC normalized to its own maximum, so it ranges from 0 to 1.
   
   # increase method: multiplicative increase between successive ranks ----
+  # BC_ranked$MeanBC[-1]: This takes all values except the first one (rows 2, 3, 4...).
+  # BC_ranked$MeanBC[-nrow(BC_ranked)]: This takes all values except the last one (rows 1, 2, 3...).
+  # The Division: By dividing these two vectors, R performs element-wise division. 
+  # You are essentially dividing the value at Rank 2 by Rank 1, Rank 3 by Rank 2, and so on.
+  
   if (nrow(BC_ranked) >= 2) {
     Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
     increaseDF <- data.frame(
@@ -404,12 +409,15 @@ identify_core <- function(
   BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
   # add OTU name, delta_pct_max_BC, is_core, last_2pct_cutoff ----
-  BC_ranked <- BC_ranked %>%
+  # NOTE. delta_pct_max_BC at rank 1 will always be -100 because IncreaseBC = 0 
+  # at rank 1 (since there is no previous rank to compare to).
+  
+  BC_ranked <- BC_ranked |>
       mutate(
           rank_num = as.numeric(as.character(rank)),
           otu_added = otu_ranked_ordered[rank_num],
-          delta_pct_max_BC = (IncreaseBC - 1) * 100, 
-          delta_pct_max_BC = ifelse(rank_num == 1, NA_real_, (IncreaseBC - 1) * 100)
+          delta_pct_max_BC = (IncreaseBC - 1) * 100 
+         
       )
   
   # elbow method: by forward-backward slope difference ----
@@ -435,7 +443,7 @@ identify_core <- function(
     elbow <- 1
   }
 
-  # threshold cut based on multiplicative increase
+  # Threshold cut based on multiplicative increase
   thr <- 1 + increase_value
   valid_increases <- which(BC_ranked$IncreaseBC >= thr)
 
@@ -445,11 +453,35 @@ identify_core <- function(
     1
   }
 
-  BC_ranked <- BC_ranked %>%
+  # Add core set flags based on lastCall and elbow
+  BC_ranked <- BC_ranked |> 
       mutate(
-          is_core = rank_num <= lastCall,
-          last_2pct_cutoff = rank_num == lastCall
-      )
+          is_BC_core = rank_num <= lastCall,
+          last_pctBC_cutoff = rank_num == lastCall,
+          is_elbow_core = rank_num <= elbow,
+          last_elbow_cutoff = rank_num == elbow
+      ) |> 
+      arrange(rank_num) |> 
+      select(
+          rank,
+          rank_num,
+          otu_added,
+          MeanBC,
+          proportionBC,
+          IncreaseBC, 
+          elbow_slope_diffs,
+          delta_pct_max_BC,
+          is_BC_core,
+          last_pctBC_cutoff,
+          is_elbow_core,
+          last_elbow_cutoff
+      ) 
+  
+  # delta_pct_max_BC at rank 1 will always be -100 because IncreaseBC = 0 
+  # To avoid confusion, we set it to NA for the first rank.
+  
+  BC_ranked <- BC_ranked |> 
+      mutate(delta_pct_max_BC = ifelse(rank_num == 1, NA_real_, (IncreaseBC - 1) * 100))
   
   # identified core sets ----
 
