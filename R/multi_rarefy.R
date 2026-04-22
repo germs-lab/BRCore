@@ -155,7 +155,7 @@ multi_rarefy <- function(
       processed_data[,, i] <- vegan::rrarefy(otu_mat, sample = depth_level)
     }
   } else {
-    out <- lapply(seq_len(num_iter), function(i) {
+    processed_data <- lapply(seq_len(num_iter), function(i) {
       if (!is.na(iteration_seeds[i])) {
         set.seed(iteration_seeds[i])
       }
@@ -172,12 +172,12 @@ multi_rarefy <- function(
 
       as.data.frame(rare_result)
     })
-    names(out) <- paste0("iter_", seq_len(num_iter))
+    names(processed_data) <- paste0("iter_", seq_len(num_iter))
 
     # Remove zero-abundance taxa for each iteration
-    processed_data <- lapply(out, function(df) {
-      df[, colSums(df) > 0, drop = FALSE]
-    })
+    # processed_data <- lapply(out, function(df) {
+    #   df[, colSums(df) > 0, drop = FALSE]
+    # })
   }
 
   avg_taxa_removed <- NULL
@@ -403,6 +403,9 @@ multi_rarefy <- function(
     cli::cli_end()
     cli::cli_end()
   } else {
+    processed_data <- lapply(processed_data, function(df) {
+      df[, colSums(df) > 0, drop = FALSE]
+    })
     summary_stats <- list(
       min_taxa = min(vapply(processed_data, ncol, integer(1))),
       max_taxa = max(vapply(processed_data, ncol, integer(1))),

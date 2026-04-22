@@ -1,8 +1,4 @@
-#' Identify Core Microbial Taxa
-#'
-#' @description
-#' This function identifies core microbial taxa based on abundance-occupancy
-#' distributions and their contributions to Bray-Curtis similarity between
+#' Identify Core Microbiome Using Bray-Curtis Similarity
 #' biological samples. Core taxa are selected using either a "last % increase"
 #' or "elbow" method implementing the method developed by Shade
 #' and Stopnisek (2019) Curr Opin Microbiol, see below for details.
@@ -120,6 +116,7 @@
 #' @export
 identify_core <- function(
   physeq_obj,
+  rarefied_list,
   priority_var,
   increase_value = 0.02,
   abundance_weight = 0,
@@ -139,21 +136,32 @@ identify_core <- function(
 
   .phyloseq_class_check(physeq_obj)
 
-  # define arguments ----
+  # validate rarefied_list ----
+  if (missing(rarefied_list) || is.null(rarefied_list)) {
+    cli::cli_abort(
+      "{.arg rarefied_list} is required. Provide the output of {.fn multi_rarefy}."
+    )
+  }
+  if (!is.list(rarefied_list) || length(rarefied_list) == 0) {
+    cli::cli_abort(
+      "{.arg rarefied_list} must be a non-empty list of rarefied data frames (output of {.fn multi_rarefy})."
+    )
+  }
 
+  # define arguments ----
   # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))
   is_rarefied <- abs(min_sum - max_sum) < 1e-6
 
   if (is_rarefied) {
-    depth_level <- round(min_sum) # Use rounded value for display
+    depth_level <- round(min_sum)
     cli::cli_alert_info(
       "otu_table() is rarefied at a depth of: {.val {depth_level}}"
     )
   } else {
     cli::cli_alert_warning(
-      "The otu_table() is not rarefied! \n Using depth_level={.val {depth_level}} for rarefaction and normalization in Bray-Curtis calculations. \n Adjust depth_level according to your objectives."
+      "The otu_table() is not rarefied! \n Using depth_level={.val {depth_level}} for normalization in Bray-Curtis calculations. \n Adjust depth_level according to your objectives."
     )
   }
 
@@ -198,7 +206,6 @@ identify_core <- function(
   }
 
   # abundance occupancy ----
-  # occupancy and mean rel. abundance
   otu_PA <- 1 * (otu > 0)
   otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
   otu_rel <- apply(
@@ -211,7 +218,6 @@ identify_core <- function(
     tibble::rownames_to_column("otu")
 
   # PresenceSum ----
-
   PresenceSum <- data.frame(
     otu = as.factor(rownames(otu)),
     otu,
@@ -279,9 +285,7 @@ identify_core <- function(
         otu_occ,
         otu_rel
       )
-    cli::cli_alert_info(
-      "Ranked by {rank_method}"
-    )
+    cli::cli_alert_info("Ranked by {rank_method}")
   }
 
   # Optional: Limit analysis to top N OTUs
@@ -294,9 +298,7 @@ identify_core <- function(
 
     if (max_otus < nrow(otu_ranked)) {
       total_otus <- nrow(otu_ranked)
-      otu_ranked <- otu_ranked |>
-        slice_head(n = max_otus)
-
+      otu_ranked <- otu_ranked |> slice_head(n = max_otus)
       cli::cli_alert_info(
         "Limiting analysis to top {max_otus} of {total_otus} OTUs (ranked by {rank_method})."
       )
@@ -310,35 +312,52 @@ identify_core <- function(
   otu_ranked_ordered <- otu_ranked$otu
 
   # BC accumulation ----
-  # cumulative BC across samples while adding taxa in rank order
-  # pairwise BC on *current* subset of taxa, normalized by depth_level, matching your formula
-
-  # start with the first ranked OTU
   cli::cli_alert_info(
     "Ranking OTUs based on BC dissimilarity, starting at {Sys.time()}"
   )
 
-  # Pre-compute sample pairs ONCE from the full OTU matrix (all samples),
-  # matching find_core behaviour — do NOT filter by depth_level here.
-  sample_pairs <- utils::combn(ncol(otu), 2)
+  # Pre-compute sample pairs ONCE from the first rarefied iteration
+  # (all iterations share the same samples after multi_rarefy filtering)
+  ref_iter <- as.matrix(t(rarefied_list[[1]])) # taxa x samples
+  sample_names <- colnames(ref_iter)
+
+  sample_pairs <- utils::combn(length(sample_names), 2)
   pair_names <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(otu)[x], collapse = " - ")
+    paste(sample_names[x], collapse = " - ")
   })
 
-  start_idx <- match(otu_ranked$otu[1], rownames(otu))
-  start_matrix <- matrix(
-    otu[start_idx, ],
-    nrow = 1,
-    dimnames = list(otu_ranked$otu[1], colnames(otu))
-  )
+  n_iter <- length(rarefied_list)
+  n_pairs <- ncol(sample_pairs)
 
-  # Rank 1: single OTU — compute directly to avoid avgdist NaN (0/0)
-  bc_start <- apply(sample_pairs, 2, function(idx) {
-    sum(abs(start_matrix[, idx[1]] - start_matrix[, idx[2]])) /
-      (2 * depth_level)
-  })
+  # Helper: compute mean BC dissimilarity across all rarefied iterations
+  # for a given subset of OTUs (rows of each iteration matrix)
+  .mean_bc_over_iters <- function(otu_subset) {
+    # otu_subset: character vector of OTU names
+    pair_sums <- matrix(0, nrow = n_iter, ncol = n_pairs)
 
-  BCaddition <- NULL
+    for (iter_i in seq_len(n_iter)) {
+      iter_mat <- as.matrix(t(rarefied_list[[iter_i]])) # taxa x samples
+      # subset to OTUs present in this iteration (some may have dropped to 0)
+      keep_otus <- intersect(otu_subset, rownames(iter_mat))
+      sub_mat <- iter_mat[keep_otus, , drop = FALSE]
+
+      bc_iter <- as.vector(
+        vegan::vegdist(t(sub_mat), method = "bray")
+      )
+
+      # Re-normalize: vegdist uses sum(x+y) as denominator;
+      # we want sum(abs(x-y)) / (2 * depth_level) to match find_core
+      pair_sums_iter <- apply(sample_pairs, 2, function(x) {
+        sum(sub_mat[, x[1]]) + sum(sub_mat[, x[2]])
+      })
+      pair_sums[iter_i, ] <- bc_iter * pair_sums_iter / (2 * depth_level)
+    }
+
+    colMeans(pair_sums)
+  }
+
+  # Rank 1
+  bc_start <- .mean_bc_over_iters(otu_ranked_ordered[1])
   BCaddition <- data.frame(
     pair_names = pair_names,
     `1` = bc_start,
@@ -353,31 +372,18 @@ identify_core <- function(
       .auto_close = TRUE
     )
 
+    cumulative_otus <- otu_ranked_ordered[1]
+
     for (i in 2:nrow(otu_ranked)) {
-      add_idx <- match(otu_ranked$otu[i], rownames(otu))
-      add_matrix <- matrix(
-        otu[add_idx, ],
-        nrow = 1,
-        dimnames = list(otu_ranked$otu[i], colnames(otu))
-      )
-      start_matrix <- rbind(start_matrix, add_matrix)
+      cumulative_otus <- c(cumulative_otus, otu_ranked_ordered[i])
 
-      bc_vec <- .calculate_bc(
-        start_matrix,
-        depth_level,
-        num_iterations = num_iter,
-        is_rarefied = is_rarefied
-      )
-
-      # Align bc_vec to the fixed pair_names — fill missing pairs with 0
-      bc_aligned <- setNames(rep(0, length(pair_names)), pair_names)
-      bc_aligned[bc_vec$names] <- bc_vec$values
+      bc_i <- .mean_bc_over_iters(cumulative_otus)
 
       BCaddition <- left_join(
         BCaddition,
         data.frame(
           pair_names = pair_names,
-          value = bc_aligned,
+          value = bc_i,
           check.names = FALSE
         ),
         by = "pair_names"
@@ -401,15 +407,10 @@ identify_core <- function(
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     mutate(rank_num = as.numeric(as.character(rank))) |>
-    arrange(rank_num) |> # order by rank integer, not MeanBC
-    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
+    arrange(rank_num) |>
+    mutate(proportionBC = .data$MeanBC / last(.data$MeanBC))
 
-  # increase method: multiplicative increase between successive ranks ----
-  # BC_ranked$MeanBC[-1]: This takes all values except the first one (rows 2, 3, 4...).
-  # BC_ranked$MeanBC[-nrow(BC_ranked)]: This takes all values except the last one (rows 1, 2, 3...).
-  # The Division: By dividing these two vectors, R performs element-wise division.
-  # You are essentially dividing the value at Rank 2 by Rank 1, Rank 3 by Rank 2, and so on.
-
+  # increase method ----
   if (nrow(BC_ranked) >= 2) {
     Increase <- ifelse(
       BC_ranked$MeanBC[-nrow(BC_ranked)] == 0,
@@ -421,23 +422,19 @@ identify_core <- function(
       rank = factor(seq_len(length(Increase) + 1))
     )
   } else {
-    increaseDF <- data.frame(IncreaseBC = 0, rank = factor(1))
+    increaseDF <- data.frame(IncreaseBC = NA_real_, rank = factor(1))
   }
   BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
-  # add OTU name, delta_pct_max_BC, is_core, last_2pct_cutoff ----
-  # NOTE. delta_pct_max_BC at rank 1 will always be -100 because IncreaseBC = 0
-  # at rank 1 (since there is no previous rank to compare to).
-
+  # add OTU name, delta_pct_max_BC ----
   BC_ranked <- BC_ranked |>
     mutate(
       rank_num = as.numeric(as.character(rank)),
       otu_added = otu_ranked_ordered[rank_num],
-      delta_pct_max_BC = (IncreaseBC - 1) * 100,
-      delta_pct_max_BC = ifelse(rank_num == 1, -100, delta_pct_max_BC)
+      delta_pct_max_BC = (IncreaseBC - 1) * 100
     )
 
-  # elbow method: by forward-backward slope difference ----
+  # elbow method ----
   elbow_slope_differences <- function(pos) {
     left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
     right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
@@ -470,7 +467,7 @@ identify_core <- function(
     1
   }
 
-  # Add core set flags based on lastCall and elbow
+  # Add core set flags
   BC_ranked <- BC_ranked |>
     mutate(
       is_BC_core = rank_num <= lastCall,
@@ -529,7 +526,6 @@ identify_core <- function(
   out
 }
 
-
 #' Calculate Bray-Curtis Dissimilarity Between Sample Pairs
 #'
 #' This function calculates the Bray-Curtis dissimilarity between all pairs of samples in a matrix.
@@ -551,116 +547,115 @@ identify_core <- function(
 #' @noRd
 #' @keywords internal
 
-.calculate_bc <- function(
-  matrix,
-  depth_level,
-  num_iterations,
-  is_rarefied = TRUE
-) {
-  if (nrow(matrix) == 0) {
-    cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
-    return(list(values = numeric(0), names = character(0)))
-  }
+# .calculate_bc <- function(
+#   matrix,
+#   depth_level,
+#   num_iterations,
+#   is_rarefied = TRUE
+# ) {
+#   if (nrow(matrix) == 0) {
+#     cli::cli_alert_warning("{.arg matrix} is empty. Enter a non-empty matrix.")
+#     return(list(values = numeric(0), names = character(0)))
+#   }
 
-  if (ncol(matrix) < 2) {
-    cli::cli_alert_warning(
-      "{.arg matrix} has fewer than 2 columns. Need at least 2 columns to calculate pairwise distances."
-    )
-    return(list(values = numeric(0), names = character(0)))
-  }
+#   if (ncol(matrix) < 2) {
+#     cli::cli_alert_warning(
+#       "{.arg matrix} has fewer than 2 columns. Need at least 2 columns to calculate pairwise distances."
+#     )
+#     return(list(values = numeric(0), names = character(0)))
+#   }
 
-  # Conditional handling for rarefied vs unrarefied data
-  if (is_rarefied) {
-    # Data already rarefied - use vegdist directly without subsampling
-    sample_pairs <- utils::combn(ncol(matrix), 2)
-    pair_labels <- apply(sample_pairs, 2, function(x) {
-      paste(colnames(matrix)[x], collapse = " - ")
-    })
+#   # Conditional handling for rarefied vs unrarefied data
+#   if (is_rarefied) {
+#     # Data already rarefied - use vegdist directly without subsampling
+#     sample_pairs <- utils::combn(ncol(matrix), 2)
+#     pair_labels <- apply(sample_pairs, 2, function(x) {
+#       paste(colnames(matrix)[x], collapse = " - ")
+#     })
 
-    bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
+#     bc_vegan <- as.vector(vegan::vegdist(t(matrix), method = "bray"))
 
-    # Per-pair normalization vegdist used
-    pair_sums <- apply(sample_pairs, 2, function(x) {
-      sum(matrix[, x[1]]) + sum(matrix[, x[2]])
-    })
+#     # Per-pair normalization vegdist used
+#     pair_sums <- apply(sample_pairs, 2, function(x) {
+#       sum(matrix[, x[1]]) + sum(matrix[, x[2]])
+#     })
 
-    # Reverse vegdist normalization and apply our own
-    bc_values <- bc_vegan * pair_sums / (2 * depth_level)
-  } else {
-    # Unrarefied data - filter samples by depth FIRST
-    floating_depth <- depth_level * 0.9999999 # account for floating-point precision
+#     # Reverse vegdist normalization and apply our own
+#     bc_values <- bc_vegan * pair_sums / (2 * depth_level)
+#   } else {
+#     # Unrarefied data - filter samples by depth FIRST
+#     floating_depth <- depth_level * 0.9999999 # account for floating-point precision
 
-    keep_samples <- colSums(matrix) >= floating_depth #ASV/OTUs should be columns
+#     keep_samples <- colSums(matrix) >= floating_depth #ASV/OTUs should be columns
 
-    filtered_matrix <- matrix[, keep_samples, drop = FALSE]
+#     filtered_matrix <- matrix[, keep_samples, drop = FALSE]
 
-    if (ncol(filtered_matrix) < 2) {
-      return(list(values = numeric(0), names = character(0)))
-    }
+#     if (ncol(filtered_matrix) < 2) {
+#       return(list(values = numeric(0), names = character(0)))
+#     }
 
-    # NOW compute sample pairs from the filtered matrix
-    sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
-    pair_labels <- apply(sample_pairs, 2, function(x) {
-      paste(colnames(filtered_matrix)[x], collapse = " - ")
-    })
+#     # NOW compute sample pairs from the filtered matrix
+#     sample_pairs <- utils::combn(ncol(filtered_matrix), 2)
+#     pair_labels <- apply(sample_pairs, 2, function(x) {
+#       paste(colnames(filtered_matrix)[x], collapse = " - ")
+#     })
 
-    # Use avgdist with rarefaction
-    bc_values <- as.vector(
-      suppressWarnings(
-        vegan::avgdist(
-          t(filtered_matrix),
-          sample = depth_level,
-          iterations = num_iterations,
-          dmethod = "bray"
-        )
-      )
-    )
-  }
+#     # Use avgdist with rarefaction
+#     bc_values <- as.vector(
+#       suppressWarnings(
+#         vegan::avgdist(
+#           t(filtered_matrix),
+#           sample = depth_level,
+#           iterations = num_iterations,
+#           dmethod = "bray"
+#         )
+#       )
+#     )
+#   }
 
-  list(
-    values = bc_values,
-    names = pair_labels
-  )
-}
+#   list(
+#     values = bc_values,
+#     names = pair_labels
+#   )
+# }
 
+# .calculate_bc_analytical <- function(matrix, depth_level, is_rarefied = FALSE) {
+#   if (nrow(matrix) == 0 || ncol(matrix) < 2) {
+#     return(list(values = numeric(0), names = character(0)))
+#   }
 
-.calculate_bc_analytical <- function(matrix, depth_level, is_rarefied = FALSE) {
-  if (nrow(matrix) == 0 || ncol(matrix) < 2) {
-    return(list(values = numeric(0), names = character(0)))
-  }
+#   if (!is_rarefied) {
+#     keep <- colSums(matrix) >= depth_level * 0.9999999
+#     matrix <- matrix[, keep, drop = FALSE]
+#     if (ncol(matrix) < 2) {
+#       return(list(values = numeric(0), names = character(0)))
+#     }
 
-  if (!is_rarefied) {
-    keep <- colSums(matrix) >= depth_level * 0.9999999
-    matrix <- matrix[, keep, drop = FALSE]
-    if (ncol(matrix) < 2) {
-      return(list(values = numeric(0), names = character(0)))
-    }
+#     col_names <- colnames(matrix)
+#     row_names <- rownames(matrix)
+#     matrix <- apply(matrix, 2, function(col) {
+#       if (sum(col) == 0) {
+#         return(rep(0, length(col)))
+#       }
+#       as.vector(rmultinom(1, size = depth_level, prob = col / sum(col)))
+#     })
+#     if (is.null(dim(matrix))) {
+#       matrix <- t(as.matrix(matrix))
+#     }
+#     colnames(matrix) <- col_names
+#     rownames(matrix) <- row_names
+#     if (ncol(matrix) < 2) {
+#       return(list(values = numeric(0), names = character(0)))
+#     }
+#   }
 
-    col_names <- colnames(matrix)
-    row_names <- rownames(matrix)
-    matrix <- apply(matrix, 2, function(col) {
-      if (sum(col) == 0) {
-        return(rep(0, length(col)))
-      }
-      as.vector(rmultinom(1, size = depth_level, prob = col / sum(col)))
-    })
-    if (is.null(dim(matrix))) {
-      matrix <- t(as.matrix(matrix))
-    }
-    colnames(matrix) <- col_names
-    rownames(matrix) <- row_names
-    if (ncol(matrix) < 2) {
-      return(list(values = numeric(0), names = character(0)))
-    }
-  }
+#   sample_pairs <- utils::combn(ncol(matrix), 2)
+#   pair_labels <- apply(sample_pairs, 2, function(x) {
+#     paste(colnames(matrix)[x], collapse = " - ")
+#   })
+#   bc_values <- apply(sample_pairs, 2, function(x) {
+#     sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level)
+#   })
 
-  sample_pairs <- utils::combn(ncol(matrix), 2)
-  pair_labels <- apply(sample_pairs, 2, function(x) {
-    paste(colnames(matrix)[x], collapse = " - ")
-  })
-  bc_values <- apply(sample_pairs, 2, function(x) {
-    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level)
-  })
-
-  list(values = bc_values, names = pair_labels)
-}
+#   list(values = bc_values, names = pair_labels)
+# }
