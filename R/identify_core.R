@@ -229,7 +229,7 @@ identify_core <- function(
     summarise(
       sumF = sum(time_freq),
       sumG = sum(coreTime),
-      nS = 2L * length(.data[[data_var]]), # K per original
+      nS = length(unique(.data[[data_var]])), # unique time points, not 2 * all rows
       Index = (sumF + sumG) / nS, # can be up to 2 (original behavior)
       .groups = "drop"
     )
@@ -239,10 +239,15 @@ identify_core <- function(
     left_join(PresenceSum, by = "otu")
 
   rank_method <- if (abundance_weight > 0) {
-      occupancy_weight <- 1 - abundance_weight
-      paste0("Occupancy: ", occupancy_weight, " and Abundance: ", abundance_weight) 
+    occupancy_weight <- 1 - abundance_weight
+    paste0(
+      "Occupancy: ",
+      occupancy_weight,
+      " and Abundance: ",
+      abundance_weight
+    )
   } else {
-      "Index only"
+    "Index only"
   }
 
   if (abundance_weight == 0) {
@@ -313,6 +318,13 @@ identify_core <- function(
     "Ranking OTUs based on BC dissimilarity, starting at {Sys.time()}"
   )
 
+  # Pre-compute sample pairs ONCE from the full OTU matrix (all samples),
+  # matching find_core behaviour — do NOT filter by depth_level here.
+  sample_pairs <- utils::combn(ncol(otu), 2)
+  pair_names <- apply(sample_pairs, 2, function(x) {
+    paste(colnames(otu)[x], collapse = " - ")
+  })
+
   start_idx <- match(otu_ranked$otu[1], rownames(otu))
   start_matrix <- matrix(
     otu[start_idx, ],
@@ -320,23 +332,16 @@ identify_core <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  #bc_vec <- .calculate_bc(
-  #  start_matrix,
-  #  depth_level,
-  #  num_iterations = num_iter,
-  #  is_rarefied = is_rarefied
-  #)
-  
-  bc_vec <- .calculate_bc_analytical(
-      start_matrix,
-      depth_level,
-      is_rarefied = is_rarefied
-  )
-  
+  # Rank 1: single OTU — compute directly to avoid avgdist NaN (0/0)
+  bc_start <- apply(sample_pairs, 2, function(idx) {
+    sum(abs(start_matrix[, idx[1]] - start_matrix[, idx[2]])) /
+      (2 * depth_level)
+  })
 
+  BCaddition <- NULL
   BCaddition <- data.frame(
-    x_names = bc_vec$names,
-    `1` = bc_vec$values,
+    pair_names = pair_names,
+    `1` = bc_start,
     check.names = FALSE
   )
 
@@ -364,14 +369,18 @@ identify_core <- function(
         is_rarefied = is_rarefied
       )
 
+      # Align bc_vec to the fixed pair_names — fill missing pairs with 0
+      bc_aligned <- setNames(rep(0, length(pair_names)), pair_names)
+      bc_aligned[bc_vec$names] <- bc_vec$values
+
       BCaddition <- left_join(
         BCaddition,
         data.frame(
-          x_names = bc_vec$names,
-          value = bc_vec$values,
+          pair_names = pair_names,
+          value = bc_aligned,
           check.names = FALSE
         ),
-        by = "x_names"
+        by = "pair_names"
       )
       names(BCaddition)[ncol(BCaddition)] <- as.character(i)
 
@@ -380,35 +389,35 @@ identify_core <- function(
   }
 
   temp_BC_matrix <- BCaddition |>
-    tibble::column_to_rownames("x_names") |>
+    tibble::column_to_rownames("pair_names") |>
     as.matrix()
 
-  # This is the bug! how BC_ranked was built!
   BC_ranked <- data.frame(
     rank = as.factor(rownames(t(temp_BC_matrix))),
     t(temp_BC_matrix),
     check.names = FALSE
   ) |>
-    pivot_longer(
-      -rank,
-      names_to = "comparison",
-      values_to = "BC"
-    ) |>
+    pivot_longer(-rank, names_to = "comparison", values_to = "BC") |>
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
-    arrange(MeanBC) |>
-    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC)) # MeanBC normalized to its own maximum, so it ranges from 0 to 1.
-  
+    mutate(rank_num = as.numeric(as.character(rank))) |>
+    arrange(rank_num) |> # order by rank integer, not MeanBC
+    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
+
   # increase method: multiplicative increase between successive ranks ----
   # BC_ranked$MeanBC[-1]: This takes all values except the first one (rows 2, 3, 4...).
   # BC_ranked$MeanBC[-nrow(BC_ranked)]: This takes all values except the last one (rows 1, 2, 3...).
-  # The Division: By dividing these two vectors, R performs element-wise division. 
+  # The Division: By dividing these two vectors, R performs element-wise division.
   # You are essentially dividing the value at Rank 2 by Rank 1, Rank 3 by Rank 2, and so on.
-  
+
   if (nrow(BC_ranked) >= 2) {
-    Increase <- BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
+    Increase <- ifelse(
+      BC_ranked$MeanBC[-nrow(BC_ranked)] == 0,
+      NA_real_,
+      BC_ranked$MeanBC[-1] / BC_ranked$MeanBC[-nrow(BC_ranked)]
+    )
     increaseDF <- data.frame(
-      IncreaseBC = c(0, Increase),
+      IncreaseBC = c(NA_real_, Increase),
       rank = factor(seq_len(length(Increase) + 1))
     )
   } else {
@@ -417,17 +426,17 @@ identify_core <- function(
   BC_ranked <- left_join(BC_ranked, increaseDF, by = "rank")
 
   # add OTU name, delta_pct_max_BC, is_core, last_2pct_cutoff ----
-  # NOTE. delta_pct_max_BC at rank 1 will always be -100 because IncreaseBC = 0 
+  # NOTE. delta_pct_max_BC at rank 1 will always be -100 because IncreaseBC = 0
   # at rank 1 (since there is no previous rank to compare to).
-  
+
   BC_ranked <- BC_ranked |>
-      mutate(
-          rank_num = as.numeric(as.character(rank)),
-          otu_added = otu_ranked_ordered[rank_num],
-          delta_pct_max_BC = (IncreaseBC - 1) * 100 
-         
-      )
-  
+    mutate(
+      rank_num = as.numeric(as.character(rank)),
+      otu_added = otu_ranked_ordered[rank_num],
+      delta_pct_max_BC = (IncreaseBC - 1) * 100,
+      delta_pct_max_BC = ifelse(rank_num == 1, -100, delta_pct_max_BC)
+    )
+
   # elbow method: by forward-backward slope difference ----
   elbow_slope_differences <- function(pos) {
     left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
@@ -462,35 +471,29 @@ identify_core <- function(
   }
 
   # Add core set flags based on lastCall and elbow
-  BC_ranked <- BC_ranked |> 
-      mutate(
-          is_BC_core = rank_num <= lastCall,
-          last_pctBC_cutoff = rank_num == lastCall,
-          is_elbow_core = rank_num <= elbow,
-          last_elbow_cutoff = rank_num == elbow
-      ) |> 
-      arrange(rank_num) |> 
-      select(
-          rank,
-          rank_num,
-          otu_added,
-          MeanBC,
-          proportionBC,
-          IncreaseBC, 
-          elbow_slope_diffs,
-          delta_pct_max_BC,
-          is_BC_core,
-          last_pctBC_cutoff,
-          is_elbow_core,
-          last_elbow_cutoff
-      ) 
-  
-  # delta_pct_max_BC at rank 1 will always be -100 because IncreaseBC = 0 
-  # To avoid confusion, we set it to NA for the first rank.
-  
-  BC_ranked <- BC_ranked |> 
-      mutate(delta_pct_max_BC = ifelse(rank_num == 1, NA_real_, (IncreaseBC - 1) * 100))
-  
+  BC_ranked <- BC_ranked |>
+    mutate(
+      is_BC_core = rank_num <= lastCall,
+      last_pctBC_cutoff = rank_num == lastCall,
+      is_elbow_core = rank_num <= elbow,
+      last_elbow_cutoff = rank_num == elbow
+    ) |>
+    arrange(rank_num) |>
+    select(
+      rank,
+      rank_num,
+      otu_added,
+      MeanBC,
+      proportionBC,
+      IncreaseBC,
+      elbow_slope_diffs,
+      delta_pct_max_BC,
+      is_BC_core,
+      last_pctBC_cutoff,
+      is_elbow_core,
+      last_elbow_cutoff
+    )
+
   # identified core sets ----
 
   elbow_core <- otu_ranked_ordered[seq_len(elbow)]
@@ -621,38 +624,43 @@ identify_core <- function(
 }
 
 
-.calculate_bc_analytical <- function(matrix, 
-                                     depth_level, 
-                                     is_rarefied = FALSE) {
-    if (nrow(matrix) == 0 || ncol(matrix) < 2)
-        return(list(values = numeric(0), names = character(0)))
-    
-    if (!is_rarefied) {
-        keep      <- colSums(matrix) >= depth_level * 0.9999999
-        matrix    <- matrix[, keep, drop = FALSE]
-        if (ncol(matrix) < 2)
-            return(list(values = numeric(0), names = character(0)))
-        
-        col_names <- colnames(matrix)
-        row_names <- rownames(matrix)
-        matrix    <- apply(matrix, 2, function(col) {
-            if (sum(col) == 0) return(rep(0, length(col)))
-            as.vector(rmultinom(1, size = depth_level, prob = col / sum(col)))
-        })
-        if (is.null(dim(matrix))) matrix <- t(as.matrix(matrix))
-        colnames(matrix) <- col_names
-        rownames(matrix) <- row_names
-        if (ncol(matrix) < 2)
-            return(list(values = numeric(0), names = character(0)))
+.calculate_bc_analytical <- function(matrix, depth_level, is_rarefied = FALSE) {
+  if (nrow(matrix) == 0 || ncol(matrix) < 2) {
+    return(list(values = numeric(0), names = character(0)))
+  }
+
+  if (!is_rarefied) {
+    keep <- colSums(matrix) >= depth_level * 0.9999999
+    matrix <- matrix[, keep, drop = FALSE]
+    if (ncol(matrix) < 2) {
+      return(list(values = numeric(0), names = character(0)))
     }
-    
-    sample_pairs <- utils::combn(ncol(matrix), 2)
-    pair_labels  <- apply(sample_pairs, 2, function(x)
-        paste(colnames(matrix)[x], collapse = " - "))
-    bc_values    <- apply(sample_pairs, 2, function(x)
-        sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level))
-    
-    list(values = bc_values, names = pair_labels)
+
+    col_names <- colnames(matrix)
+    row_names <- rownames(matrix)
+    matrix <- apply(matrix, 2, function(col) {
+      if (sum(col) == 0) {
+        return(rep(0, length(col)))
+      }
+      as.vector(rmultinom(1, size = depth_level, prob = col / sum(col)))
+    })
+    if (is.null(dim(matrix))) {
+      matrix <- t(as.matrix(matrix))
+    }
+    colnames(matrix) <- col_names
+    rownames(matrix) <- row_names
+    if (ncol(matrix) < 2) {
+      return(list(values = numeric(0), names = character(0)))
+    }
+  }
+
+  sample_pairs <- utils::combn(ncol(matrix), 2)
+  pair_labels <- apply(sample_pairs, 2, function(x) {
+    paste(colnames(matrix)[x], collapse = " - ")
+  })
+  bc_values <- apply(sample_pairs, 2, function(x) {
+    sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level)
+  })
+
+  list(values = bc_values, names = pair_labels)
 }
-
-
