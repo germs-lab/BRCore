@@ -320,12 +320,19 @@ identify_core <- function(
     dimnames = list(otu_ranked$otu[1], colnames(otu))
   )
 
-  bc_vec <- .calculate_bc(
-    start_matrix,
-    depth_level,
-    num_iterations = num_iter,
-    is_rarefied = is_rarefied
+  #bc_vec <- .calculate_bc(
+  #  start_matrix,
+  #  depth_level,
+  #  num_iterations = num_iter,
+  #  is_rarefied = is_rarefied
+  #)
+  
+  bc_vec <- .calculate_bc_analytical(
+      start_matrix,
+      depth_level,
+      is_rarefied = is_rarefied
   )
+  
 
   BCaddition <- data.frame(
     x_names = bc_vec$names,
@@ -376,6 +383,7 @@ identify_core <- function(
     tibble::column_to_rownames("x_names") |>
     as.matrix()
 
+  # This is the bug! how BC_ranked was built!
   BC_ranked <- data.frame(
     rank = as.factor(rownames(t(temp_BC_matrix))),
     t(temp_BC_matrix),
@@ -611,3 +619,40 @@ identify_core <- function(
     names = pair_labels
   )
 }
+
+
+.calculate_bc_analytical <- function(matrix, 
+                                     depth_level, 
+                                     is_rarefied = FALSE) {
+    if (nrow(matrix) == 0 || ncol(matrix) < 2)
+        return(list(values = numeric(0), names = character(0)))
+    
+    if (!is_rarefied) {
+        keep      <- colSums(matrix) >= depth_level * 0.9999999
+        matrix    <- matrix[, keep, drop = FALSE]
+        if (ncol(matrix) < 2)
+            return(list(values = numeric(0), names = character(0)))
+        
+        col_names <- colnames(matrix)
+        row_names <- rownames(matrix)
+        matrix    <- apply(matrix, 2, function(col) {
+            if (sum(col) == 0) return(rep(0, length(col)))
+            as.vector(rmultinom(1, size = depth_level, prob = col / sum(col)))
+        })
+        if (is.null(dim(matrix))) matrix <- t(as.matrix(matrix))
+        colnames(matrix) <- col_names
+        rownames(matrix) <- row_names
+        if (ncol(matrix) < 2)
+            return(list(values = numeric(0), names = character(0)))
+    }
+    
+    sample_pairs <- utils::combn(ncol(matrix), 2)
+    pair_labels  <- apply(sample_pairs, 2, function(x)
+        paste(colnames(matrix)[x], collapse = " - "))
+    bc_values    <- apply(sample_pairs, 2, function(x)
+        sum(abs(matrix[, x[1]] - matrix[, x[2]])) / (2 * depth_level))
+    
+    list(values = bc_values, names = pair_labels)
+}
+
+
