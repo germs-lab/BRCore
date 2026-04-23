@@ -407,7 +407,7 @@ identify_core <- function(
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
     mutate(rank_num = as.numeric(as.character(rank))) |>
     arrange(rank_num) |>
-    mutate(proportionBC = .data$MeanBC / last(.data$MeanBC))
+    mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
   # increase method ----
   if (nrow(BC_ranked) >= 2) {
