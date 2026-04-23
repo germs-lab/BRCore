@@ -7,6 +7,12 @@
 #' @param q Hill number order (q = 0 for richness, q = 1 for Shannon, q = 2 for Simpson)
 #' @param group_var A grouping variable to use gor grouping as in the sample_data()
 #' @param group_color A color variable to use present in the sample_data()
+#' @param convert_to_factor Logical. If \code{TRUE}, both \code{group_var} and
+#'   \code{group_color} are coerced to \code{factor} before plotting, which is
+#'   useful when those columns are numeric/continuous (e.g. dates, counts) but
+#'   should be treated as discrete groups. When \code{TRUE} a discrete colour
+#'   scale (\code{scale_color_viridis_d}) is used; otherwise the continuous
+#'   scale (\code{scale_color_viridis_c}) is used. Default \code{FALSE}.
 #'
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom phyloseq otu_table sample_data taxa_are_rows
@@ -48,7 +54,8 @@ plot_variance_propagation <- function(
   rarefied,
   q = 0,
   group_var,
-  group_color
+  group_color,
+  convert_to_factor = FALSE
 ) {
   # Validate inputs
   .phyloseq_class_check(physeq_obj)
@@ -80,7 +87,11 @@ plot_variance_propagation <- function(
     sample_id = names(raw_vals),
     value = raw_vals,
     method = "Raw"
-  )
+  ) |>
+    left_join(
+      metadata[, c("sample_id", group_var, group_color), drop = FALSE],
+      by = "sample_id"
+    )
 
   n_iter <- .get_n_iterations(rarefied)
 
@@ -88,7 +99,7 @@ plot_variance_propagation <- function(
     "Number of rarefaction iterations, n_iter= {.val {n_iter}}"
   )
 
-  # replicate raw values
+  # replicate raw values (metadata already joined)
   raw_df <- raw_df[rep(seq_len(nrow(raw_df)), n_iter), ]
 
   iter_list <- .get_iter_list(rarefied)
@@ -101,29 +112,48 @@ plot_variance_propagation <- function(
     },
     double(1)
   )
+
   rare_df <- lapply(seq_along(iter_list), function(i) {
     mat <- as.matrix(iter_list[[i]])
-
     vals <- .hill_number(mat, q = q)
-
     data.frame(
       sample_id = names(vals),
       value = vals,
       method = "Rarefied"
     )
-  }) %>%
-    bind_rows()
+  }) |>
+    bind_rows() |>
+    left_join(
+      metadata[, c("sample_id", group_var, group_color), drop = FALSE],
+      by = "sample_id"
+    )
 
   # Combine
   all_df <- bind_rows(
     mutate(raw_df, iter = NA_integer_),
     mutate(rare_df, iter = rep(seq_len(n_iter), each = length(common_samples)))
   ) |>
-    mutate(method = factor(.data$method, levels = c("Raw", "Rarefied"))) |>
-    left_join(
-      metadata[, c("sample_id", group_var, group_color)],
-      by = "sample_id"
+    mutate(method = factor(.data$method, levels = c("Raw", "Rarefied")))
+
+  # Optionally coerce grouping columns to factor
+  if (convert_to_factor) {
+    all_df <- all_df |>
+      mutate(across(all_of(c(group_var, group_color)), as.factor))
+    cli::cli_alert_info(
+      "Converted {.val {group_var}} and {.val {group_color}} to factor."
     )
+  }
+
+  # Choose color scale based on whether group_color is discrete
+  color_scale <- if (
+    convert_to_factor ||
+      is.factor(all_df[[group_color]]) ||
+      is.character(all_df[[group_color]])
+  ) {
+    ggplot2::scale_color_viridis_d(option = "turbo")
+  } else {
+    ggplot2::scale_color_viridis_c(option = "turbo")
+  }
 
   p <- ggplot(
     all_df,
@@ -131,24 +161,13 @@ plot_variance_propagation <- function(
   ) +
     geom_jitter(width = 0.15, height = 0, alpha = 0.7, size = 0.8) +
     facet_wrap(~ .data$method) +
-    theme_classic() +
-    theme(
-      strip.text = element_text(size = 10, face = "bold"),
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-      plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
-      plot.subtitle = element_text(hjust = 0.5, size = 9),
-      legend.background = element_blank(),
-      legend.key.height = unit(0.4, "cm"),
-      legend.key.width = unit(0.4, "cm")
-    ) +
+    .brcore_theme(axis_text_angle = 90) +
+    color_scale +
     guides(
-      color = guide_legend(
-        override.aes = list(size = 5, shape = 15)
-      )
+      color = guide_legend(override.aes = list(size = 5, shape = 15))
     ) +
     labs(
       x = group_var,
-      # y = paste0("Hill number (q = ", q, ")"),
       title = "Raw vs Rarefied Alpha Diversity",
       subtitle = paste0(
         "Rarefied to depth of ",
