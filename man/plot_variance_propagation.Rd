@@ -49,7 +49,7 @@ bcse_rarefied_otutable_filt <-
        physeq_obj = bcse_filt,
        depth_level = 1000,
        num_iter = 100,
-       .as_array = FALSE,
+       .as = "list",
        set_seed = 7643
    )
 

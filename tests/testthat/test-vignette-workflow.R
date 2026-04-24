@@ -113,8 +113,8 @@ test_that("2: Vignette workflow produces consistent results", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 10,
-    .as_array = FALSE,
+    num_iter = 3,
+    .as = "list",
     set_seed = 7642
   )
 
@@ -158,11 +158,11 @@ test_that("2: Vignette workflow produces consistent results", {
   # Step 6: Identify core microbiome
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
+    rarefied_list = bcse_rarefied_list,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
     depth_level = 1000,
-    num_iter = 10,
     seed = 2134
   )
 
@@ -271,8 +271,8 @@ test_that("3: Vignette core distribution plots are consistent", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 10,
-    .as_array = FALSE,
+    num_iter = 5,
+    .as = "list",
     set_seed = 7642
   )
 
@@ -301,11 +301,11 @@ test_that("3: Vignette core distribution plots are consistent", {
 
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
+    rarefied_list = bcse_rarefied_list,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
     depth_level = 1000,
-    num_iter = 10,
     seed = 2134
   )
 
@@ -405,11 +405,11 @@ test_that("4: Vignette neutral model fitting is consistent", {
 
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
+    rarefied_list = bcse_rarefied_list,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
     depth_level = 1000,
-    num_iter = 10,
     seed = 2134
   )
 

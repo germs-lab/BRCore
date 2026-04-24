@@ -46,7 +46,7 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
   expect_true(is.numeric(res$bray_curtis_ranked$proportionBC))
   expect_true(is.numeric(res$bray_curtis_ranked$IncreaseBC))
   expect_equal(max(res$bray_curtis_ranked$proportionBC), 1)
-  expect_equal(res$bray_curtis_ranked$IncreaseBC[1], 0)
+  expect_equal(res$bray_curtis_ranked$IncreaseBC[1], 0) #Fix
 
   # otu_ranked
   expect_true(is.data.frame(res$otu_ranked))
@@ -254,3 +254,5 @@ test_that("max_otus with abundance_weight preserves correct ranking", {
   expect_equal(res_limited_weighted$otu_ranked$otu, top_weighted)
   expect_equal(nrow(res_limited_weighted$otu_ranked), max_test)
 })
+
+# Test identify_core internal functions if accesible

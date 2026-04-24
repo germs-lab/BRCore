@@ -27,7 +27,7 @@ test_that("plot_variance_propagation returns ggplot with list input", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 7643
   )
 
@@ -53,7 +53,7 @@ test_that("plot works with q = 1 (Shannon)", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 42
   )
 
@@ -79,7 +79,7 @@ test_that("plot works with q = 2 (Simpson)", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 42
   )
 
@@ -138,7 +138,7 @@ test_that("plot has correct facets (Raw vs Rarefied)", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 42
   )
 
@@ -167,7 +167,7 @@ test_that("plot y-axis label reflects q value", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 42
   )
 
@@ -198,7 +198,7 @@ test_that("plot handles rarefied subset of samples", {
     physeq_obj = bcse_sub,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 42
   )
 
@@ -225,7 +225,7 @@ test_that("plot_variance_propagation errors with vector q", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 42
   )
 

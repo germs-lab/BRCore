@@ -227,7 +227,7 @@ test_that("multi_rarefy handles low-depth samples correctly", {
   rarefied_data <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 50000,
-    num_iter = 2,
+    num_iter = 3,
     .as = "list",
     set_seed = 111
   )

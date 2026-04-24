@@ -8,7 +8,7 @@ test_that("phyloseq object correctly created", {
       physeq_obj = bcse,
       depth_level = 200,
       num_iter = 3,
-      .as_array = FALSE,
+      .as = "list",
       set_seed = 123
     )
 
