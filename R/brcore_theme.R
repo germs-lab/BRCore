@@ -52,6 +52,8 @@
 #' @importFrom ggplot2 theme_classic theme element_text element_line
 #'   element_blank element_rect
 #' @importFrom grid unit
+#'
+#' @noRd
 #' @keywords internal
 .brcore_theme <- function(
   base_size = 11,
