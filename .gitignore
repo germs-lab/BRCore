@@ -38,3 +38,5 @@ Meta/
 renv/
 renv.lock
 
+/doc/
+/Meta/
