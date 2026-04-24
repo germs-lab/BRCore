@@ -95,7 +95,7 @@ and Stopnisek (2019) Curr Opin Microbiol, see below for details.
 The core set is defined using two separate methods:
 
 The function rank OTU/ASVs by occupancy (optionally with abundance
-weighting: \code{rank_score = (1 - weight) * Index + weight * scaled_abundance},
+weighting: \code{rank_score = (1 - weight) * rank + weight * scaled_abundance},
 where scaled_abundance is mean relative abundance rescaled to \verb{[0,1]}). For
 each \verb{k = 1..K}, recompute \code{S_k} as the mean Bray-Curtis similarity across
 all sample pairs using only the first \code{k} ranked OTUs; when \code{k = K}, this

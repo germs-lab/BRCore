@@ -65,7 +65,7 @@
 #' The core set is defined using two separate methods:
 #'
 #' The function rank OTU/ASVs by occupancy (optionally with abundance
-#' weighting: `rank_score = (1 - weight) * Index + weight * scaled_abundance`,
+#' weighting: `rank_score = (1 - weight) * rank + weight * scaled_abundance`,
 #' where scaled_abundance is mean relative abundance rescaled to `[0,1]`). For
 #' each `k = 1..K`, recompute `S_k` as the mean Bray-Curtis similarity across
 #' all sample pairs using only the first `k` ranked OTUs; when `k = K`, this
@@ -132,7 +132,7 @@ identify_core <- function(
   depth_level = 1000,
   seed = NULL
 ) {
-  # input checks ----
+  # Input checks ----
   cli::cli_text("\nSeed used: {seed}\n")
 
   if (is.null(seed)) {
@@ -143,9 +143,9 @@ identify_core <- function(
 
   .phyloseq_class_check(physeq_obj)
 
-  # define arguments ----
+  # Define arguments ----
   # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
-  # validate / generate rarefied_list ----
+  ## Validate / generate rarefied_list ----
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))
   is_rarefied <- abs(min_sum - max_sum) < 1e-6
@@ -175,6 +175,7 @@ identify_core <- function(
     )
   }
 
+  ## Extract OTU table, sample metadata, and taxonomy (if present) ----
   otu <- .extract_otu_matrix(physeq_obj, samples_as_rows = FALSE)
   map <- sample_data(physeq_obj) |> as("data.frame")
   map$sample_id <- rownames(map)
@@ -196,11 +197,11 @@ identify_core <- function(
     )
   }
 
-  # core prioritizing variable ----
+  ## Core prioritizing variable ----
   data_var <- priority_var
   cli::cli_alert_success("Core prioritizing variable: {data_var}")
 
-  # validate abundance_weight ----
+  ## Validate abundance_weight ----
   if (
     !is.numeric(abundance_weight) ||
       length(abundance_weight) != 1L ||
@@ -215,7 +216,7 @@ identify_core <- function(
     abundance_weight <- max(0, min(1, abundance_weight))
   }
 
-  # abundance occupancy ----
+  # Abundance occupancy ----
   otu_PA <- 1 * (otu > 0)
   otu_occ <- rowSums(otu_PA) / ncol(otu_PA)
   otu_rel <- apply(
@@ -246,7 +247,7 @@ identify_core <- function(
       sumF = sum(time_freq),
       sumG = sum(coreTime),
       nS = length(unique(.data[[data_var]])), # unique time points, not 2 * all rows
-      Index = (sumF + sumG) / nS, # can be up to 2 (original behavior)
+      rank = (sumF + sumG) / nS, # can be up to 2 (original behavior)
       .groups = "drop"
     )
 
@@ -263,13 +264,12 @@ identify_core <- function(
       abundance_weight
     )
   } else {
-    "Index only"
+    "Rank only"
   }
 
   if (abundance_weight == 0) {
-    # No abundance weighting - use Index directly
+    # No abundance weighting - use rank directly
     otu_ranked <- otu_ranked |>
-      mutate(rank = Index) |>
       arrange(desc(rank))
 
     cli::cli_alert_info(
@@ -282,13 +282,12 @@ identify_core <- function(
         abun_norm = otu_rel / max(otu_rel, na.rm = TRUE),
         spatial_weight = (abundance_weight * abun_norm) +
           ((1 - abundance_weight) * occ_norm),
-        rank = spatial_weight * Index
+        rank = spatial_weight * rank
       ) |>
-      arrange(desc(rank), desc(Index), otu) |>
+      arrange(desc(rank), otu) |>
       select(
         otu,
         rank,
-        Index,
         spatial_weight,
         occ_norm,
         abun_norm,
@@ -328,8 +327,7 @@ identify_core <- function(
 
   # Pre-compute sample pairs ONCE from the first rarefied iteration
   # (all iterations share the same samples after multi_rarefy filtering)
-  ref_iter <- as.matrix(t(rarefied_list[[1]])) # taxa x samples
-  sample_names <- colnames(ref_iter)
+  sample_names <- colnames(as.matrix(t(rarefied_list[[1]])))
 
   sample_pairs <- utils::combn(length(sample_names), 2)
   pair_names <- apply(sample_pairs, 2, function(x) {
@@ -392,11 +390,12 @@ identify_core <- function(
       cli::cli_progress_update()
     }
   }
-
+  temp_BC_matrix <- NULL
   temp_BC_matrix <- BCaddition |>
     tibble::column_to_rownames("pair_names") |>
     as.matrix()
 
+  BC_ranked <- NULL
   BC_ranked <- data.frame(
     rank = as.factor(rownames(t(temp_BC_matrix))),
     t(temp_BC_matrix),
@@ -409,7 +408,7 @@ identify_core <- function(
     arrange(rank_num) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
-  # increase method ----
+  # Increase method ----
   if (nrow(BC_ranked) >= 2) {
     Increase <- ifelse(
       BC_ranked$MeanBC[-nrow(BC_ranked)] == 0,
@@ -433,7 +432,7 @@ identify_core <- function(
       delta_pct_max_BC = (IncreaseBC - 1) * 100
     )
 
-  # elbow method ----
+  # Elbow method ----
   elbow_slope_differences <- function(pos) {
     left <- (BC_ranked$MeanBC[pos] - BC_ranked$MeanBC[1]) / pos
     right <- (BC_ranked$MeanBC[nrow(BC_ranked)] - BC_ranked$MeanBC[pos]) /
@@ -525,9 +524,25 @@ identify_core <- function(
   out
 }
 
-
-# Helper: compute mean BC dissimilarity across all rarefied iterations
-# for a given subset of OTUs (rows of each iteration matrix)
+#' Helper: compute mean BC dissimilarity across all rarefied iterations
+#' for a given subset of OTUs (rows of each iteration matrix)
+#'
+#' #' This is the core computational step that is repeated for each rank as
+#' OTUs are added.
+#' This function is called internally by `identify_core` and is not exported.
+#'
+#' @param otu_subset Character vector of OTU names to include in the
+#' calculation.
+#' @param depth_level Numeric value representing the sequencing depth level.
+#' @param rarefied_list List of rarefied OTU tables.
+#' @param sample_pairs Matrix of sample pairs for BC calculation.
+#' @param n_iter Number of iterations.
+#' @param n_pairs Number of sample pairs.
+#' @return Numeric vector of mean BC values for each sample pair.
+#'
+#' @noRd
+#' @keywords internal
+#'
 .mean_bc_over_iters <- function(
   otu_subset,
   depth_level,
@@ -559,13 +574,3 @@ identify_core <- function(
 
   colMeans(pair_sums)
 }
-
-# .bc_renormalize <- function(sub_mat, sample_pairs, depth_level) {
-#   bc_iter <- as.vector(vegan::vegdist(t(sub_mat), method = "bray"))
-
-#   pair_sums_iter <- apply(sample_pairs, 2, function(x) {
-#     sum(sub_mat[, x[1]]) + sum(sub_mat[, x[2]])
-#   })
-
-#   bc_iter * pair_sums_iter / (2 * depth_level)
-# }
