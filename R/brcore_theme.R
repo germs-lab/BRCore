@@ -122,7 +122,7 @@
 
       # Panel ----
       panel.background = element_rect(fill = "white", colour = NA),
-      panel.border = element_rect(fill = NA, colour = "black", size = 1)
+      panel.border = element_rect(fill = NA, colour = "black", linewidth = 1)
     )
 
   # Optional dashed horizontal grid (e.g. rarefaction metric plots)
