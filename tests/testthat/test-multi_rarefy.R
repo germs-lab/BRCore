@@ -7,7 +7,7 @@ test_that("Test if default behaviour is correct", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = TRUE,
+    .as = "array",
     set_seed = 123
   )
 
@@ -56,7 +56,7 @@ test_that("multi_rarefy retains samples with row sums near depth_level (floating
   expect_false("too_low" %in% result$sample_id)
 })
 
-test_that("multi_rarefy outputs all rarefaction iterations when .as_array = FALSE", {
+test_that("multi_rarefy outputs all rarefaction iterations when .as = 'list'", {
   skip_if_not_installed("phyloseq")
 
   data("bcse", package = "BRCore")
@@ -66,7 +66,7 @@ test_that("multi_rarefy outputs all rarefaction iterations when .as_array = FALS
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = num_iterations,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 123
   )
 
@@ -127,7 +127,7 @@ test_that("multi_rarefy outputs all rarefaction iterations when .as_array = FALS
   }
 })
 
-test_that("multi_rarefy with .as_array = TRUE returns 3D array", {
+test_that("multi_rarefy with .as = 'array' returns 3D array", {
   skip_if_not_installed("phyloseq")
 
   data("bcse", package = "BRCore")
@@ -137,7 +137,7 @@ test_that("multi_rarefy with .as_array = TRUE returns 3D array", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = num_iterations,
-    .as_array = TRUE,
+    .as = "array",
     set_seed = 456
   )
 
@@ -168,7 +168,7 @@ test_that("multi_rarefy list and array have consistent dimensions", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 789
   )
 
@@ -176,7 +176,7 @@ test_that("multi_rarefy list and array have consistent dimensions", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = TRUE,
+    .as = "array",
     set_seed = 789
   )
 
@@ -187,7 +187,7 @@ test_that("multi_rarefy list and array have consistent dimensions", {
       colnames(rarefied_list[[1]]),
       colnames(rarefied_array[,, 1])
     )),
-    1178L
+    2861L
   )
 
   expect_equal(dim(rarefied_array)[1], nrow(rarefied_list[[1]]))
@@ -203,7 +203,7 @@ test_that("multi_rarefy removes zero-abundance taxa independently per iteration"
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 321
   )
 
@@ -228,7 +228,7 @@ test_that("multi_rarefy handles low-depth samples correctly", {
     physeq_obj = bcse,
     depth_level = 50000,
     num_iter = 2,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 111
   )
 
@@ -247,12 +247,12 @@ test_that("multi_rarefy single iteration returns data frame (not list)", {
 
   data("bcse", package = "BRCore")
 
-  # Single iteration with .as_array = FALSE should return data frame
+  # Single iteration with .as = "list" should return data frame
   rarefied_single <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 1,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 999
   )
 

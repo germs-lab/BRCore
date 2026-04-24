@@ -10,11 +10,11 @@
 #'   OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform
 #'   for rarefaction.
-#' @param .as_array A logical indicating whether to return the results as a 3D
-#' array or as a list of data frames. If `TRUE`, returns a 3D array with
-#' dimensions (samples x taxa x iterations). If `FALSE`, returns a list of
+#' @param .as A character string indicating whether to return the results as a
+#' 3D array or as a list of data frames. If `"array"`, returns a 3D array with
+#' dimensions (samples x taxa x iterations). If `"list"`, returns a list of
 #' data frames, one for each iteration, with samples as rows and taxa as
-#' columns. (default = FALSE)
+#' columns. (default = "list")
 #' @param set_seed An optional integer to set the random seed for
 #' reproducibility (default = NULL).
 #'
@@ -57,7 +57,7 @@ multi_rarefy <- function(
   physeq_obj,
   depth_level,
   num_iter = 100,
-  .as_array = FALSE,
+  .as = "list",
   set_seed = NULL
 ) {
   # Input validation ----
@@ -140,7 +140,7 @@ multi_rarefy <- function(
   }
 
   # Multiple iterations ----
-  if (.as_array) {
+  if (.as == "array") {
     processed_data <- array(
       0,
       dim = c(n_samp, n_taxa, num_iter),
@@ -154,7 +154,8 @@ multi_rarefy <- function(
     for (i in seq_len(num_iter)) {
       processed_data[,, i] <- vegan::rrarefy(otu_mat, sample = depth_level)
     }
-  } else {
+  }
+  if (.as == "list") {
     processed_data <- lapply(seq_len(num_iter), function(i) {
       if (!is.na(iteration_seeds[i])) {
         set.seed(iteration_seeds[i])
@@ -173,20 +174,16 @@ multi_rarefy <- function(
       as.data.frame(rare_result)
     })
     names(processed_data) <- paste0("iter_", seq_len(num_iter))
-
-    # Remove zero-abundance taxa for each iteration
-    # processed_data <- lapply(out, function(df) {
-    #   df[, colSums(df) > 0, drop = FALSE]
-    # })
   }
 
   avg_taxa_removed <- NULL
 
-  if (.as_array) {
+  if (.as == "array") {
     n_samples_removed <- n_samples_before - n_samp
     removed_samples <- setdiff(original_sample_ids, rownames(otu_mat))
     n_taxa_removed <- n_taxa - dim(processed_data)[2]
-  } else {
+  }
+  if (.as == "list") {
     n_taxa_after <- min(vapply(processed_data, ncol, integer(1)))
 
     n_samples_after <- nrow(processed_data[[1]])
