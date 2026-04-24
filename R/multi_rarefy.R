@@ -135,8 +135,27 @@ multi_rarefy <- function(
 
   # Single iteration ----
   if (num_iter == 1) {
-    rare <- vegan::rrarefy(otu_mat, sample = depth_level)
-    return(as.data.frame(rare))
+    if (!is.na(iteration_seeds[1])) {
+      set.seed(iteration_seeds[1])
+    }
+    processed_data <- as.data.frame(vegan::rrarefy(
+      otu_mat,
+      sample = depth_level
+    ))
+    if (.as == "list") {
+      stats::setNames(list(processed_data), "iter_1")
+    }
+    if (.as == "array") {
+      processed_data <- array(
+        as.matrix(processed_data),
+        dim = c(nrow(processed_data), ncol(processed_data), 1),
+        dimnames = list(
+          rownames(processed_data),
+          colnames(processed_data),
+          "iter_1"
+        )
+      )
+    }
   }
 
   # Multiple iterations ----
@@ -199,6 +218,8 @@ multi_rarefy <- function(
 
     avg_taxa_removed <- mean(vapply(processed_data, ncol, double(1)))
   }
+
+  # Report results ----
   .report_rarefaction_results(
     n_samples_removed = n_samples_removed,
     n_taxa_before = n_taxa_before,
