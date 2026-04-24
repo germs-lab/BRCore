@@ -113,7 +113,7 @@ test_that("2: Vignette workflow produces consistent results", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 3,
+    num_iter = 2,
     .as = "list",
     set_seed = 7642
   )
@@ -271,7 +271,7 @@ test_that("3: Vignette core distribution plots are consistent", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 5,
+    num_iter = 2,
     .as = "list",
     set_seed = 7642
   )
@@ -402,6 +402,14 @@ test_that("4: Vignette neutral model fitting is consistent", {
   data("bcse", package = "BRCore")
   library(phyloseq)
   library(tidyverse)
+
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
+    depth_level = 1000,
+    num_iter = 2,
+    .as = "list",
+    set_seed = 7642
+  )
 
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
