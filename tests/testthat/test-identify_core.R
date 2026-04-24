@@ -46,7 +46,7 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
   expect_true(is.numeric(res$bray_curtis_ranked$proportionBC))
   expect_true(is.numeric(res$bray_curtis_ranked$IncreaseBC))
   expect_equal(max(res$bray_curtis_ranked$proportionBC), 1)
-  expect_equal(res$bray_curtis_ranked$IncreaseBC[1], 0) #Fix
+  expect_true(is.na(res$bray_curtis_ranked$IncreaseBC[1]))
 
   # otu_ranked
   expect_true(is.data.frame(res$otu_ranked))
