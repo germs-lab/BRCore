@@ -103,7 +103,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x653669370f08> 
+#>   .. .. .. .. .. ..$ :<environment: 0x653676834b28> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -152,7 +152,7 @@ bcse_metrics
 rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Processing 50 samples
 #> ℹ Generating rarefaction diagnostic plots                                         ✔ Rarefaction diagnostic plots generated successfully
-#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [1.5s]
+#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [958ms]
 print(rarefaction_plot)
 ```
 
@@ -198,11 +198,11 @@ bcse_rarefied_list <-
   multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 10,
+    num_iter = 3,
     .as_array = FALSE,
     set_seed = 7642
   )
-#> Error in multi_rarefy(physeq_obj = bcse, depth_level = 1000, num_iter = 10, : unused argument (.as_array = FALSE)
+#> Error in multi_rarefy(physeq_obj = bcse, depth_level = 1000, num_iter = 3, : unused argument (.as_array = FALSE)
 ```
 
 Let's explore the results.
@@ -261,7 +261,7 @@ replacing the `otu_table()` with the rarefied table you prefer.
 
 
 ``` r
-bcse_updated_rare <- update_otu_table(
+bcse_rare_single <- update_otu_table(
   physeq_obj = bcse,
   rarefied_otus = bcse_rarefied_list,
   iteration = 1 # Speficify which iteration to use for the updated OTU table
@@ -281,21 +281,31 @@ of the `bcse` dataset is `Crop`) so that OTUs can be core for a level of the
 variable but possibly not for others. This comes form the idea that core 
 microbiome can be transient in space and time as show by @Shade2019Abundance.
 
-*We continue with the `bcse` phyloseq object throughout the vignette.*
+*We continue with the `bcse` phyloseq object and the rarefied data `bcse_rarefied_list` throughout the vignette.*
 
 
 
 ``` r
-bcse_rare_core <- identify_core(
+bcse_core_multi <- identify_core(
   physeq_obj = bcse,
+  rarefied_list = bcse_rarefied_list,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
   depth_level = 1000,
-  num_iter = 10,
   seed = 2134
 )
-#> Error in identify_core(physeq_obj = bcse, priority_var = "Crop", increase_value = 0.02, : unused argument (num_iter = 10)
+#> Seed used: 2134
+#> ✔ Input phyloseq object is valid!
+#> Error: object 'bcse_rarefied_list' not found
+
+# With a single iteration 
+# bcse_core_single <- identify_core(
+#   physeq_obj = bcse_rare_single,
+#   priority_var = "Crop",
+#   increase_value = 0.02,
+#   seed = 2134
+# )
 ```
 
 ## *How the is the core identified?*
@@ -341,8 +351,8 @@ where additional taxa provide marginal returns in explanatory power.
 
 
 ``` r
-str(bcse_rare_core)
-#> Error: object 'bcse_rare_core' not found
+str(bcse_core_multi)
+#> Error: object 'bcse_core_multi' not found
 ```
 
 ### Visualize the abundance-occupancy distribution and the core ASV/OTUs set
@@ -352,12 +362,12 @@ The output from `identify_core()` can be used for plotting as below:
 
 ``` r
 bcse_identified_core <- plot_identified_core(
-  bray_curtis_ranked = bcse_rare_core$bray_curtis_ranked,
-  elbow = bcse_rare_core$elbow,
-  lastCall = bcse_rare_core$bc_increase,
-  increase_value = bcse_rare_core$increase_value
+  bray_curtis_ranked = bcse_core_multi$bray_curtis_ranked,
+  elbow = bcse_core_multi$elbow,
+  lastCall = bcse_core_multi$bc_increase,
+  increase_value = bcse_core_multi$increase_value
 )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 
 print(bcse_identified_core)
 #> Error: object 'bcse_identified_core' not found
@@ -375,10 +385,10 @@ Abundance-Occupancy distributions can be plotted:
 
 ``` r
 plot_abund_occ_increase <- plot_abundance_occupancy(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase"
 )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 print(plot_abund_occ_increase)
 #> Error: object 'plot_abund_occ_increase' not found
 ```
@@ -389,10 +399,10 @@ And for the `elbow` method.
 
 ``` r
 plot_abund_occ_elbow <- plot_abundance_occupancy(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "elbow"
 )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 
 plot_abund_occ_elbow +
   scale_fill_manual(values = c("darkgreen", "grey"))
@@ -409,17 +419,17 @@ plot_type argument. The optimal choice often depends on the number of levels in
 your grouping variable. For instance, bar or line plots are highly effective for 
 up to five levels, whereas heatmaps are better suited for more complex datasets. 
 While these are general recommendations, the core data is fully accessible in 
-`bcse_rare_core` should you wish to develop a custom visualization.
+`bcse_core_multi` should you wish to develop a custom visualization.
 
 
 ``` r
 plot_core_dist_bar <- plot_core_distribution(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "bar"
 )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 
 print(plot_core_dist_bar)
 #> Error: object 'plot_core_dist_bar' not found
@@ -432,12 +442,12 @@ print(plot_core_dist_bar)
 
 ``` r
 plot_core_dist_line <- plot_core_distribution(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "line"
 )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 print(plot_core_dist_line)
 #> Error: object 'plot_core_dist_line' not found
 ```
@@ -448,7 +458,7 @@ We can reorder the variable levels following logic before plotting.
 
 
 ``` r
-bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
+bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
   mutate(
     Crop = recode(
       Crop,
@@ -479,7 +489,7 @@ bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
       )
     )
   )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 ```
 
 
@@ -489,13 +499,13 @@ bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
 
 ``` r
 plot_core_dist_heatmap <- plot_core_distribution(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "heatmap"
 ) +
   viridis::scale_fill_viridis(option = "plasma", name = "Occupancy")
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 
 print(plot_core_dist_heatmap)
 #> Error: object 'plot_core_dist_heatmap' not found
@@ -520,12 +530,12 @@ To get started, we first fit the neutral model:
 
 
 ``` r
-bcse_rare_core_neutral_fit <- fit_neutral_model(
-  otu_table = bcse_rare_core$otu_table,
-  core_set = bcse_rare_core$increase_core,
-  abundance_occupancy = bcse_rare_core$abundance_occupancy
+bcse_core_multi_neutral_fit <- fit_neutral_model(
+  otu_table = bcse_core_multi$otu_table,
+  core_set = bcse_core_multi$increase_core,
+  abundance_occupancy = bcse_core_multi$abundance_occupancy
 )
-#> Error: object 'bcse_rare_core' not found
+#> Error: object 'bcse_core_multi' not found
 ```
 
 What we get is
@@ -533,16 +543,16 @@ What we get is
 
 
 ``` r
-str(bcse_rare_core_neutral_fit)
-#> Error: object 'bcse_rare_core_neutral_fit' not found
+str(bcse_core_multi_neutral_fit)
+#> Error: object 'bcse_core_multi_neutral_fit' not found
 ```
 
 ### Plot the neutral model and the core set 
 
 
 ``` r
-plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
-#> Error: object 'bcse_rare_core_neutral_fit' not found
+plot_bcse_neutral_fit <- plot_neutral_model(bcse_core_multi_neutral_fit)
+#> Error: object 'bcse_core_multi_neutral_fit' not found
 
 print(plot_bcse_neutral_fit)
 #> Error: object 'plot_bcse_neutral_fit' not found
@@ -574,7 +584,7 @@ this stochasticity, if we identify the core using only the first iteration of ou
 
 
 ``` r
-bcse_rare_core_iter1 <- identify_core(
+bcse_core_multi_iter1 <- identify_core(
   physeq_obj = bcse_updated_rare,
   priority_var = "Crop",
   increase_value = 0.02,

@@ -67,19 +67,31 @@ data("bcse", package = "BRCore")
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
 # Perform multiple rarefaction
-bcse_rarefied <- multi_rarefy(
+bcse_rarefied_list <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 100,
+  num_iter = 3,
   set_seed = 7642
 )
 
 # Update phyloseq object with rarefied data
-bcse_rare <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied)
+bcse_rare_single <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied_list, iteration = 2) # Your preffered iteration can be used here
 
 # Identify core microbiome
+
+# With a single iteration of rarefaction
 bcse_core <- identify_core(
-  physeq_obj = bcse_rare,
+  physeq_obj = bcse_rare_single,
+  priority_var = "Crop",
+  increase_value = 0.02,
+  seed = 2134
+)
+
+
+# With multiple iterations of rarefaction
+bcse_core_multi <- identify_core(
+  physeq_obj = bcse, 
+  rarefied_list = bcse_rarefied_list
   priority_var = "Crop",
   increase_value = 0.02,
   seed = 2134
