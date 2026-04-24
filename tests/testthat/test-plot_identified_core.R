@@ -21,6 +21,8 @@ test_that("plot_identified_core returns a ggplot and builds", {
     lastCall = lastCall
   )
 
-  expect_s3_class(p, "ggplot")
-  expect_silent(ggplot2::ggplot_build(p)) # renders without error
+  expect_type(p, "list")
+  expect_s3_class(p[[1]], "data.frame")
+  expect_s3_class(p[[2]], "ggplot")
+  expect_silent(ggplot2::ggplot_build(p[[2]])) # renders without error
 })

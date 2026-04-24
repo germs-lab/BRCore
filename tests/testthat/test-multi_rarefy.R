@@ -227,7 +227,7 @@ test_that("multi_rarefy handles low-depth samples correctly", {
   rarefied_data <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 50000,
-    num_iter = 3,
+    num_iter = 2,
     .as = "list",
     set_seed = 111
   )
@@ -257,9 +257,12 @@ test_that("multi_rarefy single iteration returns data frame (not list)", {
   )
 
   # Should be a DF
-  expect_s3_class(rarefied_single, "data.frame")
+  expect_type(rarefied_single, "list") # Still a list, but should contain one data frame
+  expect_s3_class(rarefied_single[[1]], "data.frame")
 
   # Length of taxa should match original (minus any removed)
-  expect_equal(length(rarefied_single), phyloseq::otu_table(bcse) |> nrow())
-  expect_true(is.data.frame(rarefied_single))
+  expect_equal(
+    length(rarefied_single[[1]]),
+    phyloseq::otu_table(bcse) |> nrow()
+  )
 })

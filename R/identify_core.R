@@ -151,9 +151,13 @@ identify_core <- function(
   is_rarefied <- abs(min_sum - max_sum) < 1e-6
 
   if (!is.null(rarefied_list)) {
-    if (!is.list(rarefied_list) || length(rarefied_list) == 0) {
+    if (!is.list(rarefied_list) || length(rarefied_list) <= 1) {
       cli::cli_abort(
-        "{.arg rarefied_list} must be a non-empty list of rarefied data frames (output of {.fn multi_rarefy})."
+        c(
+          "A list of 2 or more rarefied iterations is required when {.arg physeq_obj} is not already rarefied.",
+          "i" = "Provide the output of {.fn multi_rarefy} via {.arg rarefied_list} with at least 2 iterations.",
+          "i" = "Alternatively, use {.fn update_otu_table} to replace the OTU table with a rarefied version."
+        )
       )
     }
     cli::cli_alert_info(
@@ -169,8 +173,9 @@ identify_core <- function(
   } else {
     cli::cli_abort(
       c(
-        "{.arg rarefied_list} is required when {.arg physeq_obj} is not rarefied.",
-        "i" = "Provide the output of {.fn multi_rarefy} via {.arg rarefied_list}."
+        "{.arg physeq_obj} is not rarefied and no {.arg rarefied_list} was provided.",
+        "i" = "Provide the output of {.fn multi_rarefy} via {.arg rarefied_list} with at least 2 iterations.",
+        "i" = "Alternatively, use {.fn update_otu_table} to replace the OTU table with a rarefied version."
       )
     )
   }

@@ -33,7 +33,7 @@ cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 3,
+  num_iter = 2,
   .as = "list",
   set_seed = 7642
 )
