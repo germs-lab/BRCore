@@ -107,7 +107,7 @@ test_that("plot_variance_propagation returns ggplot with array input", {
     physeq_obj = bcse,
     depth_level = 3000,
     num_iter = 3,
-    .as_array = TRUE,
+    .as = "array",
     set_seed = 42
   )
 

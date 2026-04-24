@@ -23,8 +23,8 @@ A \code{phyloseq} object.
 \description{
 This function updates a \code{phyloseq} object by replacing its OTU/ASV table
 with a rarefied version produced by \code{multi_rarefy()}. The rarefied table can
-be a data frame, a list of data frames (\code{.as_array = FALSE}), or a 3D array
-(\code{.as_array = TRUE}). When providing a list or array, specify which iteration
+be a data frame, a list of data frames (\code{.as = "list"}), or a 3D array
+(\code{.as = "array"}). When providing a list or array, specify which iteration
 to use via the \code{iteration} parameter.
 }
 \examples{
@@ -33,26 +33,26 @@ library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# List output (.as_array = FALSE)
+# List output (.as = "list")
 otu_list <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
     depth_level = 200,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 123
   )
 
 # Extract iteration 2
 rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 
-# Array output (.as_array = TRUE)
+# Array output (.as = "array")
 otu_array <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
     depth_level = 200,
     num_iter = 3,
-    .as_array = TRUE,
+    .as = "array",
     set_seed = 123
   )
 

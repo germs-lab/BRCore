@@ -317,19 +317,10 @@ multi_rarefy <- function(
 
   # Taxa Removal
   cli::cli_h3("Taxa Removal")
-  if (n_taxa_removed > 0) {
-    cli::cli_alert_info(
-      "Original taxa input: {.val {n_taxa_before}}"
-    )
+  if (n_taxa_removed == 0) {
+    cli::cli_alert_success("No taxa removed.")
     cli::cli_alert_warning(
-      "Max: {.val {n_taxa_removed}} taxa removed (zero abundance) in viable samples (depth_level >= {.val {depth_level}})."
-    )
-    cli::cli_alert_warning(
-      "When using `.as_array = FALSE`, taxa removed may differ across iterations."
-    )
-  } else {
-    cli::cli_alert_warning(
-      "No taxa removed. \nWhen using `.as_array = TRUE`, taxa are not removed across iterations to \nmaintain consistent dimensions."
+      "Taxa are not removed across iterations to maintain consistent dimensions. \nDownstream analyses should handle zero-abundance taxa appropriately."
     )
   }
 
