@@ -52,7 +52,6 @@ test_that("1: Vignette test data structures are valid", {
   # Test: All plots are ggplot objects
   plot_objects <- c(
     "test_rarefaction_plot",
-    "test_bcse_identified_core",
     "test_plot_abund_occ_increase",
     "test_plot_abund_occ_elbow",
     "test_plot_core_dist_bar",
@@ -64,6 +63,11 @@ test_that("1: Vignette test data structures are valid", {
   for (plot_name in plot_objects) {
     expect_s3_class(test_vignette_data[[plot_name]], "ggplot")
   }
+
+  expect_s3_class(
+    test_vignette_data$test_bcse_identified_core$plot_identified_core,
+    "ggplot"
+  )
 })
 
 
@@ -215,7 +219,7 @@ test_that("2: Vignette workflow produces consistent results", {
   )
 
   # Test: Core identification plot structure
-  expect_s3_class(bcse_identified_core, "ggplot")
+  expect_s3_class(bcse_identified_core[[2]], "ggplot")
   expect_identical(
     bcse_identified_core$labels,
     test_vignette_data$test_bcse_identified_core$labels
