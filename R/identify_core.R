@@ -243,16 +243,16 @@ identify_core <- function(
     left_join(map, by = "sample_id") |>
     group_by(otu, .data[[data_var]]) |>
     summarise(
-      time_freq = sum(abun > 0) / length(abun), # frequency within date
-      coreTime = ifelse(time_freq == 1, 1, 0), # 1 if occupancy=1 at that date
+      time_freq = sum(.data$abun > 0) / length(.data$abun), # frequency within date
+      coreTime = ifelse(.data$time_freq == 1, 1, 0), # 1 if occupancy=1 at that date
       .groups = "drop"
     ) |>
     group_by(otu) |>
     summarise(
-      sumF = sum(time_freq),
-      sumG = sum(coreTime),
+      sumF = sum(.data$time_freq),
+      sumG = sum(.data$coreTime),
       nS = length(unique(.data[[data_var]])), # unique time points, not 2 * all rows
-      rank = (sumF + sumG) / nS, # can be up to 2 (original behavior)
+      rank = (.data$sumF + .data$sumG) / .data$nS, # can be up to 2 (original behavior)
       .groups = "drop"
     )
 
@@ -283,21 +283,21 @@ identify_core <- function(
   } else {
     otu_ranked <- otu_ranked |>
       mutate(
-        occ_norm = otu_occ / max(otu_occ, na.rm = TRUE),
-        abun_norm = otu_rel / max(otu_rel, na.rm = TRUE),
-        spatial_weight = (abundance_weight * abun_norm) +
-          ((1 - abundance_weight) * occ_norm),
-        rank = spatial_weight * rank
+        occ_norm = .data$otu_occ / max(.data$otu_occ, na.rm = TRUE),
+        abun_norm = .data$otu_rel / max(.data$otu_rel, na.rm = TRUE),
+        spatial_weight = (abundance_weight * .data$abun_norm) +
+          ((1 - abundance_weight) * .data$occ_norm),
+        rank = spatial_weight * .data$rank
       ) |>
-      arrange(desc(rank), otu) |>
+      arrange(desc(.data$rank), .data$otu) |>
       select(
-        otu,
-        rank,
-        spatial_weight,
-        occ_norm,
-        abun_norm,
-        otu_occ,
-        otu_rel
+        "otu",
+        "rank",
+        "spatial_weight",
+        "occ_norm",
+        "abun_norm",
+        "otu_occ",
+        "otu_rel"
       )
     cli::cli_alert_info("Ranked by {rank_method}")
   }
@@ -409,8 +409,8 @@ identify_core <- function(
     pivot_longer(-rank, names_to = "comparison", values_to = "BC") |>
     group_by(.data$rank) |>
     summarise(MeanBC = mean(.data$BC), .groups = "drop") |>
-    mutate(rank_num = as.numeric(as.character(rank))) |>
-    arrange(rank_num) |>
+    mutate(rank_num = as.numeric(as.character(.data$rank))) |>
+    arrange(.data$rank_num) |>
     mutate(proportionBC = .data$MeanBC / max(.data$MeanBC))
 
   # Increase method ----
@@ -432,9 +432,9 @@ identify_core <- function(
   # add OTU name, delta_pct_max_BC ----
   BC_ranked <- BC_ranked |>
     mutate(
-      rank_num = as.numeric(as.character(rank)),
-      otu_added = otu_ranked_ordered[rank_num],
-      delta_pct_max_BC = (IncreaseBC - 1) * 100
+      rank_num = as.numeric(as.character(.data$rank)),
+      otu_added = otu_ranked_ordered[.data$rank_num],
+      delta_pct_max_BC = (.data$IncreaseBC - 1) * 100
     )
 
   # Elbow method ----
@@ -473,25 +473,26 @@ identify_core <- function(
   # Add core set flags
   BC_ranked <- BC_ranked |>
     mutate(
-      is_BC_core = rank_num <= lastCall,
-      last_pctBC_cutoff = rank_num == lastCall,
-      is_elbow_core = rank_num <= elbow,
-      last_elbow_cutoff = rank_num == elbow
+      is_BC_core = .data$rank_num <= lastCall,
+      last_pctBC_cutoff = .data$rank_num == lastCall,
+      is_elbow_core = .data$rank_num <= elbow,
+      last_elbow_cutoff = .data$rank_num == elbow
     ) |>
-    arrange(rank_num) |>
+    arrange(.data$rank_num) |>
+
     select(
-      rank,
-      rank_num,
-      otu_added,
-      MeanBC,
-      proportionBC,
-      IncreaseBC,
-      elbow_slope_diffs,
-      delta_pct_max_BC,
-      is_BC_core,
-      last_pctBC_cutoff,
-      is_elbow_core,
-      last_elbow_cutoff
+      "rank",
+      "rank_num",
+      "otu_added",
+      "MeanBC",
+      "proportionBC",
+      "IncreaseBC",
+      "elbow_slope_diffs",
+      "delta_pct_max_BC",
+      "is_BC_core",
+      "last_pctBC_cutoff",
+      "is_elbow_core",
+      "last_elbow_cutoff"
     )
 
   # identified core sets ----

@@ -85,7 +85,7 @@ add_rarefaction_metrics <- function(data) {
       names_to = "sample_id",
       values_to = "seq_num"
     ) |>
-    group_by(sample_id) |>
+    group_by(.data$sample_id) |>
     summarize(
       read_num = sum(.data$seq_num),
       singleton_num = sum(.data$seq_num == 1),

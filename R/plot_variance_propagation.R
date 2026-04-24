@@ -19,7 +19,7 @@
 #' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning cli_alert_success cli_alert_danger
 #' @importFrom utils head
 #' @importFrom vegan rrarefy
-#' @importFrom dplyr left_join
+#' @importFrom dplyr left_join all_of
 #'
 #' @return ggplot object comparing raw vs rarefied diversity distributions across iterations.
 #'
@@ -138,7 +138,7 @@ plot_variance_propagation <- function(
   # Optionally coerce grouping columns to factor
   if (convert_to_factor) {
     all_df <- all_df |>
-      mutate(across(all_of(c(group_var, group_color)), as.factor))
+      mutate(across(dplyr::all_of(c(group_var, group_color)), as.factor))
     cli::cli_alert_info(
       "Converted {.val {group_var}} and {.val {group_color}} to factor."
     )
