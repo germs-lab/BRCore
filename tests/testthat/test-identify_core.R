@@ -4,7 +4,11 @@ test_that("identify_core returns correctly formatted outputs on switchgrass", {
   skip_if_not(is.function(identify_core), "identify_core() not found")
 
   # load test data shipped with the package
-  suppressWarnings(data("switchgrass", envir = environment()))
+  data(
+    "switchgrass",
+    package = "BRCore",
+    envir = environment()
+  )
   skip_if_not(exists("switchgrass"), "switchgrass dataset not found")
 
   # sanity: required grouping column
@@ -104,7 +108,11 @@ test_that("max_otus parameter correctly limits the number of OTUs analyzed", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("vegan")
 
-  suppressWarnings(data("switchgrass", envir = environment()))
+  data(
+    "switchgrass",
+    package = "BRCore",
+    envir = environment()
+  )
   skip_if_not(exists("switchgrass"), "switchgrass dataset not found")
 
   # Get total number of OTUs
@@ -160,7 +168,11 @@ test_that("max_otus parameter validates inputs correctly", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("vegan")
 
-  suppressWarnings(data("switchgrass", envir = environment()))
+  data(
+    "switchgrass",
+    package = "BRCore",
+    envir = environment()
+  )
   skip_if_not(exists("switchgrass"), "switchgrass dataset not found")
 
   # Test invalid inputs
@@ -199,7 +211,11 @@ test_that("max_otus preserves top-ranked OTUs based on ranking method", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("vegan")
 
-  suppressWarnings(data("switchgrass", envir = environment()))
+  data(
+    "switchgrass",
+    package = "BRCore",
+    envir = environment()
+  )
   skip_if_not(exists("switchgrass"), "switchgrass dataset not found")
 
   # Run with all OTUs
@@ -229,7 +245,11 @@ test_that("max_otus with abundance_weight preserves correct ranking", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("vegan")
 
-  suppressWarnings(data("switchgrass", envir = environment()))
+  data(
+    "switchgrass",
+    package = "BRCore",
+    envir = environment()
+  )
   skip_if_not(exists("switchgrass"), "switchgrass dataset not found")
 
   # Test with abundance weighting

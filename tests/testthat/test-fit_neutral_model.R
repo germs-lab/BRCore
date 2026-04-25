@@ -3,12 +3,8 @@ test_that("GlobalPatterns pipeline -> fit_neutral_model basic structure", {
   skip_if_not(exists("identify_core"), "identify_core() not found")
   skip_if_not(exists("fit_neutral_model"), "fit_neutral_model() not found")
 
-  test_that("switchgrass dataset loads", {
-    utils::data("switchgrass", package = "BRCore", envir = environment())
-    expect_true(exists("switchgrass"))
-    # e.g., check structure
-    expect_s4_class(switchgrass, "phyloseq")
-  })
+  data("switchgrass", package = "BRCore", envir = environment())
+  skip_if_not(exists("switchgrass"), "switchgrass dataset not found")
 
   switchgrass_core <- identify_core(
     physeq_obj = switchgrass,

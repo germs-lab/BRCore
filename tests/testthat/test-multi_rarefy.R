@@ -1,7 +1,7 @@
 test_that("Test if default behaviour is correct", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   otu_table_rare <- multi_rarefy(
     physeq_obj = bcse,
@@ -59,7 +59,7 @@ test_that("multi_rarefy retains samples with row sums near depth_level (floating
 test_that("multi_rarefy outputs all rarefaction iterations when .as = 'list'", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   num_iterations <- 3
   rarefied_data <- multi_rarefy(
@@ -130,7 +130,7 @@ test_that("multi_rarefy outputs all rarefaction iterations when .as = 'list'", {
 test_that("multi_rarefy with .as = 'array' returns 3D array", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   num_iterations <- 5
   rarefied_array <- multi_rarefy(
@@ -161,7 +161,7 @@ test_that("multi_rarefy with .as = 'array' returns 3D array", {
 test_that("multi_rarefy list and array have consistent dimensions", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   # Same parameters for both
   rarefied_list <- multi_rarefy(
@@ -197,7 +197,7 @@ test_that("multi_rarefy list and array have consistent dimensions", {
 test_that("multi_rarefy removes zero-abundance taxa independently per iteration", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied_data <- multi_rarefy(
     physeq_obj = bcse,
@@ -221,7 +221,7 @@ test_that("multi_rarefy removes zero-abundance taxa independently per iteration"
 test_that("multi_rarefy handles low-depth samples correctly", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   # Use high depth to force some samples to be removed
   rarefied_data <- multi_rarefy(
@@ -245,7 +245,7 @@ test_that("multi_rarefy handles low-depth samples correctly", {
 test_that("multi_rarefy single iteration returns data frame (not list)", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   # Single iteration with .as = "list" should return data frame
   rarefied_single <- multi_rarefy(

@@ -7,8 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(here)
-library(phyloseq)
 library(BRCore)
 
 test_check("BRCore")

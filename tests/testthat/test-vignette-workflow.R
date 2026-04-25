@@ -90,7 +90,7 @@ test_that("2: Vignette workflow produces consistent results", {
   library(viridis)
 
   # Step 1: Load bcse data
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   # Step 2: Calculate rarefaction metrics
   bcse_metrics <- add_rarefaction_metrics(data = bcse)
@@ -267,7 +267,7 @@ test_that("3: Vignette core distribution plots are consistent", {
   load(rda_path)
 
   # Recreate necessary objects for plotting
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
   library(phyloseq)
   library(tidyverse)
   library(viridis)
@@ -403,7 +403,7 @@ test_that("4: Vignette neutral model fitting is consistent", {
   load(rda_path)
 
   # Recreate necessary objects
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
   library(phyloseq)
   library(tidyverse)
 

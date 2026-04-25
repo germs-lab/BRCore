@@ -1,7 +1,7 @@
 test_that("phyloseq object correctly created", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   otu_table_rare <-
     multi_rarefy(
