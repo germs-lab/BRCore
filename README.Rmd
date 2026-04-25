@@ -57,6 +57,7 @@ install.packages("BRCore")
 
 Install the *development* version of BRCore from GitHub with:
 
+Install the *development* version of BRCore from GitHub with:
 ```{r}
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
