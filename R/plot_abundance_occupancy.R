@@ -92,24 +92,18 @@ plot_abundance_occupancy <- function(core_result, core_set = "elbow") {
     scale_fill_manual(
       values = c("Core" = "#CC2D35", "Not core" = "grey")
     ) +
-    theme_classic() +
-    theme(
-      plot.title = element_text(
-        hjust = 0.5,
-        size = 12,
-        face = "bold"
-      ),
-      plot.subtitle = element_text(hjust = 0.5, size = 9),
-      legend.position = c(0.98, 0.02),
-      legend.justification = c("right", "bottom"),
-      legend.background = element_rect(
-        fill = alpha("white", 0.7),
-        color = NA
-      ),
-      legend.key.height = unit(0.4, "cm"),
-      legend.key.width = unit(0.4, "cm"),
-      legend.title = element_blank(),
-      legend.text = element_text(size = 9)
+    .brcore_theme(
+      legend_position = c(0.98, 0.02),
+      extra_themes = list(
+        theme(
+          legend.justification = c("right", "bottom"),
+          legend.background = element_rect(
+            fill = alpha("white", 0.7),
+            color = NA
+          ),
+          legend.title = element_blank()
+        )
+      )
     ) +
     labs(
       title = "Abundance-Occupancy curve",

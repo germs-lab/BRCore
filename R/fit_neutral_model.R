@@ -72,9 +72,11 @@
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
 #' @export
-fit_neutral_model <- function(otu_table, core_set, abundance_occupancy) {
-  # source("../PAPER_Shade_CurrOpinMicro/script/sncm.fit.R")
-
+fit_neutral_model <- function(
+        otu_table,
+        core_set,
+        abundance_occupancy) {
+    
   # input checks ----
   if (!is.matrix(otu_table) && !is.data.frame(otu_table)) {
     cli::cli_abort(

@@ -140,35 +140,20 @@ plot_core_distribution <- function(
   if (plot_type == "bar") {
     p <- ggplot(
       plotDF,
-      aes(
-        x = otu,
-        y = time_freq,
-        fill = factor(.data[[group_var]])
-      )
+      aes(x = otu, y = time_freq, fill = factor(.data[[group_var]]))
     ) +
       geom_bar(stat = "identity", position = "dodge") +
       coord_flip() +
       scale_x_discrete(limits = rev(levels(plotDF$otu))) +
-      theme_classic() +
-      theme(
-        plot.title = element_text(
-          hjust = 0.5,
-          size = 12,
-          face = "bold"
-        ),
-        plot.subtitle = element_text(hjust = 0.5, size = 9),
-        axis.text = element_text(size = 6),
-        legend.key.height = unit(0.4, "cm"),
-        legend.key.width = unit(0.4, "cm"),
-        legend.title = element_blank(),
-        legend.text = element_text(size = 8)
+      .brcore_theme(
+        extra_themes = list(theme(legend.title = element_blank()))
       ) +
+      ggplot2::scale_fill_viridis_d(option = "turbo") +
       labs(
         title = paste("Core set occupancy across:", group_var),
         x = "Ranked ASV/OTUs",
         y = "Occupancy"
-      ) +
-      scale_fill_npg()
+      )
   } else if (plot_type == "line") {
     group_levels <- length(levels(factor(plotDF[[group_var]])))
 
@@ -189,23 +174,11 @@ plot_core_distribution <- function(
         nrow = group_levels
       ) +
       scale_y_continuous(limits = c(0, 1)) +
-      theme_classic() +
-      theme(
-        plot.title = element_text(
-          hjust = 0.5,
-          size = 12,
-          face = "bold"
-        ),
-        legend.position = "none",
-        axis.ticks.x = element_line(),
-        axis.text.y = element_text(size = 8),
-        axis.text.x = element_text(
-          angle = 45,
-          size = 6,
-          vjust = 1,
-          hjust = 1
-        )
+      .brcore_theme(
+        axis_text_angle = 45,
+        extra_themes = list(theme(legend.position = "none"))
       ) +
+      ggplot2::scale_color_viridis_d(option = "turbo") +
       labs(
         title = paste("Core set occupancy across:", group_var),
         x = "Ranked ASV/OTUs",
@@ -214,30 +187,18 @@ plot_core_distribution <- function(
   } else if (plot_type == "heatmap") {
     p <- ggplot(
       plotDF,
-      aes(
-        x = factor(.data[[group_var]]),
-        y = otu,
-        fill = time_freq
-      )
+      aes(x = factor(.data[[group_var]]), y = otu, fill = time_freq)
     ) +
       geom_tile(color = "white", linewidth = 0.5) +
-      # viridis if you want:
-      # viridis::scale_fill_viridis(option = "plasma", name = "Occupancy") +
-      theme_classic() +
-      theme(
-        plot.title = element_text(
-          hjust = 0.5,
-          size = 12,
-          face = "bold"
-        ),
-        legend.key.height = grid::unit(0.4, "cm"),
-        legend.key.width = grid::unit(0.4, "cm"),
-        legend.title = element_text(size = 8, face = "bold"),
-        legend.text = element_text(size = 8),
-        axis.ticks.x = element_line(),
-        axis.text.y = element_text(size = 6),
-        axis.text.x = element_text(angle = 33, vjust = 1, hjust = 1)
+      .brcore_theme(
+        axis_text_angle = 33,
+        extra_themes = list(
+          theme(
+            legend.title = element_text(size = 9, face = "bold")
+          )
+        )
       ) +
+      ggplot2::scale_fill_viridis_c(option = "plasma") +
       labs(
         title = paste("Core set occupancy across:", group_var),
         x = paste(group_var),

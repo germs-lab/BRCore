@@ -10,11 +10,11 @@
 #'   OTUs/ASVs) to which samples should be rarefied.
 #' @param num_iter An integer specifying the number of iterations to perform
 #'   for rarefaction.
-#' @param .as_array A logical indicating whether to return the results as a 3D
-#' array or as a list of data frames. If `TRUE`, returns a 3D array with
-#' dimensions (samples x taxa x iterations). If `FALSE`, returns a list of
+#' @param .as A character string indicating whether to return the results as a
+#' 3D array or as a list of data frames. If `"array"`, returns a 3D array with
+#' dimensions (samples x taxa x iterations). If `"list"`, returns a list of
 #' data frames, one for each iteration, with samples as rows and taxa as
-#' columns. (default = FALSE)
+#' columns. (default = "list")
 #' @param set_seed An optional integer to set the random seed for
 #' reproducibility (default = NULL).
 #'
@@ -45,7 +45,7 @@
 #'   physeq_obj = bcse,
 #'   depth_level = 1000,
 #'   num_iter = 100,
-#'   .as_array = FALSE,
+#'   .as = "list",
 #'   set_seed = 7642
 #' )
 #'
@@ -57,7 +57,7 @@ multi_rarefy <- function(
   physeq_obj,
   depth_level,
   num_iter = 100,
-  .as_array = FALSE,
+  .as = "list",
   set_seed = NULL
 ) {
   # Input validation ----
@@ -135,12 +135,31 @@ multi_rarefy <- function(
 
   # Single iteration ----
   if (num_iter == 1) {
-    rare <- vegan::rrarefy(otu_mat, sample = depth_level)
-    return(as.data.frame(rare))
+    if (!is.na(iteration_seeds[1])) {
+      set.seed(iteration_seeds[1])
+    }
+    processed_data <- as.data.frame(vegan::rrarefy(
+      otu_mat,
+      sample = depth_level
+    ))
+    if (.as == "list") {
+      stats::setNames(list(processed_data), "iter_1")
+    }
+    if (.as == "array") {
+      processed_data <- array(
+        as.matrix(processed_data),
+        dim = c(nrow(processed_data), ncol(processed_data), 1),
+        dimnames = list(
+          rownames(processed_data),
+          colnames(processed_data),
+          "iter_1"
+        )
+      )
+    }
   }
 
   # Multiple iterations ----
-  if (.as_array) {
+  if (.as == "array") {
     processed_data <- array(
       0,
       dim = c(n_samp, n_taxa, num_iter),
@@ -154,8 +173,9 @@ multi_rarefy <- function(
     for (i in seq_len(num_iter)) {
       processed_data[,, i] <- vegan::rrarefy(otu_mat, sample = depth_level)
     }
-  } else {
-    out <- lapply(seq_len(num_iter), function(i) {
+  }
+  if (.as == "list") {
+    processed_data <- lapply(seq_len(num_iter), function(i) {
       if (!is.na(iteration_seeds[i])) {
         set.seed(iteration_seeds[i])
       }
@@ -172,21 +192,17 @@ multi_rarefy <- function(
 
       as.data.frame(rare_result)
     })
-    names(out) <- paste0("iter_", seq_len(num_iter))
-
-    # Remove zero-abundance taxa for each iteration
-    processed_data <- lapply(out, function(df) {
-      df[, colSums(df) > 0, drop = FALSE]
-    })
+    names(processed_data) <- paste0("iter_", seq_len(num_iter))
   }
 
   avg_taxa_removed <- NULL
 
-  if (.as_array) {
+  if (.as == "array") {
     n_samples_removed <- n_samples_before - n_samp
     removed_samples <- setdiff(original_sample_ids, rownames(otu_mat))
     n_taxa_removed <- n_taxa - dim(processed_data)[2]
-  } else {
+  }
+  if (.as == "list") {
     n_taxa_after <- min(vapply(processed_data, ncol, integer(1)))
 
     n_samples_after <- nrow(processed_data[[1]])
@@ -202,6 +218,8 @@ multi_rarefy <- function(
 
     avg_taxa_removed <- mean(vapply(processed_data, ncol, double(1)))
   }
+
+  # Report results ----
   .report_rarefaction_results(
     n_samples_removed = n_samples_removed,
     n_taxa_before = n_taxa_before,
@@ -320,19 +338,10 @@ multi_rarefy <- function(
 
   # Taxa Removal
   cli::cli_h3("Taxa Removal")
-  if (n_taxa_removed > 0) {
-    cli::cli_alert_info(
-      "Original taxa input: {.val {n_taxa_before}}"
-    )
+  if (n_taxa_removed == 0) {
+    cli::cli_alert_success("No taxa removed.")
     cli::cli_alert_warning(
-      "Max: {.val {n_taxa_removed}} taxa removed (zero abundance) in viable samples (depth_level >= {.val {depth_level}})."
-    )
-    cli::cli_alert_warning(
-      "When using `.as_array = FALSE`, taxa removed may differ across iterations."
-    )
-  } else {
-    cli::cli_alert_warning(
-      "No taxa removed. \nWhen using `.as_array = TRUE`, taxa are not removed across iterations to \nmaintain consistent dimensions."
+      "Taxa are not removed across iterations to maintain consistent dimensions. \nDownstream analyses should handle zero-abundance taxa appropriately."
     )
   }
 
@@ -403,6 +412,9 @@ multi_rarefy <- function(
     cli::cli_end()
     cli::cli_end()
   } else {
+    processed_data <- lapply(processed_data, function(df) {
+      df[, colSums(df) > 0, drop = FALSE]
+    })
     summary_stats <- list(
       min_taxa = min(vapply(processed_data, ncol, integer(1))),
       max_taxa = max(vapply(processed_data, ncol, integer(1))),

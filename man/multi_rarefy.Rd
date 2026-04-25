@@ -8,7 +8,7 @@ multi_rarefy(
   physeq_obj,
   depth_level,
   num_iter = 100,
-  .as_array = FALSE,
+  .as = "list",
   set_seed = NULL
 )
 }
@@ -21,11 +21,11 @@ OTUs/ASVs) to which samples should be rarefied.}
 \item{num_iter}{An integer specifying the number of iterations to perform
 for rarefaction.}
 
-\item{.as_array}{A logical indicating whether to return the results as a 3D
-array or as a list of data frames. If \code{TRUE}, returns a 3D array with
-dimensions (samples x taxa x iterations). If \code{FALSE}, returns a list of
+\item{.as}{A character string indicating whether to return the results as a
+3D array or as a list of data frames. If \code{"array"}, returns a 3D array with
+dimensions (samples x taxa x iterations). If \code{"list"}, returns a list of
 data frames, one for each iteration, with samples as rows and taxa as
-columns. (default = FALSE)}
+columns. (default = "list")}
 
 \item{set_seed}{An optional integer to set the random seed for
 reproducibility (default = NULL).}
@@ -52,7 +52,7 @@ otu_table_rare <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
-  .as_array = FALSE,
+  .as = "list",
   set_seed = 7642
 )
 

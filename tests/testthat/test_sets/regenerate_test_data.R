@@ -33,8 +33,8 @@ cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 10,
-  .as_array = FALSE,
+  num_iter = 2,
+  .as = "list",
   set_seed = 7642
 )
 
@@ -50,11 +50,11 @@ test_bcse_rare <- update_otu_table(
 cat("Identifying core microbiome...\n")
 test_bcse_rare_core <- identify_core(
   physeq_obj = bcse,
+  rarefied_list = test_bcse_rarefied_otutable,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
   depth_level = 1000,
-  num_iter = 10,
   seed = 2134
 )
 

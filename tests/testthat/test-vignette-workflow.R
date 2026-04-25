@@ -52,7 +52,6 @@ test_that("1: Vignette test data structures are valid", {
   # Test: All plots are ggplot objects
   plot_objects <- c(
     "test_rarefaction_plot",
-    "test_bcse_identified_core",
     "test_plot_abund_occ_increase",
     "test_plot_abund_occ_elbow",
     "test_plot_core_dist_bar",
@@ -64,6 +63,11 @@ test_that("1: Vignette test data structures are valid", {
   for (plot_name in plot_objects) {
     expect_s3_class(test_vignette_data[[plot_name]], "ggplot")
   }
+
+  expect_s3_class(
+    test_vignette_data$test_bcse_identified_core[[2]],
+    "ggplot"
+  )
 })
 
 
@@ -113,8 +117,8 @@ test_that("2: Vignette workflow produces consistent results", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 10,
-    .as_array = FALSE,
+    num_iter = 2,
+    .as = "list",
     set_seed = 7642
   )
 
@@ -158,11 +162,11 @@ test_that("2: Vignette workflow produces consistent results", {
   # Step 6: Identify core microbiome
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
+    rarefied_list = bcse_rarefied_list,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
     depth_level = 1000,
-    num_iter = 10,
     seed = 2134
   )
 
@@ -215,7 +219,7 @@ test_that("2: Vignette workflow produces consistent results", {
   )
 
   # Test: Core identification plot structure
-  expect_s3_class(bcse_identified_core, "ggplot")
+  expect_s3_class(bcse_identified_core[[2]], "ggplot")
   expect_identical(
     bcse_identified_core$labels,
     test_vignette_data$test_bcse_identified_core$labels
@@ -271,8 +275,8 @@ test_that("3: Vignette core distribution plots are consistent", {
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 10,
-    .as_array = FALSE,
+    num_iter = 2,
+    .as = "list",
     set_seed = 7642
   )
 
@@ -301,11 +305,11 @@ test_that("3: Vignette core distribution plots are consistent", {
 
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
+    rarefied_list = bcse_rarefied_list,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
     depth_level = 1000,
-    num_iter = 10,
     seed = 2134
   )
 
@@ -403,13 +407,21 @@ test_that("4: Vignette neutral model fitting is consistent", {
   library(phyloseq)
   library(tidyverse)
 
+  bcse_rarefied_list <- multi_rarefy(
+    physeq_obj = bcse,
+    depth_level = 1000,
+    num_iter = 2,
+    .as = "list",
+    set_seed = 7642
+  )
+
   bcse_rare_core <- identify_core(
     physeq_obj = bcse,
+    rarefied_list = bcse_rarefied_list,
     priority_var = "Crop",
     increase_value = 0.02,
     abundance_weight = 0,
     depth_level = 1000,
-    num_iter = 10,
     seed = 2134
   )
 

@@ -74,47 +74,21 @@ plot_rarefaction_metrics <- function(data) {
 
   # Generate plot grid
   plot_output <- ggarrange(
-    # Plot a - Histogram with improvements
+    # Plot a - Histogram
     ggplot(sample_df, aes(x = read_num)) +
-      geom_histogram(
-        binwidth = 5000,
-        fill = "firebrick",
-        color = "white"
-      ) +
+      geom_histogram(binwidth = 5000, fill = "firebrick", color = "white") +
       scale_x_continuous(labels = scales::comma) +
       scale_y_continuous(labels = scales::comma) +
-      theme_classic() +
-      theme(
-        panel.grid.major.y = element_line(
-          color = "grey",
-          linetype = "dashed",
-          linewidth = 0.5
-        )
-      ) +
-      labs(
-        title = "Histogram",
-        x = "Sequence reads",
-        y = "Sample counts"
-      ),
+      .brcore_theme(dashed_grid = TRUE) +
+      labs(title = "Histogram", x = "Sequence reads", y = "Sample counts"),
 
     # Plot b - Lower 25% histogram
     ggplot(sample_df, aes(x = read_num)) +
-      geom_histogram(
-        binwidth = 1000,
-        fill = "firebrick",
-        color = "white"
-      ) +
+      geom_histogram(binwidth = 1000, fill = "firebrick", color = "white") +
       coord_cartesian(xlim = c(0, readno_q1)) +
       scale_x_continuous(labels = scales::comma) +
       scale_y_continuous(labels = scales::comma) +
-      theme_classic() +
-      theme(
-        panel.grid.major.y = element_line(
-          color = "grey",
-          linetype = "dashed",
-          linewidth = 0.5
-        )
-      ) +
+      .brcore_theme(dashed_grid = TRUE) +
       labs(
         title = "Histogram (Lower 25%)",
         x = "Sequence reads",
@@ -125,14 +99,7 @@ plot_rarefaction_metrics <- function(data) {
     ggplot(sample_df, aes(x = read_num, y = goods_cov)) +
       geom_point(shape = 19, color = "firebrick", size = 1) +
       scale_x_continuous(labels = scales::comma) +
-      theme_classic() +
-      theme(
-        panel.grid.major.y = element_line(
-          color = "grey",
-          linetype = "dashed",
-          linewidth = 0.5
-        )
-      ) +
+      .brcore_theme(dashed_grid = TRUE) +
       labs(
         title = "Good's Coverage",
         x = "Sequence reads",
@@ -141,21 +108,9 @@ plot_rarefaction_metrics <- function(data) {
 
     # Plot d - Log10 jitter
     ggplot(sample_df, aes(x = 1, y = read_num)) +
-      geom_jitter(
-        shape = 19,
-        color = "firebrick",
-        width = 0.2,
-        size = 1
-      ) +
-      theme_classic() +
-      theme(
-        panel.grid.major.y = element_line(
-          color = "grey",
-          linetype = "dashed",
-          linewidth = 0.5
-        )
-      ) +
+      geom_jitter(shape = 19, color = "firebrick", width = 0.2, size = 1) +
       scale_y_log10(labels = scales::comma) +
+      .brcore_theme(dashed_grid = TRUE) +
       labs(title = "Log10 jitter", x = "Data set", y = "Sequence reads"),
 
     # Plot e - Log10 boxplot
@@ -167,36 +122,18 @@ plot_rarefaction_metrics <- function(data) {
         max.overlaps = 15,
         size = 3
       ) +
-      theme_classic() +
-      theme(
-        panel.grid.major.y = element_line(
-          color = "grey",
-          linetype = "dashed",
-          linewidth = 0.5
-        )
-      ) +
       scale_y_log10(labels = scales::comma) +
+      .brcore_theme(dashed_grid = TRUE) +
       labs(title = "Log10 boxplot", x = "Data set", y = "Sequence reads"),
 
-    # Plot f - Ranked samples (fixed)
+    # Plot f - Ranked samples
     {
       temp_df <- arrange(sample_df, read_num)
       ggplot(temp_df, aes(x = seq_len(nrow(temp_df)), y = read_num)) +
         geom_bar(stat = "identity", fill = "firebrick", color = NA) +
         scale_y_continuous(labels = scales::comma) +
-        theme_classic() +
-        theme(
-          panel.grid.major.y = element_line(
-            color = "grey",
-            linetype = "dashed",
-            linewidth = 0.5
-          )
-        ) +
-        labs(
-          title = "Ranked samples",
-          x = "Samples",
-          y = "Sequence reads"
-        )
+        .brcore_theme(dashed_grid = TRUE) +
+        labs(title = "Ranked samples", x = "Samples", y = "Sequence reads")
     },
     ncol = 3,
     nrow = 2,

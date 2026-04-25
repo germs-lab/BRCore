@@ -175,24 +175,18 @@ plot_neutral_model <- function(fit_result) {
       inherit.aes = FALSE,
       show.legend = FALSE
     ) +
-    # Make sure only the Membership legend remains
     guides(color = "none", linetype = "none") +
-    theme_classic() +
-    theme(
-      plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
-      plot.subtitle = element_text(hjust = 0.5, size = 9),
-      legend.position = c(0.98, 0.02),
-      legend.justification = c("right", "bottom"),
-      legend.background = element_rect(
-        fill = alpha("white", 0.7),
-        color = NA
-      ),
-      legend.key.height = unit(0.2, "cm"),
-      legend.key.width = unit(0.3, "cm"),
-      legend.title = element_blank(),
-      legend.text = element_text(size = 8)
+    .brcore_theme(
+      legend_position = c(0.98, 0.02),
+      extra_themes = list(theme(
+        legend.justification = c("right", "bottom"),
+        legend.background = element_rect(
+          fill = alpha("white", 0.7),
+          color = NA
+        ),
+        legend.title = element_blank()
+      ))
     ) +
-    # White box with two lines: R^2 on top, m below (above the legend)
     annotate(
       "label",
       x = box_x,
@@ -206,12 +200,11 @@ plot_neutral_model <- function(fit_result) {
       ),
       parse = TRUE,
       hjust = 1,
-      vjust = 0,
+      vjust = -0.75,
       size = 3,
       fill = "white",
       alpha = 0.9,
       lineheight = 1.05
-      # label.size = 0  # This removes the border
     ) +
     labs(
       title = "Neutral model",

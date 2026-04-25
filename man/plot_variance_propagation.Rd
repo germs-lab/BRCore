@@ -4,7 +4,14 @@
 \alias{plot_variance_propagation}
 \title{Variance propagation diagnostic for rarefaction}
 \usage{
-plot_variance_propagation(physeq_obj, rarefied, q = 0, group_var, group_color)
+plot_variance_propagation(
+  physeq_obj,
+  rarefied,
+  q = 0,
+  group_var,
+  group_color,
+  convert_to_factor = FALSE
+)
 }
 \arguments{
 \item{physeq_obj}{Raw phyloseq object}
@@ -16,6 +23,13 @@ plot_variance_propagation(physeq_obj, rarefied, q = 0, group_var, group_color)
 \item{group_var}{A grouping variable to use gor grouping as in the sample_data()}
 
 \item{group_color}{A color variable to use present in the sample_data()}
+
+\item{convert_to_factor}{Logical. If \code{TRUE}, both \code{group_var} and
+\code{group_color} are coerced to \code{factor} before plotting, which is
+useful when those columns are numeric/continuous (e.g. dates, counts) but
+should be treated as discrete groups. When \code{TRUE} a discrete colour
+scale (\code{scale_color_viridis_d}) is used; otherwise the continuous
+scale (\code{scale_color_viridis_c}) is used. Default \code{FALSE}.}
 }
 \value{
 ggplot object comparing raw vs rarefied diversity distributions across iterations.
@@ -35,7 +49,7 @@ bcse_rarefied_otutable_filt <-
        physeq_obj = bcse_filt,
        depth_level = 1000,
        num_iter = 100,
-       .as_array = FALSE,
+       .as = "list",
        set_seed = 7643
    )
 

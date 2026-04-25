@@ -5,6 +5,7 @@ library(knitr)
 library(here)
 library(devtools)
 
+devtools::load_all()
 knit("vignettes/BRCore-vignette.Rmd.orig", "vignettes/BRCore-vignette.Rmd")
 
 # Moving files
@@ -20,3 +21,9 @@ file.remove(figure_files, figure_dir)
 
 # Build static vignette
 build_vignettes()
+
+# Extract R code from vignette
+knitr::purl(
+  "vignettes/BRCore-vignette.Rmd.orig",
+  output = "vignettes/BRCore-vignette.R"
+)
