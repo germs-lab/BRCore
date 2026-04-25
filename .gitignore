@@ -14,8 +14,8 @@
 ### Package Development ###
 *-Ex.R
 inst/doc
-doc/
-Meta/
+/doc/
+/Meta/
 
 ### Build Artifacts ###
 /*.tar.gz
@@ -38,3 +38,6 @@ Meta/
 renv/
 renv.lock
 
+/doc/
+/Meta/
+docs

@@ -1,6 +1,12 @@
 ---
 title: "Introduction to BRCore"
-output: rmarkdown::html_vignette
+author: "By Bolívar Aponte Rolón and Gian Maria Niccolò Benucci"
+date: "Last modified: 24 April, 2026"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+
 vignette: >
   %\VignetteIndexEntry{Introduction to BRCore}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,40 +24,43 @@ link-citations: true
   padding: 10px;
   margin: 15px 0;
 }
+
+h1, .h1 {
+    margin-top: 84px;
+    margin-bottom: 42px;
+}
+h2, .h2, h3, .h3 {
+    margin-top: 42px;
+    margin-bottom: 21px;
+}
+
+p.caption {
+    font-size: 1em;
+    font-style: italic;
+    color: grey;
+    margin-right: 10%;
+    margin-left: 10%;
+    text-align: justify;
+}
 </style>
 
-# Load R libraries
+## Load R libraries
 
 
 ``` r
-library(BRCore)
-
-if (requireNamespace("phyloseq", quietly = TRUE)) {
-  library(phyloseq)
-} else {
-  message("Package 'phyloseq' not installed; some examples will be skipped.")
-}
-
-if (requireNamespace("tidyverse", quietly = TRUE)) {
-  library(tidyverse)
-} else {
-  message(
-    "Package 'tidyverse' not installed; some code chunks will be skipped or use base R."
+invisible(
+  lapply(
+    c("BRCore", "phyloseq", "tidyverse", "viridis"),
+    library,
+    character.only = TRUE
   )
-}
-
-if (requireNamespace("viridis", quietly = TRUE)) {
-  library(viridis)
-} else {
-  message(
-    "Package 'viridis' not installed; some code chunks will be skipped or use base R."
-  )
-}
+)
 ```
 
+## Datasets included
 The `BRCore` R package comes with a few datasets. Three 16S datasets: `switchgrass`, 
-`mimulus`, and `bean`, from @Shade2019Abundance; a 16S dataset, called `bcse`, from leaves 
-of ten different cropping systems in the Bioenergy Crop Research Experiment 
+`mimulus`, and `bean`, from @Shade2019Abundance; a 16S dataset, called `bcse`, 
+from leaves of ten different cropping systems in the Bioenergy Crop Research Experiment 
 from @Haan2023Contrasting. Here we are going to use `bcse` since it is not rarefied 
 in contrast of the other three.
 
@@ -94,7 +103,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x556b76193820> 
+#>   .. .. .. .. .. ..$ :<environment: 0x5f4493a140f8> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -108,21 +117,24 @@ str(bcse)
 #>   .. .. ..@ metadata       : list()
 ```
 
-# Preprocessing
+# Data Exploration and Parameter Selection for Core Identification
 
+
+## Rarefaction metrics and visualization
 We are not going to talk about the importance of rarefaction as it is not the goal
 of this vignette, but if you are interested you should read @Schloss2024Rarefaction, 
 @Schloss2024Waste, @Hong2022Rarefy, and @Weiss2017Normalization as a start.
 
 In `BRCore`, to identified the ideal rarefaction cutoff we can plot a simple series 
-of visuals to guide us in the decision. As we all know, we can estimate how well
-a DNA sample will sequence, but there are always some samples that fail to sequence 
-(or sequence badly) and some others that will sequence "too well" for reasons that 
-are outside our control or by chance.
+of visuals to guide us in the decision. As we all know, we can, more or less, 
+estimate how well a DNA sample will sequence, but there are always some samples 
+that fail to sequence (or sequence badly) and some others that will sequence 
+"too well" for reasons that are outside our control or by chance.
 
 In the end we will need to decide how many samples we are accepting to discard and
-how much diversity we want to retain. To do that we can use some help form these plots
-below.
+how much diversity we want to retain in our data. To do that we can use some help 
+by plotting some diagnostics plots as shown below.
+
 
 
 ``` r
@@ -139,152 +151,164 @@ bcse_metrics
 ``` r
 rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Processing 50 samples
-#> 
-ℹ Generating rarefaction diagnostic plots
-
-                                         
-✔ Rarefaction diagnostic plots generated successfully
-#> ℹ Generating rarefaction diagnostic plots
-
-✔ Generating rarefaction diagnostic plots [813ms]
+#> ℹ Generating rarefaction diagnostic plots                                         ✔ Rarefaction diagnostic plots generated successfully
+#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [935ms]
 print(rarefaction_plot)
 ```
 
-![plot of chunk fig1_plot_metrics](images/fig1_plot_metrics-1.png)
-
-**Figure 1** Rarefaction metrics. a-b, histograms of samples. c, Good's coverage per
-total number of sequences in a sample. d-e, log10 of sequences in a sample. f, 
-samples ranked by sequence reads in a sample.
-
-<div class="note">
-**Note:** The Good's coverage" is a statistics used in ecology that estimates the proportion
-of species in a community that are represented in a sample, based on the number of 
-species encountered and the total number of individuals sampled. Essentially, it 
-quantifies how well a sample represents the overall diversity of a population or 
-ecosystem. Good's coverage is calculated as \(1-(n1/N)\), where \(n1\) is the number
-of unique ASV/OTUs (i.e. species) found only once, and \(N\) is the total number of 
-sequence reads (i.e. individuals); a high percentage (e.g., >95%) means most reads
-are from common taxa, suggesting sufficient sampling, while low coverage indicates 
-many rare, potentially missed, taxa. 
+<div class="figure" style="text-align: center">
+<img src="images/fig1_plot_metrics-1.png" alt="Figure 1: Rarefaction metrics. a-b, histograms of samples. c, Good's coverage per total number of sequences in a sample. d-e, log10 of sequences in a sample. f,  samples ranked by sequence reads in a sample."  />
+<p class="caption">Figure 1: Rarefaction metrics. a-b, histograms of samples. c, Good's coverage per total number of sequences in a sample. d-e, log10 of sequences in a sample. f,  samples ranked by sequence reads in a sample.</p>
 </div>
 
-# Perform mutiple rarefaction
 
-The best way to rarefy your data is to use the multiple rarefaction approach. Originally
-developed by Sanders in 1968 it has been adopted widely in ecology research. 
+<div class="note">
+**Note:** The Good's coverage" is a statistics used in ecology that estimates the 
+proportion of species in a community that are represented in a sample, based on 
+the number of species encountered and the total number of individuals sampled. 
+Essentially, it quantifies how well a sample represents the overall diversity of 
+a population or ecosystem. Good's coverage is calculated as $(1-(n1/N)$, where $n1$ 
+is the number of unique ASV/OTUs (i.e. species) found only once, and $N$ is the 
+total number of sequence reads (i.e. individuals); a high percentage (e.g., >95%) 
+means most reads are from common taxa, suggesting sufficient sampling, while low 
+coverage indicates many rare, potentially missed, taxa. 
+</div>
+
+## Rarefy the data and explore variance propagation
+Originally developed by @Sanders1968Marine rarefaction has been adopted widely in 
+ecology and microbiome research. It consists on randomly re sampling, multiple times,
+the same number of species (ASV/OTUs) across all samples, to calculate the expected 
+number of species that would be found if all the samples were all the same. It basically
+prevents samples with more individuals (e.g., more sequencing reads) from appearing
+more diverse simply because they were sampled more heavily. 
+
+Because rarefaction is a random process it add noise to the data, each re sampling
+is slightly different from others due to chance. This can be problematic, especially
+when a very low rarefaction cutoff is selected, when for example we want to compare
+2 treatments. This is due to the fact that the lower the rarefaction cutoff the more
+chance you have that rarefaction iterations will differ one another as also
+showed by @Cameron2021Rarefying.
+
+We developed functions that can perform and store all the rarefaction iterations
+so to evaluate (and visualize) the generated noise in the process as show below
 
 
 ``` r
-bcse_rarefied_otutable <-
+bcse_rarefied_list <-
   multi_rarefy(
-    physeq = bcse,
+    physeq_obj = bcse,
     depth_level = 1000,
-    num_iter = 100,
-    threads = 8,
+    num_iter = 3,
+    .as_array = FALSE,
     set_seed = 7642
   )
-#> Seed used: 7642
+#> Error in multi_rarefy(physeq_obj = bcse, depth_level = 1000, num_iter = 3, : unused argument (.as_array = FALSE)
 ```
 
-We can then inspect that everything looks good before going further.
+Let's explore the results.
 
 
 ``` r
-rowSums(bcse_rarefied_otutable)
-#> bcse100 bcse101 bcse102 bcse103 bcse104 bcse106 bcse107 bcse109 bcse111 bcse191 bcse192  bcse49  bcse50  bcse51  bcse57 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse58  bcse59  bcse61  bcse62  bcse63  bcse65  bcse66  bcse67  bcse68  bcse69  bcse70  bcse71  bcse72  bcse73  bcse75 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse76  bcse77  bcse78  bcse79  bcse80  bcse81  bcse82  bcse83  bcse85  bcse86  bcse87  bcse88  bcse95  bcse96  bcse97 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse98  bcse99 
-#>    1000    1000
-bcse_rarefied_otutable[1:10, 1:10]
-#>         OTU_427 OTU_11 OTU_253 OTU_148  OTU_3 OTU_78 OTU_58 OTU_152 OTU_16 OTU_35
-#> bcse100     0.0   0.00       0   10.91 191.70   0.00   0.00    0.00   1.18      0
-#> bcse101     0.0   0.00       0    0.00 146.35   0.00   0.00    0.00   0.24      0
-#> bcse102     0.0   0.00       0    0.00  99.65   0.00   0.00    0.00   0.14      0
-#> bcse103     0.0   0.09       0    0.00 121.97   0.00   0.00    0.00   0.28      0
-#> bcse104     0.0   0.00       0    0.08  76.69   0.00   0.00    0.00   1.19      0
-#> bcse106     0.0   0.00       0    1.46 335.31   0.00   0.00    0.00   0.00      0
-#> bcse107     0.6   0.62       0    0.61 166.35   3.02   3.63    0.61   1.69      0
-#> bcse109     0.0   0.32       0    0.65 170.70   0.26   0.00    0.00   4.41      0
-#> bcse111     0.0   0.00       0    0.15 201.20   0.00   0.00    0.00   0.16      0
-#> bcse191     0.0   0.00       0    7.39 248.33   0.00   0.00    0.00   0.24      0
+class(bcse_rarefied_list)
+#> Error: object 'bcse_rarefied_list' not found
+str(bcse_rarefied_list[[1]], list.len = 10) # Dimensions of iteration #1
+#> Error: object 'bcse_rarefied_list' not found
 ```
 
-### Recreate a phyloseq object with rarefied `otu_table()` 
-
-We can then use the `do_phyloseq()` function to replace the `otu_table()` with the 
-rarefied table you just created. Or, you can create a new object with rarefied table
-calculated before.
+And plot the variance (the noise we talked above) across the 10 iterations of 
+rarefaction. We can use the `plot_variance_propagation()` function to visualize 
+this variance in Alpha diversity across samples and iterations and compare 
+Raw (non-rarefied) vs. Rarefied data.
 
 
 ``` r
-bcse_rare <-
-  update_otu_table(physeq = bcse, otu_rare = bcse_rarefied_otutable)
-#> Sample names from the original phyloseq object (otu_table):
-#>  [1] "bcse50"  "bcse69"  "bcse73"  "bcse191" "bcse82"  "bcse102" "bcse111" "bcse86"  "bcse97"  "bcse88"  "bcse104"
-#> [12] "bcse108" "bcse81"  "bcse77"  "bcse78"  "bcse96"  "bcse66"  "bcse57"  "bcse75"  "bcse101" "bcse192" "bcse98" 
-#> [23] "bcse105" "bcse106" "bcse76"  "bcse103" "bcse51"  "bcse63"  "bcse68"  "bcse109" "bcse65"  "bcse58"  "bcse107"
-#> [34] "bcse62"  "bcse59"  "bcse99"  "bcse49"  "bcse85"  "bcse79"  "bcse72"  "bcse80"  "bcse71"  "bcse110" "bcse95" 
-#> [45] "bcse67"  "bcse61"  "bcse100" "bcse87"  "bcse83"  "bcse70"
-#> Sample names in the rarefied OTU table (data.frame) after reordering to match phyloseq:
-#>  [1] "bcse50"  "bcse69"  "bcse73"  "bcse191" "bcse82"  "bcse102" "bcse111" "bcse86"  "bcse97"  "bcse88"  "bcse104"
-#> [12] "NA"      "bcse81"  "bcse77"  "bcse78"  "bcse96"  "bcse66"  "bcse57"  "bcse75"  "bcse101" "bcse192" "bcse98" 
-#> [23] "NA.1"    "bcse106" "bcse76"  "bcse103" "bcse51"  "bcse63"  "bcse68"  "bcse109" "bcse65"  "bcse58"  "bcse107"
-#> [34] "bcse62"  "bcse59"  "bcse99"  "bcse49"  "bcse85"  "bcse79"  "bcse72"  "bcse80"  "bcse71"  "NA.2"    "bcse95" 
-#> [45] "bcse67"  "bcse61"  "bcse100" "bcse87"  "bcse83"  "bcse70"
-#> ! Phyloseq object and rarefied otu_tables sample names are NOT identical. Check below samples removed by rarefaction.
-#> ! Samples removed due to rarefaction: bcse108, bcse105, bcse110
-#> ✔ Analysis complete!
+rarefaction_variance_plot <- plot_variance_propagation(
+  physeq_obj = bcse,
+  rarefied = bcse_rarefied_list,
+  q = 0,
+  group_var = "Crop",
+  group_color = "Plot"
+)
+#> ✔ Input phyloseq object is valid!
+#> 
+#> ── Rarefaction Variance Propagation Visualization ────────────────────
+#> Error: object 'bcse_rarefied_list' not found
+print(rarefaction_variance_plot)
+#> Error: object 'rarefaction_variance_plot' not found
+```
 
-print(bcse_rare)
-#> phyloseq-class experiment-level object
-#> otu_table()   OTU Table:         [ 2723 taxa and 47 samples ]
-#> sample_data() Sample Data:       [ 47 samples by 3 sample variables ]
-#> tax_table()   Taxonomy Table:    [ 2723 taxa by 10 taxonomic ranks ]
-#> refseq()      DNAStringSet:      [ 2723 reference sequences ]
-sample_sums(bcse_rare)
-#>  bcse50  bcse69  bcse73 bcse191  bcse82 bcse102 bcse111  bcse86  bcse97  bcse88 bcse104  bcse81  bcse77  bcse78  bcse96 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse66  bcse57  bcse75 bcse101 bcse192  bcse98 bcse106  bcse76 bcse103  bcse51  bcse63  bcse68 bcse109  bcse65  bcse58 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#> bcse107  bcse62  bcse59  bcse99  bcse49  bcse85  bcse79  bcse72  bcse80  bcse71  bcse95  bcse67  bcse61 bcse100  bcse87 
-#>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
-#>  bcse83  bcse70 
-#>    1000    1000
+
+Review the rarefaction and variance plots to determine the ideal sampling depth.
+You are looking for a "sweet spot" that maintains high diversity and sample sizes
+while keeping variance across iterations low. Pay extra attention when rarefaction
+cutoff is quite low, as show by @Cameron2021Rarefying. Note this depth, as it will
+serve as the cutoff for the `identify_core()` step in your pipeline.
+
+### OPTIONAL: Recreate a phyloseq object with rarefied `otu_table()` 
+
+The `identify_core()` function, handles the rarefaction iterations internally, you
+do not need to worry about rarefaction. The results from `add_rarefaction_metrics()`,
+`plot_rarefaction_metrics()`, and `multi_rarefy()` are meant to explore the data
+and inform the chosen parameters for `identify_core()`. You will specify how many 
+rarefaction iterations you decided to run within the function.
+
+If you have a phyloseq object with a rarefied `otu_table()` or if you want to use one
+specific rarefaction iteration generated by `multi_rarefy()` you also have 
+these options. The choice is up to you and depends on your preferences and the 
+specific goals of your analysis. The `update_otu_table()` function allows for 
+replacing the `otu_table()` with the rarefied table you prefer.
+
+
+
+``` r
+bcse_rare_single <- update_otu_table(
+  physeq_obj = bcse,
+  rarefied_otus = bcse_rarefied_list,
+  iteration = 1 # Speficify which iteration to use for the updated OTU table
+)
+#> Error: object 'bcse_rarefied_list' not found
 ```
 
 # Core analysis
 
+
 ### Identify the core ASV/OTUs set
 
-We can now identify how many core ASV/OTUs are present in our dataset across a 
-variable we want to use to calculate the core, in this case is "Crop". The resulted
-object will contain several metrics for the core set of ASV/OTUs calculated across
-the variable `Crop`.
+We can now identify how many core ASV/OTUs are present in the dataset. One 
+important difference that separates `identify_core()` form other methods of
+identification of core taxa is that you can specify a variable (in the case 
+of the `bcse` dataset is `Crop`) so that OTUs can be core for a level of the 
+variable but possibly not for others. This comes form the idea that core 
+microbiome can be transient in space and time as show by @Shade2019Abundance.
+
+*We continue with the `bcse` phyloseq object and the rarefied data `bcse_rarefied_list` throughout the vignette.*
+
 
 
 ``` r
-bcse_rare_core <- identify_core(
-  physeq_obj = bcse_rare,
+bcse_core_multi <- identify_core(
+  physeq_obj = bcse,
+  rarefied_list = bcse_rarefied_list,
   priority_var = "Crop",
   increase_value = 0.02,
   abundance_weight = 0,
+  depth_level = 1000,
   seed = 2134
 )
 #> Seed used: 2134
 #> ✔ Input phyloseq object is valid!
-#> ℹ otu_table() is rarefied at a depth of: 1000
-#> ✔ Core prioritizing variable: Crop
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2025-12-22 22:08:02.668628
-#> ✔ Elbow method identified 9 core OTUs
-#> ✔ % increase method identified 33 core OTUs
-#> ✔ Analysis complete!
+#> Error: object 'bcse_rarefied_list' not found
+
+# With a single iteration 
+# bcse_core_single <- identify_core(
+#   physeq_obj = bcse_rare_single,
+#   priority_var = "Crop",
+#   increase_value = 0.02,
+#   seed = 2134
+# )
 ```
 
-### *How the is the core identified?*
+## *How the is the core identified?*
 
 As shown by @Shade2019Abundance, an interesting way explore the abundance and 
 occupancy inclusion thresholds used to define the core microbiome is to evaluate how 
@@ -308,199 +332,133 @@ the curve into two parts, and finding the point that maximizes the difference
 in average rates of change between these parts. 
 
 * The second method uses a final percent `increase` threshold in beta-diversity 
-(we recommend 2% or more), which continues adding taxa until improvements fall 
+(recommend 2% or more), which continues adding taxa until improvements fall 
 below this percentage. 
 
 Both methods measure improvement using Bray-Curtis similarity through the 
-equation `C = 1 - (BC_core/BC_all)`, where `C` represents the contribution of 
-ranked taxa to total similarity, `BC_core` is the Bray-Curtis similarity using 
-only core taxa, and `BC_all` uses the complete dataset. 
+equation $C = 1 - (BC_{core}/BC_{all})$, where $C$ represents the contribution of 
+ranked taxa to total similarity, $BC_{core}$ is the Bray-Curtis similarity using 
+only core taxa, and $BC_{all}$ uses the complete dataset. 
 
 The cumulative explanatory value of adding each next-ranked taxon can be plotted
-using the plot_bc_increase function, with the red line indicating the elbow 
-method cutoff and colored lines showing the 2% threshold cutoff. These approaches
-eliminate the need for subjective threshold setting by automatically identifying
-natural breakpoints where additional taxa provide marginal returns in explanatory
-power.
+using the `plot_identified_core()` function, with the vertical lines indicating 
+the elbow and 2% threshold cutoff methods. These approaches eliminate the need 
+for subjective threshold setting by automatically identifying natural breakpoints 
+where additional taxa provide marginal returns in explanatory power.
 
-The output is a list of 13 named items.
+**The output is a list of 13 named items.**
+
 
 
 ``` r
-str(bcse_rare_core)
-#> List of 13
-#>  $ bray_curtis_ranked : tibble [2,723 × 5] (S3: tbl_df/tbl/data.frame)
-#>   ..$ rank             : Factor w/ 2723 levels "1","10","100",..: 1 1112 1947 2058 2169 2280 2391 2502 2613 2 ...
-#>   ..$ MeanBC           : num [1:2723] 0.0749 0.0781 0.0894 0.105 0.1066 ...
-#>   ..$ proportionBC     : num [1:2723] 0.122 0.127 0.146 0.171 0.174 ...
-#>   ..$ IncreaseBC       : num [1:2723] 0 1.04 1.14 1.18 1.01 ...
-#>   ..$ elbow_slope_diffs: num [1:2723] -0.000198 0.001431 0.004644 0.007354 0.006155 ...
-#>  $ otu_ranked         :'data.frame':	2723 obs. of  8 variables:
-#>   ..$ otu    : chr [1:2723] "OTU_3" "OTU_116" "OTU_12" "OTU_21" ...
-#>   ..$ otu_occ: num [1:2723] 1 1 1 1 1 1 1 1 1 1 ...
-#>   ..$ otu_rel: num [1:2723] 0.21718 0.00453 0.01767 0.03347 0.00268 ...
-#>   ..$ sumF   : num [1:2723] 10 10 10 10 10 10 10 10 10 10 ...
-#>   ..$ sumG   : num [1:2723] 10 10 10 10 10 10 10 10 10 10 ...
-#>   ..$ nS     : int [1:2723] 20 20 20 20 20 20 20 20 20 20 ...
-#>   ..$ Index  : num [1:2723] 1 1 1 1 1 1 1 1 1 1 ...
-#>   ..$ rank   : num [1:2723] 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ abundance_occupancy:'data.frame':	2723 obs. of  3 variables:
-#>   ..$ otu    : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   ..$ otu_occ: num [1:2723] 0.0851 0.4255 0.0426 0.7447 1 ...
-#>   ..$ otu_rel: num [1:2723] 2.66e-05 5.61e-04 4.89e-06 5.05e-03 2.17e-01 ...
-#>  $ priority_var       : chr "Crop"
-#>  $ abundance_weight   : num 0
-#>  $ elbow              : int 9
-#>  $ bc_increase        : int 33
-#>  $ increase_value     : num 0.02
-#>  $ elbow_core         : chr [1:9] "OTU_3" "OTU_116" "OTU_12" "OTU_21" ...
-#>  $ increase_core      : chr [1:33] "OTU_3" "OTU_116" "OTU_12" "OTU_21" ...
-#>  $ otu_table          : num [1:2723, 1:47] 0 0.01 0 0 257.1 ...
-#>   ..- attr(*, "dimnames")=List of 2
-#>   .. ..$ : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   .. ..$ : chr [1:47] "bcse50" "bcse69" "bcse73" "bcse191" ...
-#>  $ metadata           :'data.frame':	47 obs. of  4 variables:
-#>   ..$ Niche    : chr [1:47] "Leaf" "Leaf" "Leaf" "Leaf" ...
-#>   ..$ Crop     : chr [1:47] "Corn" "Sorghum" "Switchgrass" "Miscanthus" ...
-#>   ..$ Plot     : chr [1:47] "R2" "R4" "R5" "R5" ...
-#>   ..$ sample_id: chr [1:47] "bcse50" "bcse69" "bcse73" "bcse191" ...
-#>  $ taxonomy           :'data.frame':	2723 obs. of  10 variables:
-#>   ..$ OTU_ID   : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   ..$ Kingdom  : chr [1:2723] "Bacteria" "Bacteria" "Bacteria" "Bacteria" ...
-#>   ..$ Phylum   : chr [1:2723] "Myxococcota" "Actinobacteriota" "Proteobacteria" "Proteobacteria" ...
-#>   ..$ Class    : chr [1:2723] "Polyangia" "Actinobacteria" "Alphaproteobacteria" "Gammaproteobacteria" ...
-#>   ..$ Order    : chr [1:2723] "Polyangiales" "Streptomycetales" "Rhizobiales" "Enterobacterales" ...
-#>   ..$ Family   : chr [1:2723] "Polyangiaceae" "Streptomycetaceae" "Rhizobiaceae" "Enterobacteriaceae" ...
-#>   ..$ Genus    : chr [1:2723] "Aetherobacter" "Streptomyces" "Mesorhizobium" NA ...
-#>   ..$ Species  : chr [1:2723] "Uncultured_bacterium_3097" NA "Mesorhizobium_sophorae" NA ...
-#>   ..$ BestMatch: chr [1:2723] "Uncultured bacterium 3097" "Streptomyces" "Mesorhizobium sophorae" "Enterobacteriaceae" ...
-#>   ..$ Taxonomy : chr [1:2723] "OTU_427-Uncultured bacterium 3097" "OTU_11-Streptomyces" "OTU_253-Mesorhizobium sophorae" "OTU_148-Enterobacteriaceae" ...
-#>  - attr(*, "class")= chr [1:2] "identify_core_result" "list"
+str(bcse_core_multi)
+#> Error: object 'bcse_core_multi' not found
 ```
 
 ### Visualize the abundance-occupancy distribution and the core ASV/OTUs set
 
-As you can see, all the objects needed for the plot were outputted in the list 
-obtained from `identify_core()`
+The output from `identify_core()` can be used for plotting as below:
 
 
 ``` r
 bcse_identified_core <- plot_identified_core(
-  bray_curtis_ranked = bcse_rare_core$bray_curtis_ranked,
-  elbow = bcse_rare_core$elbow,
-  lastCall = bcse_rare_core$bc_increase,
-  increase_value = bcse_rare_core$increase_value
+  bray_curtis_ranked = bcse_core_multi$bray_curtis_ranked,
+  elbow = bcse_core_multi$elbow,
+  lastCall = bcse_core_multi$bc_increase,
+  increase_value = bcse_core_multi$increase_value
 )
-```
+#> Error: object 'bcse_core_multi' not found
 
-
-``` r
 print(bcse_identified_core)
+#> Error: object 'bcse_identified_core' not found
 ```
 
-![plot of chunk fig2_identified_core](images/fig2_identified_core-1.png)
 
-**Figure 2** Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. 
+
 
 ### Visualize the abundance-occupancy curve 
 
-We can also then have a quick look about how abundance and how frequent the identified
-core set is compare to all other taxa in the community using the last 2% increase 
-in Bray-Curtis similarity of the ranked ASV/OTUs.
+Abundance-Occupancy distributions can be plotted:
+
+
 
 
 ``` r
 plot_abund_occ_increase <- plot_abundance_occupancy(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase"
 )
-```
-
-
-``` r
+#> Error: object 'bcse_core_multi' not found
 print(plot_abund_occ_increase)
+#> Error: object 'plot_abund_occ_increase' not found
 ```
 
-![plot of chunk fig3_plot_increase](images/fig3_plot_increase-1.png)
+And for the `elbow` method.
 
-**Figure 3** Abundance-occupancy distribution and last 2% increase core set. 
-
-We can also visualize the core set detected with the `elbow` method.
 
 
 ``` r
 plot_abund_occ_elbow <- plot_abundance_occupancy(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "elbow"
 )
-```
+#> Error: object 'bcse_core_multi' not found
 
-
-``` r
 plot_abund_occ_elbow +
   scale_fill_manual(values = c("darkgreen", "grey"))
-#> Scale for fill is already present.
-#> Adding another scale for fill, which will replace the existing scale.
+#> Error: object 'plot_abund_occ_elbow' not found
 ```
 
-![plot of chunk fig4_plot_elbow](images/fig4_plot_elbow-1.png)
-
-**Figure 4** Abundance-occupancy distribution and last elbow core set. 
 
 ### Visualize the core set across the variable used for detecting the core
 
-This can be achieved using the `plot_core_distribution()` function.
-Three visualization methods are implemented. Using the `plot_type` argument, you 
-can switch between a bar plot, a line plot or heatmap. Each visualization has 
-its advantages and disadvantages depending on how many levels the variable used 
-for detecting the core has. For example, for up to 5 levels I would use bar or 
-line plot, otherwise I would use heatmaps. This is subjective and you can 
-build your own plotting function since you have all the data you need 
-in `bcse_rare_core`.
-
-See the different figures below:
+The `plot_core_distribution()` it can be used to visualize ASV/OTUs occupancy across 
+the variable specified during the identification of the core. The function provides
+three visualization methods—bar, line, and heatmap—which can be toggled using the
+plot_type argument. The optimal choice often depends on the number of levels in 
+your grouping variable. For instance, bar or line plots are highly effective for 
+up to five levels, whereas heatmaps are better suited for more complex datasets. 
+While these are general recommendations, the core data is fully accessible in 
+`bcse_core_multi` should you wish to develop a custom visualization.
 
 
 ``` r
 plot_core_dist_bar <- plot_core_distribution(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "bar"
 )
-```
+#> Error: object 'bcse_core_multi' not found
 
-
-``` r
 print(plot_core_dist_bar)
+#> Error: object 'plot_core_dist_bar' not found
 ```
 
-![plot of chunk fig5_plot_type_bar](images/fig5_plot_type_bar-1.png)
 
-**Figure 5** A bar plot won't work here, way too many variable levels.
+
+
 
 
 ``` r
 plot_core_dist_line <- plot_core_distribution(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "line"
 )
-```
-
-
-``` r
+#> Error: object 'bcse_core_multi' not found
 print(plot_core_dist_line)
+#> Error: object 'plot_core_dist_line' not found
 ```
 
-![plot of chunk fig6_plot_type_line](images/fig6_plot_type_line-1.png)
 
-**Figure 6** A line plot may be a little better.
+
+We can reorder the variable levels following logic before plotting.
 
 
 ``` r
-bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
+bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
   mutate(
     Crop = recode(
       Crop,
@@ -531,204 +489,136 @@ bcse_rare_core$metadata <- bcse_rare_core$metadata %>%
       )
     )
   )
+#> Error: object 'bcse_core_multi' not found
 ```
+
+
+
+
 
 
 ``` r
 plot_core_dist_heatmap <- plot_core_distribution(
-  core_result = bcse_rare_core,
+  core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "heatmap"
 ) +
   viridis::scale_fill_viridis(option = "plasma", name = "Occupancy")
-```
+#> Error: object 'bcse_core_multi' not found
 
-
-``` r
 print(plot_core_dist_heatmap)
+#> Error: object 'plot_core_dist_heatmap' not found
 ```
 
-![plot of chunk fig7_plot_type_heatmap](images/fig7_plot_type_heatmap-1.png)
 
-**Figure 7** A heatmap, is definitely more compact and shows well enough the average 
-occupancy across samples in each variable level.
+# Fitting Neutral Model
 
-# Fitting Neutral Model 
 
-In ecology and evolution a neutral model is a model that generate patterns assuming 
-random chance and functional equivalence among species (ASV/OTUs) or individuals 
-rather than specific deterministic factors, for example, selection or niches 
-(There is a vast literature about this, that we can not cover here). 
-In practice, neutral models are a specific case of Null models [@Gotelli2006Null] 
-and the act as null hypotheses to test if observed real-world patterns (e.g., species abundance, 
-genetic diversity) significantly deviate from what random processes would predict,
-and can help scientists to identify the influence of actual ecological or 
-evolutionary forces. 
+Neutral models in ecology assume that species (ASVs/OTUs) are functionally 
+equivalent and that community patterns arise from random chance rather than 
+deterministic niches or selection. As a specific case of null models [@Gotelli2006Null], 
+they act as a baseline: if real-world data significantly differs from the model's
+predictions, we can infer that non-random ecological forces are at play.
 
-The work of @Sloan2006Quantifying and @Burns2015Contribution were among the first to 
-apply these type of models to microbiome data. In `BRCore`, we implemented user 
-friendly functions to fit and visualize neutral models in microbiome data, without 
-compromising the original conceptual or mathematical framework developed by 
-the abovementioned authors.
+Drawing on the influential work of @Sloan2006Quantifying and @Burns2015Contribution, 
+BRCore implements accessible functions to fit and visualize these models. Our goal
+is to make these powerful ecological tools easy to use without losing the 
+conceptual rigor of the original math.
 
-First, we fit the neutral model 
+To get started, we first fit the neutral model:
 
 
 ``` r
-bcse_rare_core_neutral_fit <- fit_neutral_model(
-  otu_table = bcse_rare_core$otu_table,
-  core_set = bcse_rare_core$increase_core,
-  abundance_occupancy = bcse_rare_core$abundance_occupancy
+bcse_core_multi_neutral_fit <- fit_neutral_model(
+  otu_table = bcse_core_multi$otu_table,
+  core_set = bcse_core_multi$increase_core,
+  abundance_occupancy = bcse_core_multi$abundance_occupancy
 )
-#> Waiting for profiling to be done...
-#> Waiting for profiling to be done...
-#> ✔ Analysis complete!
+#> Error: object 'bcse_core_multi' not found
 ```
 
 What we get is
 
 
+
 ``` r
-str(bcse_rare_core_neutral_fit)
-#> List of 2
-#>  $ goodness_of_fit :'data.frame':	1 obs. of  24 variables:
-#>   ..$ m         : num 0.63
-#>   ..$ m.ci      : num 0.0827
-#>   ..$ m.mle     : num 0.63
-#>   ..$ maxLL     : num -1790
-#>   ..$ binoLL    : num -2656
-#>   ..$ poisLL    : num -2657
-#>   ..$ Rsqr      : num 0.415
-#>   ..$ Rsqr.bino : num 0.607
-#>   ..$ Rsqr.pois : num 0.607
-#>   ..$ RMSE      : num 0.125
-#>   ..$ RMSE.bino : num 0.103
-#>   ..$ RMSE.pois : num 0.103
-#>   ..$ AIC       : num -3576
-#>   ..$ BIC       : num -3565
-#>   ..$ AIC.bino  : num -5309
-#>   ..$ BIC.bino  : num -5297
-#>   ..$ AIC.pois  : num -5309
-#>   ..$ BIC.pois  : num -5298
-#>   ..$ N         : num 1000
-#>   ..$ Samples   : num 47
-#>   ..$ Richness  : num 2723
-#>   ..$ Detect    : num 0.001
-#>   ..$ above.pred: num 0.246
-#>   ..$ below.pred: num 0.00992
-#>  $ model_prediction:'data.frame':	2723 obs. of  14 variables:
-#>   ..$ otu       : chr [1:2723] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
-#>   ..$ otu_occ   : num [1:2723] 0.0851 0.4255 0.0426 0.7447 1 ...
-#>   ..$ otu_rel   : num [1:2723] 2.66e-05 5.61e-04 4.89e-06 5.05e-03 2.17e-01 ...
-#>   ..$ membership: chr [1:2723] "Not core" "Not core" "Not core" "Not core" ...
-#>   ..$ p         : num [1:2723] 2.66e-05 5.61e-04 4.89e-06 5.05e-03 2.17e-01 ...
-#>   ..$ freq      : num [1:2723] 0.0851 0.4255 0.0426 0.7447 1 ...
-#>   ..$ freq.pred : num [1:2723] 0.00725 0.17879 0.00132 0.98128 1 ...
-#>   ..$ pred.lwr  : num [1:2723] 5.50e-04 9.50e-02 2.07e-05 8.93e-01 9.24e-01 ...
-#>   ..$ pred.upr  : num [1:2723] 0.0884 0.3111 0.078 0.997 1 ...
-#>   ..$ bino.pred : num [1:2723] 0.02625 0.42937 0.00488 0.99368 1 ...
-#>   ..$ bino.lwr  : num [1:2723] 0.005364 0.298538 0.000261 0.913188 0.924442 ...
-#>   ..$ bino.upr  : num [1:2723] 0.1187 0.5709 0.0843 0.9996 1 ...
-#>   ..$ y         : chr [1:2723] NA NA NA NA ...
-#>   ..$ fit_class : chr [1:2723] "As predicted" "Above prediction" "As predicted" "Below prediction" ...
-#>  - attr(*, "class")= chr [1:2] "fit_neutral_model" "list"
+str(bcse_core_multi_neutral_fit)
+#> Error: object 'bcse_core_multi_neutral_fit' not found
 ```
 
 ### Plot the neutral model and the core set 
 
 
 ``` r
-plot_bcse_neutral_fit <- plot_neutral_model(bcse_rare_core_neutral_fit)
-```
+plot_bcse_neutral_fit <- plot_neutral_model(bcse_core_multi_neutral_fit)
+#> Error: object 'bcse_core_multi_neutral_fit' not found
 
-
-``` r
 print(plot_bcse_neutral_fit)
+#> Error: object 'plot_bcse_neutral_fit' not found
 ```
-
-![plot of chunk fig8_plot_neutral_fit](images/fig8_plot_neutral_fit-1.png)
-
-**Figure 8** Neutral model of abundance-occupancy distributions for the `bcse` 
-dataset. *R*^2^ is a standard r-square statistics of goodness of fit
-(*R*^2^ = 1 − SS~err~/SS~total~) while *m* is the immigration parameter and 
-represents the probability that a given individual in a sample originated from 
-the meta community rather than from the local community.
-
-In Figure 8 we can see that the neutral model does not fit well: the *R*^2^ is 
-quite low, and we can visually see that most of the ASV/OTUs (not just the core, 
-all taxa are considered here) are above the model prediction. Additionally, the 
-estimated immigration paramater m = 0.63 tells that strong mixing from the 
-meta community occur, the local community is dominated by immigration.
+ 
 
 <div class="note">
 **Note:** 
-As a rule of thumb, when: 
-As a rule of thumb, the migration parameter (<em>m</em>) can be interpreted as follows:  
+Interpretations of the Migration Parameter, as a rule of thumb:
 <ul>
-  <li><strong>Very low</strong> (<em>m</em> ≈ 0–0.05): strong dispersal limitation; 
+  <li><strong>Low</strong> ($m \approx 0–0.05$): strong dispersal limitation; 
   local history dominates community assembly.</li>
-  <li><strong>Moderate</strong> (<em>m</em> ≈ 0.1–0.3): partial connectivity among 
+  <li><strong>Moderate</strong> ($m \approx 0.1–0.3$): partial connectivity among 
   sites; both dispersal and local structure influence community composition.</li>
-  <li><strong>High</strong> (<em>m</em> ≥ 0.4, as in our case): high dispersal 
-  rates and strong mixing from the regional source pool.</li>
+  <li><strong>High</strong> ($m \geq 0.4$): high dispersal rates and strong mixing 
+  from the regional source pool.</li>
 </ul>
 </div>
 
-# Session info
+
+# Supplemental Information
+
+
+It is critical to note that the core taxa identified from a single rarefaction 
+iteration may differ from those identified through multiple iterations. To illustrate
+this stochasticity, if we identify the core using only the first iteration of our
+`bcse` phyloseq object with rarefied `otu_table()` generated above using
+`update_otu_table()`, we obtain the following results:
+
 
 ``` r
-sessionInfo()
-#> R version 4.5.2 (2025-10-31)
-#> Platform: x86_64-pc-linux-gnu
-#> Running under: Arch Linux
-#> 
-#> Matrix products: default
-#> BLAS/LAPACK: /usr/lib/libopenblas.so.0.3;  LAPACK version 3.12.0
-#> 
-#> locale:
-#>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8        LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8   
-#>  [6] LC_MESSAGES=C.UTF-8    LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C           LC_TELEPHONE=C        
-#> [11] LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C   
-#> 
-#> time zone: America/Chicago
-#> tzcode source: system (glibc)
-#> 
-#> attached base packages:
-#> [1] stats     graphics  grDevices utils     datasets  methods   base     
-#> 
-#> other attached packages:
-#>  [1] BRCore_1.0.0      viridis_0.6.5     viridisLite_0.4.2 lubridate_1.9.4   forcats_1.0.0     stringr_1.6.0    
-#>  [7] dplyr_1.1.4       purrr_1.2.0       readr_2.1.5       tidyr_1.3.1       tibble_3.3.0      ggplot2_4.0.1    
-#> [13] tidyverse_2.0.0   phyloseq_1.54.0   here_1.0.1        knitr_1.50        devtools_2.4.5    usethis_3.1.0    
-#> 
-#> loaded via a namespace (and not attached):
-#>   [1] RColorBrewer_1.1-3  sys_3.4.3           rstudioapi_0.17.1   jsonlite_2.0.0      magrittr_2.0.4     
-#>   [6] farver_2.1.2        rmarkdown_2.30      fs_1.6.6            vctrs_0.6.5         multtest_2.66.0    
-#>  [11] memoise_2.0.1       askpass_1.2.1       base64enc_0.1-3     rstatix_0.7.3       htmltools_0.5.9    
-#>  [16] curl_7.0.0          broom_1.0.11        Rhdf5lib_1.32.0     Formula_1.2-5       rhdf5_2.54.1       
-#>  [21] parallelly_1.45.1   desc_1.4.3          htmlwidgets_1.6.4   testthat_3.2.3      plyr_1.8.9         
-#>  [26] cachem_1.1.0        commonmark_1.9.2    igraph_2.2.1        mime_0.13           lifecycle_1.0.4    
-#>  [31] minpack.lm_1.2-4    iterators_1.0.14    pkgconfig_2.0.3     Matrix_1.7-2        R6_2.6.1           
-#>  [36] fastmap_1.2.0       rcmdcheck_1.4.0     shiny_1.10.0        digest_0.6.39       colorspace_2.1-2   
-#>  [41] ps_1.8.1            S4Vectors_0.48.0    rprojroot_2.0.4     pkgload_1.4.0       Hmisc_5.2-4        
-#>  [46] ggpubr_0.6.2        vegan_2.7-2         labeling_0.4.3      timechange_0.3.0    abind_1.4-8        
-#>  [51] mgcv_1.9-4          compiler_4.5.2      remotes_2.5.0       withr_3.0.2         htmlTable_2.4.3    
-#>  [56] S7_0.2.1            backports_1.5.0     carData_3.0-5       pkgbuild_1.4.6      ggsignif_0.6.4     
-#>  [61] MASS_7.3-64         openssl_2.3.2       sessioninfo_1.2.3   biomformat_1.38.0   ggsci_4.1.0        
-#>  [66] permute_0.9-8       tools_4.5.2         foreign_0.8-88      ape_5.8-1           httpuv_1.6.15      
-#>  [71] nnet_7.3-20         glue_1.8.0          callr_3.7.6         nlme_3.1-167        rhdf5filters_1.22.0
-#>  [76] promises_1.3.2      grid_4.5.2          checkmate_2.3.3     cluster_2.1.8       reshape2_1.4.5     
-#>  [81] ade4_1.7-23         generics_0.1.4      gtable_0.3.6        tzdb_0.4.0          data.table_1.17.8  
-#>  [86] hms_1.1.3           xml2_1.3.6          car_3.1-3           XVector_0.50.0      BiocGenerics_0.56.0
-#>  [91] ggrepel_0.9.6       foreach_1.5.2       pillar_1.11.1       later_1.4.1         splines_4.5.2      
-#>  [96] lattice_0.22-7      survival_3.8-3      tidyselect_1.2.1    Biostrings_2.78.0   miniUI_0.1.1.1     
-#> [101] gridExtra_2.3       IRanges_2.44.0      Seqinfo_1.0.0       stats4_4.5.2        xfun_0.54          
-#> [106] Biobase_2.70.0      credentials_2.0.2   brio_1.1.5          stringi_1.8.7       xopen_1.0.1        
-#> [111] evaluate_1.0.5      codetools_0.2-20    cli_3.6.5           rpart_4.1.24        xtable_1.8-4       
-#> [116] roxygen2_7.3.3      processx_3.8.5      gert_2.1.5          Rcpp_1.1.0          parallel_4.5.2     
-#> [121] ellipsis_0.3.2      prettyunits_1.2.0   profvis_0.4.0       urlchecker_1.0.1    scales_1.4.0       
-#> [126] crayon_1.5.3        rlang_1.1.6         cowplot_1.2.0
+bcse_core_multi_iter1 <- identify_core(
+  physeq_obj = bcse_updated_rare,
+  priority_var = "Crop",
+  increase_value = 0.02,
+  abundance_weight = 0,
+  seed = 2135
+)
+#> Seed used: 2135
+#> Error: object 'bcse_updated_rare' not found
 ```
+
+## Further Customization of `identify_core()`
+
+While the default settings of `identify_core()` are suitable for most analyses, the 
+function provides additional parameters to balance computational efficiency with 
+ecological nuance. In large datasets with thousands of ASV/OTUs, ranking every single 
+taxon can be computationally expensive. The `max_otus` parameter allows you to cap 
+the number of taxa processed. Rare taxa (those with very low abundance) rarely 
+contribute more than 2% to the Bray-Curtis similarity. Limiting the ranking can 
+significantly speed up your analysis without losing the core signal. However, 
+if set too low, you may inadvertently exclude "satellite" taxa—those that are low
+in abundance but highly persistent (high occupancy) across your samples.
+
+By default, `identify_core()` prioritizes occupancy (how often a taxon appears). 
+However, you may want to account for relative abundance (how dominant a taxon is). 
+The `abundance_weight` argument (numeric, 0 to 1) allows you to blend these two metrics:
+
+* abundance_weight = 0 (Default): Ranking is based strictly on occupancy and composite metrics.
+
+* abundance_weight = 1: Ranking is based purely on mean relative abundance.
+
+* Intermediate Values: A value such as 0.3 creates a hybrid score, weighting occupancy at 70% and abundance at 30%.
+
+Notably, incorporating abundance weighting will likely result in a different core set than 
+an occupancy-only approach. 
+
 
 # References

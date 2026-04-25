@@ -8,7 +8,8 @@ plot_identified_core(
   bray_curtis_ranked,
   elbow,
   lastCall,
-  increase_value = 0.02
+  increase_value = 0.02,
+  dataset_name = NULL
 )
 }
 \arguments{
@@ -21,9 +22,13 @@ Bray-Curtis increase method (Integer).}
 
 \item{increase_value}{The percent increase value in decimal (e.g. 0.02) used
 for the Bray-Curtis increase method.}
+
+\item{dataset_name}{Optional character string. When provided, it is
+prepended to the plot title (e.g. \code{"Switchgrass"}).
+Default \code{NULL} (no prefix).}
 }
 \value{
-A \pkg{ggplot2} object.
+A list containing: 1) \code{df_for_plot}, a data frame used for plotting, and 2) \code{plot_identified_core}, a ggplot object visualizing the Bray-Curtis increase with annotated cutoff points.
 }
 \description{
 Visualize the cumulative normalized mean Bray-Curtis increase returned by
@@ -44,10 +49,10 @@ data("switchgrass", package = "BRCore")
 
 # Identify core taxa
 res <- identify_core(
- physeq_obj = switchgrass,
- priority_var = "sampling_date",
- increase_value = 0.02,
- seed = 48821
+  physeq_obj = switchgrass,
+  priority_var = "sampling_date",
+  increase_value = 0.02,
+  seed = 48821
 )
 
 # Plot using the returned curve and cut indices; label from increase_value
@@ -56,7 +61,7 @@ plot_identified_core(
   elbow = res$elbow,
   lastCall = res$bc_increase,
   increase_value = res$increase_value
- )
+)
 }
 
 }

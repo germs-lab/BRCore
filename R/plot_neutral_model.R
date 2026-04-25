@@ -52,184 +52,177 @@
 
 #' @export
 plot_neutral_model <- function(fit_result) {
-    # Export dataframes
-    obs1 <- as.data.frame(fit_result$model_prediction)
-    obs2 <- as.data.frame(fit_result$goodness_of_fit)
+  # Export dataframes
+  obs1 <- as.data.frame(fit_result$model_prediction)
+  obs2 <- as.data.frame(fit_result$goodness_of_fit)
 
-    # pre-split - all 6 combinations
-    pts_notcore_as <- filter(
-        obs1,
-        membership == "Not core",
-        fit_class == "As predicted"
-    )
-    pts_notcore_above <- filter(
-        obs1,
-        membership == "Not core",
-        fit_class == "Above prediction"
-    )
-    pts_notcore_below <- filter(
-        obs1,
-        membership == "Not core",
-        fit_class == "Below prediction"
-    )
-    pts_core_as <- filter(
-        obs1,
-        membership == "Core",
-        fit_class == "As predicted"
-    )
-    pts_core_above <- filter(
-        obs1,
-        membership == "Core",
-        fit_class == "Above prediction"
-    )
-    pts_core_below <- filter(
-        obs1,
-        membership == "Core",
-        fit_class == "Below prediction"
-    )
+  # pre-split - all 6 combinations
+  pts_notcore_as <- filter(
+    obs1,
+    membership == "Not core",
+    fit_class == "As predicted"
+  )
+  pts_notcore_above <- filter(
+    obs1,
+    membership == "Not core",
+    fit_class == "Above prediction"
+  )
+  pts_notcore_below <- filter(
+    obs1,
+    membership == "Not core",
+    fit_class == "Below prediction"
+  )
+  pts_core_as <- filter(
+    obs1,
+    membership == "Core",
+    fit_class == "As predicted"
+  )
+  pts_core_above <- filter(
+    obs1,
+    membership == "Core",
+    fit_class == "Above prediction"
+  )
+  pts_core_below <- filter(
+    obs1,
+    membership == "Core",
+    fit_class == "Below prediction"
+  )
 
-    # Legend grouping labels
-    all_pts <- bind_rows(
-        bind_rows(pts_notcore_as, pts_notcore_above, pts_notcore_below) |>
-            mutate(grp = "Not core"),
-        mutate(pts_core_as, grp = "Core (as predicted)"),
-        mutate(pts_core_above, grp = "Core (above prediction)"),
-        mutate(pts_core_below, grp = "Core (below prediction)")
-    )
+  # Legend grouping labels
+  all_pts <- bind_rows(
+    bind_rows(pts_notcore_as, pts_notcore_above, pts_notcore_below) |>
+      mutate(grp = "Not core"),
+    mutate(pts_core_as, grp = "Core (as predicted)"),
+    mutate(pts_core_above, grp = "Core (above prediction)"),
+    mutate(pts_core_below, grp = "Core (below prediction)")
+  )
 
-    # if still empty, bail nicely
-    if (nrow(all_pts) == 0) {
-        cli::cli_abort(
-            "Nothing to plot: no rows in model_prediction after filtering (check p>0 and membership/fit_class)."
+  # if still empty, bail nicely
+  if (nrow(all_pts) == 0) {
+    cli::cli_abort(
+      "Nothing to plot: no rows in model_prediction after filtering (check p>0 and membership/fit_class)."
+    )
+  }
+
+  # Extract R2 and m (works for column- or rowname-shaped tables)
+  R2 <- if ("Rsqr" %in% names(obs2)) {
+    obs2$Rsqr[1]
+  } else {
+    suppressWarnings(as.numeric(obs2["Rsqr", 1]))
+  }
+  mV <- if ("m" %in% names(obs2)) {
+    obs2$m[1]
+  } else {
+    suppressWarnings(as.numeric(obs2["m", 1]))
+  }
+
+  # Compute a spot just ABOVE the legend (bottom-right)
+  xr <- range(log10(all_pts$otu_rel), na.rm = TRUE)
+  dx <- diff(xr)
+  yr <- range(all_pts$otu_occ, na.rm = TRUE)
+  dy <- diff(yr)
+  box_x <- xr[1] + 0.95 * dx
+  box_y <- yr[1] + 0.12 * dy # raise/lower if you want different spacing
+
+  p <- ggplot(all_pts, aes(x = log10(otu_rel), y = otu_occ, fill = grp)) +
+    geom_point(
+      shape = 21,
+      size = 1.5,
+      alpha = 0.9,
+      aes(color = after_scale(fill))
+    ) +
+    scale_fill_manual(
+      values = c(
+        "Not core" = "grey",
+        "Core (as predicted)" = "#CC2D35",
+        "Core (above prediction)" = "#0072B2",
+        "Core (below prediction)" = "#7FB800"
+      ),
+      breaks = c(
+        "Not core",
+        "Core (as predicted)",
+        "Core (above prediction)",
+        "Core (below prediction)"
+      )
+    ) +
+    # Keep lines but remove their legends
+    geom_line(
+      data = obs1,
+      aes(x = log10(p), y = freq.pred),
+      color = "blue",
+      linewidth = 0.8,
+      alpha = 0.25,
+      inherit.aes = FALSE,
+      show.legend = FALSE
+    ) +
+    geom_line(
+      data = obs1,
+      aes(x = log10(p), y = pred.upr),
+      color = "black",
+      linewidth = 0.8,
+      linetype = "twodash",
+      alpha = 0.25,
+      inherit.aes = FALSE,
+      show.legend = FALSE
+    ) +
+    geom_line(
+      data = obs1,
+      aes(x = log10(p), y = pred.lwr),
+      color = "black",
+      linewidth = 0.8,
+      linetype = "twodash",
+      alpha = 0.25,
+      inherit.aes = FALSE,
+      show.legend = FALSE
+    ) +
+    guides(color = "none", linetype = "none") +
+    .brcore_theme(
+      legend_position = c(0.98, 0.02),
+      extra_themes = list(theme(
+        legend.justification = c("right", "bottom"),
+        legend.background = element_rect(
+          fill = alpha("white", 0.7),
+          color = NA
+        ),
+        legend.title = element_blank()
+      ))
+    ) +
+    annotate(
+      "label",
+      x = box_x,
+      y = box_y,
+      label = paste0(
+        "atop(italic(R)^2==",
+        sprintf("%.2f", R2),
+        ",italic(m)==",
+        sprintf("%.3f", mV),
+        ")"
+      ),
+      parse = TRUE,
+      hjust = 1,
+      vjust = -0.75,
+      size = 3,
+      fill = "white",
+      alpha = 0.9,
+      lineheight = 1.05
+    ) +
+    labs(
+      title = "Neutral model",
+      x = "Log10(mean abundance)",
+      y = "Occupancy"
+    )
+  # change legend shape to avoid confusion with the scatter points.
+  p <- p +
+    guides(
+      fill = guide_legend(
+        override.aes = list(
+          shape = 22,
+          size = 4,
+          colour = NA,
+          stroke = 0
         )
-    }
+      )
+    )
 
-    # Extract R2 and m (works for column- or rowname-shaped tables)
-    R2 <- if ("Rsqr" %in% names(obs2)) {
-        obs2$Rsqr[1]
-    } else {
-        suppressWarnings(as.numeric(obs2["Rsqr", 1]))
-    }
-    mV <- if ("m" %in% names(obs2)) {
-        obs2$m[1]
-    } else {
-        suppressWarnings(as.numeric(obs2["m", 1]))
-    }
-
-    # Compute a spot just ABOVE the legend (bottom-right)
-    xr <- range(log10(all_pts$otu_rel), na.rm = TRUE)
-    dx <- diff(xr)
-    yr <- range(all_pts$otu_occ, na.rm = TRUE)
-    dy <- diff(yr)
-    box_x <- xr[1] + 0.95 * dx
-    box_y <- yr[1] + 0.12 * dy # raise/lower if you want different spacing
-
-    p <- ggplot(all_pts, aes(x = log10(otu_rel), y = otu_occ, fill = grp)) +
-        geom_point(
-            shape = 21,
-            size = 1.5,
-            alpha = 0.9,
-            aes(color = after_scale(fill))
-        ) +
-        scale_fill_manual(
-            values = c(
-                "Not core" = "grey",
-                "Core (as predicted)" = "#CC2D35",
-                "Core (above prediction)" = "#0072B2",
-                "Core (below prediction)" = "#7FB800"
-            ),
-            breaks = c(
-                "Not core",
-                "Core (as predicted)",
-                "Core (above prediction)",
-                "Core (below prediction)"
-            )
-        ) +
-        # Keep lines but remove their legends
-        geom_line(
-            data = obs1,
-            aes(x = log10(p), y = freq.pred),
-            color = "blue",
-            linewidth = 0.8,
-            alpha = 0.25,
-            inherit.aes = FALSE,
-            show.legend = FALSE
-        ) +
-        geom_line(
-            data = obs1,
-            aes(x = log10(p), y = pred.upr),
-            color = "black",
-            linewidth = 0.8,
-            linetype = "twodash",
-            alpha = 0.25,
-            inherit.aes = FALSE,
-            show.legend = FALSE
-        ) +
-        geom_line(
-            data = obs1,
-            aes(x = log10(p), y = pred.lwr),
-            color = "black",
-            linewidth = 0.8,
-            linetype = "twodash",
-            alpha = 0.25,
-            inherit.aes = FALSE,
-            show.legend = FALSE
-        ) +
-        # Make sure only the Membership legend remains
-        guides(color = "none", linetype = "none") +
-        theme_classic() +
-        theme(
-            plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
-            plot.subtitle = element_text(hjust = 0.5, size = 9),
-            legend.position = c(0.98, 0.02),
-            legend.justification = c("right", "bottom"),
-            legend.background = element_rect(
-                fill = alpha("white", 0.7),
-                color = NA
-            ),
-            legend.key.height = unit(0.2, "cm"),
-            legend.key.width = unit(0.3, "cm"),
-            legend.title = element_blank(),
-            legend.text = element_text(size = 8)
-        ) +
-        # White box with two lines: R^2 on top, m below (above the legend)
-        annotate(
-            "label",
-            x = box_x,
-            y = box_y,
-            label = paste0(
-                "atop(italic(R)^2==",
-                sprintf("%.2f", R2),
-                ",italic(m)==",
-                sprintf("%.3f", mV),
-                ")"
-            ),
-            parse = TRUE,
-            hjust = 1,
-            vjust = 0,
-            size = 3,
-            fill = "white",
-            alpha = 0.9,
-            lineheight = 1.05
-            #label.size = 0  # This removes the border
-        ) +
-        labs(
-            title = "Neutral model",
-            x = "Log10(mean abundance)",
-            y = "Occupancy"
-        )
-    # change legend shape to avoid confusion with the scatter points.
-    p <- p +
-        guides(
-            fill = guide_legend(
-                override.aes = list(
-                    shape = 22,
-                    size = 4,
-                    colour = NA,
-                    stroke = 0
-                )
-            )
-        )
-
-    return(p)
+  return(p)
 }

@@ -7,7 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://www.r-pkg.org/badges/version/BRCore)](https://www.r-pkg.org/badges/version/BRCore)
+[![](https://www.r-pkg.org/badges/version-last-release/BRCore)](https://www.r-pkg.org/badges/version-last-release/BRCore)
 [![](https://cranlogs.r-pkg.org/badges/grand-total/BRCore)](https://cran.r-project.org/package=BRCore)
 [![Codecov test
 coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.codecov.io/gh/germs-lab/BRCore)
@@ -15,29 +15,39 @@ coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.c
 
 <!-- badges: end -->
 
+## Overview
+
 BRCore provides a unified framework for identification and ecological
 interpretation of core microbiomes across time and space, enhancing
 robustness and reproducibility in microbiome data analysis.
 
-## Features
-
 BRCore provides tools for:
 
-- **Rarefaction analysis**: Calculate pre-rarefaction metrics
-  (`add_rarefaction_metrics()`) and perform multiple rarefaction
-  (`multi_rarefy()`)
-- **Core microbiome identification**: Identify core microbial taxa using
-  abundance-occupancy distributions (`identify_core()`)
-- **Neutral model fitting**: Fit and visualize neutral community models
-  (`fit_neutral_model()`, `plot_neutral_model()`)
-- **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
-  curves, and core distributions (`plot_rarefaction_metrics()`,
-  `plot_abundance_occupancy()`, `plot_core_distribution()`,
-  `plot_identified_core()`)
+**Rarefaction analysis**: Calculate pre-rarefaction metrics and perform
+multiple rarefactions
+
+- `add_rarefaction_metrics()`
+- `multi_rarefy()`
+
+**Core microbiome identification**: Identify core microbial taxa using
+abundance-occupancy distributions
+
+- `identify_core()`
+
+**Neutral model fitting**: Fit and visualize neutral community models
+
+- `fit_neutral_model()`
+- `plot_neutral_model()`
+
+**Visualization**: Plot rarefaction diagnostics, abundance-occupancy
+curves, and core distributions
+
+- `plot_rarefaction_metrics()`
+- `plot_abundance_occupancy()`
+- `plot_core_distribution()`
+- `plot_identified_core()`
 
 ## Installation
-
-### Quick Install (Recommended)
 
 Install the latest *stable* version of BRCore from CRAN with:
 
@@ -52,24 +62,7 @@ Install the *development* version of BRCore from GitHub with:
 pak::pak("germs-lab/BRCore")
 ```
 
-***Note:*** *If you don’t have `pak` installed, you can use `devtools`
-or `remotes` but you may need to install dependencies manually. `pak`
-handles dependencies automatically.*
-
-### Install with Vignettes
-
-``` r
-# For the latest development version with vignettes, use:
-# install.packages("devtools")
-devtools::install_github("germs-lab/BRCore", build_vignettes = TRUE)
-
-# or using remotes
-# install.packages("remotes")
-remotes::install_github("germs-lab/BRCore", build_vignettes = TRUE)
-```
-
-***Note:** Building vignettes requires additional time and dependencies.
-Use this option only if you need local access to documentation*
+***Note:*** *`pak` handles dependencies automatically.*
 
 ## Quick Start
 
@@ -84,22 +77,35 @@ data("bcse", package = "BRCore")
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
 # Perform multiple rarefaction
-bcse_rarefied <- multi_rarefy(
-  physeq = bcse,
+bcse_rarefied_list <- multi_rarefy(
+  physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 100,
-  threads = 4,
+  num_iter = 3,
   set_seed = 7642
 )
 
 # Update phyloseq object with rarefied data
-bcse_rare <- update_otu_table(physeq = bcse, otu_rare = bcse_rarefied)
+bcse_rare_single <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied_list, iteration = 2) # Your preffered iteration can be used here
 
 # Identify core microbiome
+
+# With a single iteration of rarefaction
 bcse_core <- identify_core(
-  physeq_obj = bcse_rare,
+  physeq_obj = bcse_rare_single,
   priority_var = "Crop",
   increase_value = 0.02,
+  seed = 2134
+)
+
+
+# With multiple iterations of rarefaction
+bcse_core_multi <- identify_core(
+  physeq_obj = bcse, 
+  rarefied_list = bcse_rarefied_list
+  priority_var = "Crop",
+  increase_value = 0.02,
+  depth_level = 1000,
+  num_iter = 10,
   seed = 2134
 )
 
@@ -112,6 +118,7 @@ bcse_neutral <- fit_neutral_model(
   core_set = bcse_core$increase_core,
   abundance_occupancy = bcse_core$abundance_occupancy
 )
+
 plot_neutral_model(bcse_neutral)
 ```
 

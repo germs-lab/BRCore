@@ -4,18 +4,28 @@
 \alias{update_otu_table}
 \title{Add a rarefied otu_table to a phyloseq object}
 \usage{
-update_otu_table(physeq, otu_rare)
+update_otu_table(physeq_obj, rarefied_otus, iteration = NULL)
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object in which you want to add the rarefied OTU/ASV table.}
+\item{physeq_obj}{A \code{phyloseq} object in which you want to add the rarefied
+OTU/ASV table.}
 
-\item{otu_rare}{A rarefied otu_table dataframe.}
+\item{rarefied_otus}{A data frame, list of data frames, or 3D array output from
+\code{multi_rarefy()} containing the rarefied OTU/ASV tables.}
+
+\item{iteration}{Integer specifying which iteration to extract from a list
+or array. Required when \code{rarefied_otus} is a list or array. Ignored when
+\code{rarefied_otus} is a data frame.}
 }
 \value{
 A \code{phyloseq} object.
 }
 \description{
-This function imports a rarefied otu_table (or normalized) in a \code{phyloseq} object \code{otu_table()} layer.
+This function updates a \code{phyloseq} object by replacing its OTU/ASV table
+with a rarefied version produced by \code{multi_rarefy()}. The rarefied table can
+be a data frame, a list of data frames (\code{.as = "list"}), or a 3D array
+(\code{.as = "array"}). When providing a list or array, specify which iteration
+to use via the \code{iteration} parameter.
 }
 \examples{
 \donttest{
@@ -23,25 +33,31 @@ library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# Perform multiple rarefaction
-otu_table_rare <-
-    multi_rarefy(
-        physeq = GlobalPatterns,
-        depth_level = 200,
-        num_iter = 3,
-        threads = 1,
-        set_seed = 123
-    )
+# List output (.as = "list")
+otu_list <-
+  multi_rarefy(
+    physeq_obj = GlobalPatterns,
+    depth_level = 200,
+    num_iter = 3,
+    .as = "list",
+    set_seed = 123
+  )
 
-# Check the rarefied data output
-rowSums(otu_table_rare)
+# Extract iteration 2
+rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 
-# Recreate the phyloseq object and check
-rarefied_GlobalPatterns<-
-    update_otu_table(physeq = GlobalPatterns,
-                otu_rare = otu_table_rare )
+# Array output (.as = "array")
+otu_array <-
+  multi_rarefy(
+    physeq_obj = GlobalPatterns,
+    depth_level = 200,
+    num_iter = 3,
+    .as = "array",
+    set_seed = 123
+  )
 
-sample_sums(rarefied_GlobalPatterns)
+# Extract iteration 1
+rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
 }
 
 }

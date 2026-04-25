@@ -1,16 +1,26 @@
 #' Add a rarefied otu_table to a phyloseq object
 #'
-#' This function imports a rarefied otu_table (or normalized) in a `phyloseq` object `otu_table()` layer.
+#' This function updates a `phyloseq` object by replacing its OTU/ASV table
+#' with a rarefied version produced by `multi_rarefy()`. The rarefied table can
+#' be a data frame, a list of data frames (`.as = "list"`), or a 3D array
+#' (`.as = "array"`). When providing a list or array, specify which iteration
+#' to use via the `iteration` parameter.
 #'
-#' @param physeq A `phyloseq` object in which you want to add the rarefied OTU/ASV table.
-#' @param otu_rare A rarefied otu_table dataframe.
+#' @param physeq_obj A `phyloseq` object in which you want to add the rarefied
+#' OTU/ASV table.
+#' @param rarefied_otus A data frame, list of data frames, or 3D array output from
+#' `multi_rarefy()` containing the rarefied OTU/ASV tables.
+#' @param iteration Integer specifying which iteration to extract from a list
+#' or array. Required when `rarefied_otus` is a list or array. Ignored when
+#' `rarefied_otus` is a data frame.
 #'
 #' @return A `phyloseq` object.
 #'
 #' @importFrom phyloseq otu_table sample_data tax_table phy_tree refseq
 #' @importFrom phyloseq phyloseq sample_names prune_taxa prune_samples
 #' @importFrom phyloseq sample_sums taxa_sums
-#' @importFrom cli cli_inform cli_alert_success cli_alert_warning
+#' @importFrom cli cli_inform cli_alert_success cli_alert_warning cli_alert_info
+#' @importFrom cli cli_abort
 #' @importFrom magrittr %>%
 #'
 #' @examples
@@ -19,111 +29,170 @@
 #' library(BRCore)
 #' data(GlobalPatterns, package = "phyloseq")
 #'
-#' # Perform multiple rarefaction
-#' otu_table_rare <-
-#'     multi_rarefy(
-#'         physeq = GlobalPatterns,
-#'         depth_level = 200,
-#'         num_iter = 3,
-#'         threads = 1,
-#'         set_seed = 123
-#'     )
+#' # List output (.as = "list")
+#' otu_list <-
+#'   multi_rarefy(
+#'     physeq_obj = GlobalPatterns,
+#'     depth_level = 200,
+#'     num_iter = 3,
+#'     .as = "list",
+#'     set_seed = 123
+#'   )
 #'
-#' # Check the rarefied data output
-#' rowSums(otu_table_rare)
+#' # Extract iteration 2
+#' rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 #'
-#' # Recreate the phyloseq object and check
-#' rarefied_GlobalPatterns<-
-#'     update_otu_table(physeq = GlobalPatterns,
-#'                 otu_rare = otu_table_rare )
+#' # Array output (.as = "array")
+#' otu_array <-
+#'   multi_rarefy(
+#'     physeq_obj = GlobalPatterns,
+#'     depth_level = 200,
+#'     num_iter = 3,
+#'     .as = "array",
+#'     set_seed = 123
+#'   )
 #'
-#' sample_sums(rarefied_GlobalPatterns)
-#'}
+#' # Extract iteration 1
+#' rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
+#' }
 #'
 #' @export
-update_otu_table <- function(physeq, otu_rare) {
-    # sample names from original phyloseq object
-    physeq_samples <- sample_names(physeq)
-    cli::cli_inform(
-        "Sample names from the original phyloseq object (otu_table):"
-    )
-    print(physeq_samples)
+update_otu_table <- function(physeq_obj, rarefied_otus, iteration = NULL) {
+  suppressMessages(.phyloseq_class_check(physeq_obj))
 
-    # reorder rarefied OTU table to match
-    otu_rare_ord <- otu_rare[physeq_samples, , drop = FALSE]
+  physeq_samples <- sample_names(physeq_obj)
 
-    # sample names from rarefied OTU table (after reordering)
-    otu_rare_samples <- rownames(otu_rare_ord)
-    cli::cli_inform(
-        "Sample names in the rarefied OTU table (data.frame) after reordering to match phyloseq:"
-    )
-    print(otu_rare_samples)
-
-    if (identical(physeq_samples, otu_rare_samples)) {
-        cli::cli_alert_success(
-            "Phyloseq object and rarefied otu_tables sample names are identical."
-        )
-    } else {
-        cli::cli_alert_warning(
-            "Phyloseq object and rarefied otu_tables sample names are NOT identical. Check below samples removed by rarefaction."
-        )
+  # Handle list input
+  if (is.list(rarefied_otus) && !is.data.frame(rarefied_otus)) {
+    if (is.null(iteration)) {
+      cli::cli_abort(
+        "{.arg iteration} must be specified when {.arg rarefied_otus} is a list."
+      )
     }
 
-    # Check for samples removed due to rarefaction
-    if (!all(physeq_samples %in% otu_rare_samples)) {
-        removed_samples <- physeq_samples[
-            !(physeq_samples %in% otu_rare_samples)
-        ]
-        cli::cli_alert_warning(
-            "Samples removed due to rarefaction: {paste(removed_samples, collapse = ', ')}"
-        )
-    } else {
-        # Calculate rarefaction depth (assuming all samples have the same depth after rarefaction)
-        rarefaction_depth <- sum(otu_rare[1, ])
-        cli::cli_alert_success(
-            "All samples kept after rarefaction at depth of: {rarefaction_depth}"
-        )
+    n_iter <- length(rarefied_otus)
+
+    if (iteration < 1 || iteration > n_iter) {
+      cli::cli_abort(
+        "{.arg iteration} must be between 1 and {n_iter}."
+      )
     }
 
-    # Create list of components for the new phyloseq object
-    phyloseq_components <- list(
-        otu_table(
-            t(otu_rare_ord) |>
-                as.matrix() |>
-                as.data.frame(),
-            taxa_are_rows = TRUE
-        ),
-        sample_data(physeq)
+    cli::cli_alert_info(
+      "Extracting iteration {.val {iteration}} from list of {.val {n_iter}} iterations."
     )
 
-    # Add optional components if they exist and are not empty
-    if (!is.null(tax_table(physeq, errorIfNULL = FALSE))) {
-        phyloseq_components <- c(
-            phyloseq_components,
-            list(tax_table(physeq))
-        )
+    rarefied_otus <- as.data.frame(rarefied_otus[[iteration]])
+  }
+
+  # Handle 3D array input
+  if (is.array(rarefied_otus) && length(dim(rarefied_otus)) == 3) {
+    if (is.null(iteration)) {
+      cli::cli_abort(
+        "{.arg iteration} must be specified when {.arg rarefied_otus} is a 3D array."
+      )
     }
 
-    if (!is.null(phy_tree(physeq, errorIfNULL = FALSE))) {
-        phyloseq_components <- c(
-            phyloseq_components,
-            list(phy_tree(physeq))
-        )
+    n_iter <- dim(rarefied_otus)[3]
+
+    if (iteration < 1 || iteration > n_iter) {
+      cli::cli_abort(
+        "{.arg iteration} must be between 1 and {n_iter}."
+      )
     }
 
-    if (!is.null(refseq(physeq, errorIfNULL = FALSE))) {
-        phyloseq_components <- c(
-            phyloseq_components,
-            list(refseq(physeq))
-        )
-    }
+    cli::cli_alert_info(
+      "Extracting iteration {.val {iteration}} from array with {.val {n_iter}} iterations."
+    )
 
-    # Build the new phyloseq object
-    new_phyloseq <- do.call(phyloseq, phyloseq_components) %>%
-        prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
-        prune_samples(sample_sums(x = .) > 0, x = .)
+    rarefied_otus <- as.data.frame(rarefied_otus[,, iteration])
+  }
 
-    cli::cli_alert_success("Analysis complete!")
+  # Now rarefied_otus is always a data frame
+  otu_rare_samples <- rownames(rarefied_otus)
+  shared_samples <- intersect(physeq_samples, otu_rare_samples)
+  removed_samples <- setdiff(physeq_samples, otu_rare_samples)
 
-    return(new_phyloseq)
+  .report_sample_status(
+    shared_samples,
+    removed_samples,
+    rarefied_otus,
+    physeq_samples
+  )
+
+  otu_rare_ord <- rarefied_otus[shared_samples, , drop = FALSE]
+
+  cli::cli_alert_info(
+    "Building phyloseq object with {.val {nrow(otu_rare_ord)}} samples and {.val {ncol(otu_rare_ord)}} taxa"
+  )
+
+  # Build components
+  phyloseq_components <- list(
+    otu_table(
+      t(otu_rare_ord) |> as.matrix() |> as.data.frame(),
+      taxa_are_rows = TRUE
+    ),
+    sample_data(physeq_obj)[shared_samples, ]
+  )
+
+  # Add optional components if they exist
+  .add_optional_component <- function(components, accessor) {
+    obj <- accessor(physeq_obj, errorIfNULL = FALSE)
+    if (!is.null(obj)) c(components, list(obj)) else components
+  }
+
+  phyloseq_components <- .add_optional_component(phyloseq_components, tax_table)
+  phyloseq_components <- .add_optional_component(phyloseq_components, phy_tree)
+  phyloseq_components <- .add_optional_component(phyloseq_components, refseq)
+
+  # Build the new phyloseq object
+  new_phyloseq <- do.call(phyloseq, phyloseq_components) %>%
+    prune_taxa(taxa_sums(x = .) > 0, x = .) %>%
+    prune_samples(sample_sums(x = .) > 0, x = .)
+
+  cli::cli_alert_success("Update complete!")
+
+  return(new_phyloseq)
+}
+
+
+#' Report sample status after rarefaction
+#' Internal function to report on the status of samples after rarefaction, including any removed samples and whether sample names match between the original phyloseq object and the rarefied OTU table.
+#' @noRd
+#' @keywords internal
+.report_sample_status <- function(
+  shared_samples,
+  removed_samples,
+  rarefied_otus,
+  physeq_samples
+) {
+  if (length(shared_samples) == 0) {
+    cli::cli_alert_danger(
+      "No matching sample names between phyloseq object and rarefied OTU table."
+    )
+    stop("No matching sample names. Check rownames of rarefied_otus.")
+  }
+
+  otu_rare_samples <- rownames(rarefied_otus)
+
+  if (identical(sort(physeq_samples), sort(otu_rare_samples))) {
+    cli::cli_alert_success(
+      "Phyloseq object and rarefied otu_table sample names are identical."
+    )
+  } else {
+    cli::cli_alert_warning(
+      "Phyloseq object and rarefied otu_table sample names are NOT identical. Check samples removed by rarefaction below."
+    )
+  }
+
+  if (length(removed_samples) > 0) {
+    cli::cli_alert_warning(
+      "{.val {length(removed_samples)}} sample{?s} removed due to rarefaction: {.val {paste(removed_samples, collapse = ', ')}}"
+    )
+  } else {
+    rarefaction_depth <- sum(rarefied_otus[1, ])
+    cli::cli_alert_success(
+      "All samples kept after rarefaction at depth of: {.val {rarefaction_depth}}"
+    )
+  }
 }

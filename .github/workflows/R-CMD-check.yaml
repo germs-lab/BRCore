@@ -16,7 +16,8 @@ on:
     branches:
       - main
       - develop
-  workflow_dispatch: # Manual trigger on ANY branch
+  workflow_dispatch:
+    # Manual trigger on ANY branch
 
 name: R-CMD-check.yaml
 
@@ -74,6 +75,6 @@ jobs:
       - name: Check package
         uses: r-lib/actions/check-r-package@v2
         with:
-          error-on: '"error"'
+          error-on: "\"error\""
           upload-snapshots: true
-          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          build_args: "c(\"--no-manual\",\"--compact-vignettes=gs+qpdf\")"

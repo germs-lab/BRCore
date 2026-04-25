@@ -54,15 +54,15 @@ binomial null model, and Poisson null model.
 \examples{
 \dontrun{
 # Generate example community data
-spp_data <- matrix(rpois(100*50, 5), nrow=100, ncol=50)
+spp_data <- matrix(rpois(100 * 50, 5), nrow = 100, ncol = 50)
 colnames(spp_data) <- paste0("Species_", 1:50)
 
 # Fit SNCM and get statistics
-fit_stats <- sncm.fit(spp_data, stats=TRUE)
+fit_stats <- sncm.fit(spp_data, stats = TRUE)
 print(fit_stats)
 
 # Get predictions for plotting
-predictions <- sncm.fit(spp_data, stats=FALSE)
+predictions <- sncm.fit(spp_data, stats = FALSE)
 }
 
 }

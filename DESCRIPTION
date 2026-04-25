@@ -1,14 +1,15 @@
 Package: BRCore
-Title: Provides a Set of Tools to Process and Analyze Microbial Data from Bioenergy Research Centers
-Version: 1.0.2
+Title: Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers
+Version: 2.0.0
 Authors@R: c(
     person("Bolívar", "Aponte Rolón",
            email = "bolaponte@pm.me", 
            role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2544-4551")),
-    person("Gian Maria Niccolo", "Benucci",
+    person("Gian Maria Niccolò", "Benucci",
+           email = "benucci@msu.edu",
            role = "aut", 
-           comment = c(ORCID = "0000-0003-1589-947X")),
+           comment = c(ORCID = "0000-0003-1589-947X", "Co-maintainer")),
     person("Brandon", "Kristy", 
            role = "aut", 
            comment = c(ORCID = "0000-0003-1589-947X")),
@@ -19,8 +20,12 @@ Authors@R: c(
            role = "aut", 
            comment = c(ORCID = "0000-0002-1532-6826")),
     person("Adina", "Howe", 
-           role = "ctb", 
-           comment = c(ORCID = "0000-0002-7705-343X")) 
+           role = "aut", 
+           comment = c(ORCID = "0000-0002-7705-343X")),
+    person("Center for Advanced Bioenergy and Bioproducts Innovation", 
+           role = c("cph", "fnd")),
+    person("Great Lakes Bioenergy Research Center", 
+           role = c("cph", "fnd"))
   )
 Description: BRCore provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 License: MIT + file LICENSE
@@ -59,3 +64,5 @@ Depends:
     R (>= 4.4)
 LazyData: true
 VignetteBuilder: knitr
+URL: https://github.com/germs-lab/BRCore, http://www.germslab.org/BRCore/
+BugReports: https://github.com/germs-lab/BRCore/issues
