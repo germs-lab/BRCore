@@ -37,14 +37,12 @@ curves, and core distributions
 Install the latest *stable* version of BRCore from CRAN with:
 
 ``` r
-
 install.packages("BRCore")
 ```
 
 Install the *development* version of BRCore from GitHub with:
 
 ``` r
-
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
 ```
@@ -54,7 +52,6 @@ pak::pak("germs-lab/BRCore")
 ## Quick Start
 
 ``` r
-
 library(BRCore)
 library(phyloseq)
 
@@ -65,22 +62,31 @@ data("bcse", package = "BRCore")
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
 # Perform multiple rarefaction
-bcse_rarefied <- multi_rarefy(
+bcse_rarefied_list <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 10,
+  num_iter = 3,
   set_seed = 7642
 )
 
-# Explore the structure of the rarefied data
-plot_rarefaction_metrics(bcse_metrics)
-plot_variance_propagation(bcse_rarefied)
-
-# Decide on "depth_level" and "num_iter" based on the plots above, and then perform core selection.
+# Update phyloseq object with rarefied data
+bcse_rare_single <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied_list, iteration = 2) # Your preffered iteration can be used here
 
 # Identify core microbiome
+
+# With a single iteration of rarefaction
 bcse_core <- identify_core(
-  physeq_obj = bcse,
+  physeq_obj = bcse_rare_single,
+  priority_var = "Crop",
+  increase_value = 0.02,
+  seed = 2134
+)
+
+
+# With multiple iterations of rarefaction
+bcse_core_multi <- identify_core(
+  physeq_obj = bcse, 
+  rarefied_list = bcse_rarefied_list
   priority_var = "Crop",
   increase_value = 0.02,
   depth_level = 1000,
@@ -106,7 +112,6 @@ plot_neutral_model(bcse_neutral)
 For detailed examples and use cases, see the package vignette:
 
 ``` r
-
 vignette("BRCore-vignette", package = "BRCore")
 ```
 

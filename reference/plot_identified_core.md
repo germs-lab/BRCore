@@ -13,7 +13,8 @@ plot_identified_core(
   bray_curtis_ranked,
   elbow,
   lastCall,
-  increase_value = 0.02
+  increase_value = 0.02,
+  dataset_name = NULL
 )
 ```
 
@@ -37,9 +38,16 @@ plot_identified_core(
   The percent increase value in decimal (e.g. 0.02) used for the
   Bray-Curtis increase method.
 
+- dataset_name:
+
+  Optional character string. When provided, it is prepended to the plot
+  title (e.g. `"Switchgrass"`). Default `NULL` (no prefix).
+
 ## Value
 
-A ggplot2 object.
+A list containing: 1) `df_for_plot`, a data frame used for plotting, and
+2) `plot_identified_core`, a ggplot object visualizing the Bray-Curtis
+increase with annotated cutoff points.
 
 ## Details
 
@@ -71,11 +79,17 @@ res <- identify_core(
 )
 #> Seed used: 48821
 #> ✔ Input phyloseq object is valid!
-#> ℹ otu_table() is rarefied at a depth of: 1000
+#> ℹ No `rarefied_list` provided. `physeq_obj` is already rarefied; wrapping as a single iteration.
 #> ℹ No taxonomy found (or empty). Continuing without taxonomy.
 #> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranked by Index only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 16:22:33.751216
+#> ℹ Ranked by Rank only
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-25 19:01:53.949657
+#> ■■■■■■                            15% | ETA:  6s
+#> ■■■■■■■■■■■■                      35% | ETA:  5s
+#> ■■■■■■■■■■■■■■■■■■■               60% | ETA:  4s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         81% | ETA:  2s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    98% | ETA:  0s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 34 core OTUs
 #> ✔ Analysis complete!
@@ -87,6 +101,27 @@ plot_identified_core(
   lastCall = res$bc_increase,
   increase_value = res$increase_value
 )
+#> $df_for_plot
+#> # A tibble: 40 × 13
+#>    rank  rank_num otu_added  MeanBC proportionBC IncreaseBC elbow_slope_diffs
+#>    <fct>    <int> <chr>       <dbl>        <dbl>      <dbl>             <dbl>
+#>  1 1            1 OTU47     0.00638       0.0124      NA            -0.000719
+#>  2 2            2 OTU2      0.0469        0.0913       7.35          0.0196  
+#>  3 3            3 OTU6      0.0962        0.187        2.05          0.0294  
+#>  4 4            4 OTU21     0.104         0.203        1.08          0.0239  
+#>  5 5            5 OTU10     0.109         0.212        1.04          0.0199  
+#>  6 6            6 OTU7      0.136         0.266        1.25          0.0211  
+#>  7 7            7 OTU4      0.210         0.410        1.54          0.0287  
+#>  8 8            8 OTU430    0.219         0.427        1.04          0.0262  
+#>  9 9            9 OTU23     0.227         0.441        1.03          0.0241  
+#> 10 10          10 OTU18     0.237         0.462        1.05          0.0227  
+#> # ℹ 30 more rows
+#> # ℹ 6 more variables: delta_pct_max_BC <dbl>, is_BC_core <lgl>,
+#> #   last_pctBC_cutoff <lgl>, is_elbow_core <lgl>, last_elbow_cutoff <lgl>,
+#> #   rank_fac <fct>
+#> 
+#> $plot_identified_core
 
+#> 
 # }
 ```

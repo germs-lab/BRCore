@@ -3,7 +3,10 @@
 ## Core Identification Functions
 
 - [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
-  : Identify Core Microbial Taxa
+  : Identify Core Microbiome Using Bray-Curtis Similarity biological
+  samples. Core taxa are selected using either a "last % increase" or
+  "elbow" method implementing the method developed by Shade and
+  Stopnisek (2019) Curr Opin Microbiol, see below for details.
 - [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
   : Plot Bray-Curtis increase over ranked OTU/ASVs
 - [`plot_core_distribution()`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)

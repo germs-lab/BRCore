@@ -35,7 +35,7 @@ we're in an HPC environment or a local machine."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Get the number of available CPU cores based on environment</h1>
-      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/HEAD/R/parallel_helpers.R" class="external-link"><code>R/parallel_helpers.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.0/R/parallel_helpers.R" class="external-link"><code>R/parallel_helpers.R</code></a></small>
       <div class="d-none name"><code>get_available_cores.Rd</code></div>
     </div>
 
@@ -65,15 +65,15 @@ we're in an HPC environment or a local machine.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_available_cores</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Local environment. Using 7 core(s)/worker(s) via parallelly::availableCores().</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Local environment. Using 3 core(s)/worker(s) via parallelly::availableCores().</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Keeping 1 core/worker available for system.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> system </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      3 </span>
 <span class="r-in"><span><span class="fu">get_available_cores</span><span class="op">(</span>default <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Local environment. Using 7 core(s)/worker(s) via parallelly::availableCores().</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Local environment. Using 3 core(s)/worker(s) via parallelly::availableCores().</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Keeping 1 core/worker available for system.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> system </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      7 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      3 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

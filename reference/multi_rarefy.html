@@ -39,7 +39,7 @@ Samples with fewer OTUs/ASVs than the specified depth_level are discarded."></he
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Run multiple rarefaction for microbiome count tables</h1>
-      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/HEAD/R/multi_rarefy.R" class="external-link"><code>R/multi_rarefy.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.0/R/multi_rarefy.R" class="external-link"><code>R/multi_rarefy.R</code></a></small>
       <div class="d-none name"><code>multi_rarefy.Rd</code></div>
     </div>
 
@@ -56,7 +56,7 @@ Samples with fewer OTUs/ASVs than the specified <code>depth_level</code> are dis
 <span>  <span class="va">physeq_obj</span>,</span>
 <span>  <span class="va">depth_level</span>,</span>
 <span>  num_iter <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  .as_array <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .as <span class="op">=</span> <span class="st">"list"</span>,</span>
 <span>  set_seed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -79,12 +79,12 @@ OTUs/ASVs) to which samples should be rarefied.</p></dd>
 for rarefaction.</p></dd>
 
 
-<dt id="arg--as-array">.as_array<a class="anchor" aria-label="anchor" href="#arg--as-array"></a></dt>
-<dd><p>A logical indicating whether to return the results as a 3D
-array or as a list of data frames. If <code>TRUE</code>, returns a 3D array with
-dimensions (samples x taxa x iterations). If <code>FALSE</code>, returns a list of
+<dt id="arg--as">.as<a class="anchor" aria-label="anchor" href="#arg--as"></a></dt>
+<dd><p>A character string indicating whether to return the results as a
+3D array or as a list of data frames. If <code>"array"</code>, returns a 3D array with
+dimensions (samples x taxa x iterations). If <code>"list"</code>, returns a list of
 data frames, one for each iteration, with samples as rows and taxa as
-columns. (default = FALSE)</p></dd>
+columns. (default = "list")</p></dd>
 
 
 <dt id="arg-set-seed">set_seed<a class="anchor" aria-label="anchor" href="#arg-set-seed"></a></dt>
@@ -111,7 +111,7 @@ Samples with less than <code>depth_level</code> sequences are discarded.</p>
 <span class="r-in"><span>  physeq_obj <span class="op">=</span> <span class="va">bcse</span>,</span></span>
 <span class="r-in"><span>  depth_level <span class="op">=</span> <span class="fl">1000</span>,</span></span>
 <span class="r-in"><span>  num_iter <span class="op">=</span> <span class="fl">100</span>,</span></span>
-<span class="r-in"><span>  .as_array <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>  .as <span class="op">=</span> <span class="st">"list"</span>,</span></span>
 <span class="r-in"><span>  set_seed <span class="op">=</span> <span class="fl">7642</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -136,16 +136,16 @@ Samples with less than <code>depth_level</code> sequences are discarded.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Samples removed: <span style="color: #0000BB;">"bcse108, bcse105, bcse110"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Taxa Removal </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Original taxa input: <span style="color: #0000BB;">2861</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Max: <span style="color: #0000BB;">1832</span> taxa removed (zero abundance) in viable samples (depth_level &gt;= <span style="color: #0000BB;">1000</span>).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> When using `.as_array = FALSE`, taxa removed may differ across iterations.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No taxa removed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Taxa are not removed across iterations to maintain consistent dimensions. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downstream analyses should handle zero-abundance taxa appropriately.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Data Sparsity </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Returning list of data frames for each iteration.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> • Rarefied matrix (across <span style="color: #0000BB;">100</span> iterations):</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">44542</span> zeros (<span style="color: #0000BB;">92.1</span>% sparsity) out of <span style="color: #0000BB;">48363</span> entries</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">48865</span> zeros (<span style="color: #0000BB;">92.58</span>% sparsity) out of <span style="color: #0000BB;">52781</span> entries</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">46569.7</span> zeros (<span style="color: #0000BB;">92.36</span>% sparsity) out of <span style="color: #0000BB;">50420.7</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">130551</span> zeros (<span style="color: #0000BB;">97.09</span>% sparsity) out of <span style="color: #0000BB;">134467</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">130690</span> zeros (<span style="color: #0000BB;">97.19</span>% sparsity) out of <span style="color: #0000BB;">134467</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">130616.1</span> zeros (<span style="color: #0000BB;">97.14</span>% sparsity) out of <span style="color: #0000BB;">134467</span> entries</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Final Data Dimensions </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Output: <span style="color: #0000BB;">100</span> iterations with <span style="color: #0000BB;">50</span> unique samples</span>

@@ -2,10 +2,37 @@
 
 ## BRCore 2.0.0
 
-Date: 2026-04-13
+Date: 2026-04-24
 
 ### Breaking Changes
 
+- [de1fa42](https://github.com/germs-lab/BRCore/commit/de1fa425d7466f7e652136b949884f795d878e0c)
+  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md):
+  `.as_array` logical argument replaced with `.as` character argument
+  (e.g. `"list"`, `"array"`). Single-iteration handling improved to
+  support all `.as` formats and seeds.
+- [fbb3b90](https://github.com/germs-lab/BRCore/commit/fbb3b907b7010a3c64e6efb096b5d797b8f90fd9)
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md):
+  output column renamed from `Index` to `rank`.
+- [fa7387e](https://github.com/germs-lab/BRCore/commit/fa7387e6e74e9cb4ac5dafe4f993288717a8ba54)
+  `find_core()` removed; ground truth logic moved to `debugging` branch.
+- [28b8821](https://github.com/germs-lab/BRCore/commit/28b8821a49e438c0a0bd5d14dd878689b9b97bff)
+  and
+  [4f5a9c9](https://github.com/germs-lab/BRCore/commit/4f5a9c91ea4e5972d0937680a63704a3d2a0c9ab)
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  major rewrite:
+  [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html)
+  replaced with
+  [`vegan::vegdist()`](https://vegandevs.github.io/vegan/reference/vegdist.html)
+  via new `.mean_bc_over_iters()` internal helper; `rarefied_list` is
+  now optional and requires ≥ 2 iterations when provided. This fixes
+  incorrect results on unrarefied datasets caused by how
+  [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html)
+  handles zeros in a matrix of ones.
+- [9f3b3ae](https://github.com/germs-lab/BRCore/commit/9f3b3ae29b999b4691c4e0fffb9b9e358063e389)
+  [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+  now returns a named list with `$df` and `$plot` instead of a bare plot
+  object.
 - [3a590aa](https://github.com/germs-lab/BRCore/commit/3a590aa0b3a1ebccf868ae1186804d64ccab7f21)
   General update/refactor of tests to include new function parameters
   and logic. Regenerated
@@ -31,19 +58,28 @@ Date: 2026-04-13
   computation and eliminated the need for parallelization. CLI messages
   were improved to handle these new types and present summary statistics
   and information to users.
-- [79153ca](https://github.com/germs-lab/BRCore/commit/79153cabcdd93f44080566ea09d18f194afbae9d)
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
-  gained new internal logic (originally tested in
-  `identify_core_avgdist()`, see
-  [\#91](https://github.com/germs-lab/BRCore/pull/91) and
-  [704f2ee](https://github.com/germs-lab/BRCore/commit/704f2ee2216a6354113877713571a5dbd3b77322))
-  based on
-  [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html).
-  Rarefactions and iterations handled by
-  [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html).
 
 ### New Features
 
+- [dbdf9fe](https://github.com/germs-lab/BRCore/commit/dbdf9fecd5dbecde83bba3a72038ffcbfa267e71)
+  Added `.brcore_theme()` internal helper (`brcore_theme.R`) to unify
+  plot styling (borders, title sizes, viridis palettes) across all
+  plotting functions.
+- [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+  gains an optional `dataset_name` parameter for plot titles.
+
+### Bug Fixes
+
+- [3225bd4](https://github.com/germs-lab/BRCore/commit/3225bd4c28180ded6e36bc0e7fbdfa2a2496f7cd)
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md):
+  fixed `proportionBC` normalisation to use
+  [`max()`](https://rdrr.io/r/base/Extremes.html) instead of `last()`.
+- [b3824ab](https://github.com/germs-lab/BRCore/commit/b3824ab272ec16b65c0136e10e65e5925ff74474)
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md):
+  fixed BC ranking and pair alignment using unique time points.
+- [7439ed3](https://github.com/germs-lab/BRCore/commit/7439ed31dc496d60165f7a250e957b6eabfc7f82)
+  [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md):
+  fixed deprecated `size` → `linewidth` in `panel.border`.
 - [5c2c57e](https://github.com/germs-lab/BRCore/commit/5c2c57eaa574b61bfa8045ef4614d64413680a68)
   and
   [bfd74da](https://github.com/germs-lab/BRCore/commit/bfd74da34cd63c1ef59c491679fda49299cd7701)
@@ -61,11 +97,20 @@ Date: 2026-04-13
   [`cli::cli_progress_bar()`](https://cli.r-lib.org/reference/cli_progress_bar.html)
   in `.calculate_bc()`.
 
-### Smaller changes
+### Smaller Changes
 
-- [e4ac648](https://github.com/germs-lab/BRCore/commit/e4ac648420ceaa6bb3d5d946e8f7170029e6f615)
-  Extracted Bray-Curtis dissimilarity calculation into `.calculate_bc()`
-  internal helper.
+- [36285d2](https://github.com/germs-lab/BRCore/commit/36285d232d595702ce9846566b40957febd4777a)
+  Tidy eval compliance enforced throughout using `.data$` pronouns and
+  quoted column names; `globals.R` significantly trimmed.
+
+- Vignette and README updated to reflect the required multi-iteration
+  workflow for
+  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md).
+
+- Test suite updated for `identify_core`, `multi_rarefy`,
+  `plot_identified_core`, `plot_variance_propagation`,
+  `update_otu_table`, and the full vignette workflow. Test data
+  regenerated (`test_vignette_data.rda` grew ~250 KB).
 
 - Vignette updated to include
   [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
@@ -75,6 +120,14 @@ Date: 2026-04-13
   new workflow allows users to determine the adequate sequence read
   depth for their data and input that into
   [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md).
+
+**See PR [\#97](https://github.com/germs-lab/BRCore/pull/97) and
+[\#95](https://github.com/germs-lab/BRCore/pull/95) for more details**
+
+### Contributors
+
+[@jibarozzo](https://github.com/jibarozzo)
+[@Gian77](https://github.com/Gian77)
 
 ## BRCore 1.0.2
 

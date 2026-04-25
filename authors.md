@@ -27,7 +27,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/germs-lab/BRCore/blob/HEAD/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/germs-lab/BRCore/blob/v2.0.0/DESCRIPTION)
 
 Aponte Rolón B, Benucci G, Kristy B, Shade A, Stopnisek N, Howe A
 (2026). *BRCore: Unified Framework for Identification and Ecological

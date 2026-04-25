@@ -13,7 +13,7 @@ multi_rarefy(
   physeq_obj,
   depth_level,
   num_iter = 100,
-  .as_array = FALSE,
+  .as = "list",
   set_seed = NULL
 )
 ```
@@ -34,13 +34,13 @@ multi_rarefy(
   An integer specifying the number of iterations to perform for
   rarefaction.
 
-- .as_array:
+- .as:
 
-  A logical indicating whether to return the results as a 3D array or as
-  a list of data frames. If `TRUE`, returns a 3D array with dimensions
-  (samples x taxa x iterations). If `FALSE`, returns a list of data
-  frames, one for each iteration, with samples as rows and taxa as
-  columns. (default = FALSE)
+  A character string indicating whether to return the results as a 3D
+  array or as a list of data frames. If `"array"`, returns a 3D array
+  with dimensions (samples x taxa x iterations). If `"list"`, returns a
+  list of data frames, one for each iteration, with samples as rows and
+  taxa as columns. (default = "list")
 
 - set_seed:
 
@@ -66,7 +66,7 @@ otu_table_rare <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
   num_iter = 100,
-  .as_array = FALSE,
+  .as = "list",
   set_seed = 7642
 )
 #> 
@@ -91,16 +91,16 @@ otu_table_rare <- multi_rarefy(
 #> ! Samples removed: "bcse108, bcse105, bcse110"
 #> 
 #> ── Taxa Removal 
-#> ℹ Original taxa input: 2861
-#> ! Max: 1832 taxa removed (zero abundance) in viable samples (depth_level >= 1000).
-#> ! When using `.as_array = FALSE`, taxa removed may differ across iterations.
+#> ✔ No taxa removed.
+#> ! Taxa are not removed across iterations to maintain consistent dimensions. 
+#> Downstream analyses should handle zero-abundance taxa appropriately.
 #> 
 #> ── Data Sparsity 
 #> ℹ Returning list of data frames for each iteration.
 #> • Rarefied matrix (across 100 iterations):
-#>   • Min: 44542 zeros (92.1% sparsity) out of 48363 entries
-#>   • Max: 48865 zeros (92.58% sparsity) out of 52781 entries
-#>   • Avg: 46569.7 zeros (92.36% sparsity) out of 50420.7 entries
+#>   • Min: 130551 zeros (97.09% sparsity) out of 134467 entries
+#>   • Max: 130690 zeros (97.19% sparsity) out of 134467 entries
+#>   • Avg: 130616.1 zeros (97.14% sparsity) out of 134467 entries
 #> 
 #> ── Final Data Dimensions 
 #> ✔ Output: 100 iterations with 50 unique samples

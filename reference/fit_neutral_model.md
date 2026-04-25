@@ -77,16 +77,21 @@ switchgrass_core <- identify_core(
   physeq_obj     = switchgrass,
   priority_var   = "sampling_date",
   increase_value = 0.02,
-  num_iter       = 1,
   seed           = 092825
 )
 #> Seed used: 92825
 #> ✔ Input phyloseq object is valid!
-#> ℹ otu_table() is rarefied at a depth of: 1000
+#> ℹ No `rarefied_list` provided. `physeq_obj` is already rarefied; wrapping as a single iteration.
 #> ℹ No taxonomy found (or empty). Continuing without taxonomy.
 #> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranked by Index only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 16:21:17.924218
+#> ℹ Ranked by Rank only
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-25 19:00:48.294719
+#> ■■■■■                             15% | ETA:  6s
+#> ■■■■■■■■■                         28% | ETA:  7s
+#> ■■■■■■■■■■■■■■■■■                 53% | ETA:  5s
+#> ■■■■■■■■■■■■■■■■■■■■■■            70% | ETA:  4s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       87% | ETA:  2s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 34 core OTUs
 #> ✔ Analysis complete!

@@ -23,13 +23,13 @@ Integer number of cores available
 
 ``` r
 get_available_cores()
-#> ℹ Local environment. Using 7 core(s)/worker(s) via parallelly::availableCores().
+#> ℹ Local environment. Using 3 core(s)/worker(s) via parallelly::availableCores().
 #> Keeping 1 core/worker available for system.
 #> system 
-#>      7 
+#>      3 
 get_available_cores(default = 2)
-#> ℹ Local environment. Using 7 core(s)/worker(s) via parallelly::availableCores().
+#> ℹ Local environment. Using 3 core(s)/worker(s) via parallelly::availableCores().
 #> Keeping 1 core/worker available for system.
 #> system 
-#>      7 
+#>      3 
 ```

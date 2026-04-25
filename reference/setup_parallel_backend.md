@@ -23,8 +23,8 @@ Either a cluster object (HPC) or integer number of cores (local)
 
 ``` r
 setup_parallel_backend()
-#> ℹ Local environment. Using 7 core(s)/worker(s) via parallelly::availableCores().
+#> ℹ Local environment. Using 3 core(s)/worker(s) via parallelly::availableCores().
 #> Keeping 1 core/worker available for system.
 #> system 
-#>      7 
+#>      3 
 ```

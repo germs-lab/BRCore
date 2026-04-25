@@ -33,7 +33,7 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Variance propagation diagnostic for rarefaction</h1>
-      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/HEAD/R/plot_variance_propagation.R" class="external-link"><code>R/plot_variance_propagation.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.0/R/plot_variance_propagation.R" class="external-link"><code>R/plot_variance_propagation.R</code></a></small>
       <div class="d-none name"><code>plot_variance_propagation.Rd</code></div>
     </div>
 
@@ -43,7 +43,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_variance_propagation</span><span class="op">(</span><span class="va">physeq_obj</span>, <span class="va">rarefied</span>, q <span class="op">=</span> <span class="fl">0</span>, <span class="va">group_var</span>, <span class="va">group_color</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_variance_propagation</span><span class="op">(</span></span>
+<span>  <span class="va">physeq_obj</span>,</span>
+<span>  <span class="va">rarefied</span>,</span>
+<span>  q <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  <span class="va">group_var</span>,</span>
+<span>  <span class="va">group_color</span>,</span>
+<span>  convert_to_factor <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -69,6 +76,15 @@
 <dt id="arg-group-color">group_color<a class="anchor" aria-label="anchor" href="#arg-group-color"></a></dt>
 <dd><p>A color variable to use present in the sample_data()</p></dd>
 
+
+<dt id="arg-convert-to-factor">convert_to_factor<a class="anchor" aria-label="anchor" href="#arg-convert-to-factor"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, both <code>group_var</code> and
+<code>group_color</code> are coerced to <code>factor</code> before plotting, which is
+useful when those columns are numeric/continuous (e.g. dates, counts) but
+should be treated as discrete groups. When <code>TRUE</code> a discrete colour
+scale (<code>scale_color_viridis_d</code>) is used; otherwise the continuous
+scale (<code>scale_color_viridis_c</code>) is used. Default <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -88,7 +104,7 @@
 <span class="r-in"><span>       physeq_obj <span class="op">=</span> <span class="va">bcse_filt</span>,</span></span>
 <span class="r-in"><span>       depth_level <span class="op">=</span> <span class="fl">1000</span>,</span></span>
 <span class="r-in"><span>       num_iter <span class="op">=</span> <span class="fl">100</span>,</span></span>
-<span class="r-in"><span>       .as_array <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>       .as <span class="op">=</span> <span class="st">"list"</span>,</span></span>
 <span class="r-in"><span>       set_seed <span class="op">=</span> <span class="fl">7643</span></span></span>
 <span class="r-in"><span>   <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
@@ -112,16 +128,16 @@
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No samples removed.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Taxa Removal </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Original taxa input: <span style="color: #0000BB;">2861</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Max: <span style="color: #0000BB;">2688</span> taxa removed (zero abundance) in viable samples (depth_level &gt;= <span style="color: #0000BB;">1000</span>).</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> When using `.as_array = FALSE`, taxa removed may differ across iterations.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No taxa removed.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Taxa are not removed across iterations to maintain consistent dimensions. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Downstream analyses should handle zero-abundance taxa appropriately.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Data Sparsity </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Returning list of data frames for each iteration.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> • Rarefied matrix (across <span style="color: #0000BB;">100</span> iterations):</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">1145</span> zeros (<span style="color: #0000BB;">66.18</span>% sparsity) out of <span style="color: #0000BB;">1730</span> entries</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">1483</span> zeros (<span style="color: #0000BB;">70.96</span>% sparsity) out of <span style="color: #0000BB;">2090</span> entries</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">1336.3</span> zeros (<span style="color: #0000BB;">69</span>% sparsity) out of <span style="color: #0000BB;">1936.6</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Min: <span style="color: #0000BB;">27982</span> zeros (<span style="color: #0000BB;">97.8</span>% sparsity) out of <span style="color: #0000BB;">28610</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Max: <span style="color: #0000BB;">28035</span> zeros (<span style="color: #0000BB;">97.99</span>% sparsity) out of <span style="color: #0000BB;">28610</span> entries</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   • Avg: <span style="color: #0000BB;">28009.7</span> zeros (<span style="color: #0000BB;">97.9</span>% sparsity) out of <span style="color: #0000BB;">28610</span> entries</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Final Data Dimensions </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Output: <span style="color: #0000BB;">100</span> iterations with <span style="color: #0000BB;">10</span> unique samples</span>

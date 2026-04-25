@@ -4,9 +4,8 @@ This function updates a `phyloseq` object by replacing its OTU/ASV table
 with a rarefied version produced by
 [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
 The rarefied table can be a data frame, a list of data frames
-(`.as_array = FALSE`), or a 3D array (`.as_array = TRUE`). When
-providing a list or array, specify which iteration to use via the
-`iteration` parameter.
+(`.as = "list"`), or a 3D array (`.as = "array"`). When providing a list
+or array, specify which iteration to use via the `iteration` parameter.
 
 ## Usage
 
@@ -45,13 +44,13 @@ library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# List output (.as_array = FALSE)
+# List output (.as = "list")
 otu_list <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
     depth_level = 200,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 123
   )
 #> 
@@ -75,16 +74,16 @@ otu_list <-
 #> ✔ No samples removed.
 #> 
 #> ── Taxa Removal 
-#> ℹ Original taxa input: 19216
-#> ! Max: 17740 taxa removed (zero abundance) in viable samples (depth_level >= 200).
-#> ! When using `.as_array = FALSE`, taxa removed may differ across iterations.
+#> ✔ No taxa removed.
+#> ! Taxa are not removed across iterations to maintain consistent dimensions. 
+#> Downstream analyses should handle zero-abundance taxa appropriately.
 #> 
 #> ── Data Sparsity 
 #> ℹ Returning list of data frames for each iteration.
 #> • Rarefied matrix (across 3 iterations):
-#>   • Min: 36251 zeros (94.46% sparsity) out of 38376 entries
-#>   • Max: 36677 zeros (94.55% sparsity) out of 38792 entries
-#>   • Avg: 36444 zeros (94.47% sparsity) out of 38575.3 entries
+#>   • Min: 497462 zeros (99.57% sparsity) out of 499616 entries
+#>   • Max: 497501 zeros (99.58% sparsity) out of 499616 entries
+#>   • Avg: 497484.7 zeros (99.57% sparsity) out of 499616 entries
 #> 
 #> ── Final Data Dimensions 
 #> ✔ Output: 3 iterations with 26 unique samples
@@ -101,16 +100,16 @@ rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 #> ℹ Extracting iteration 2 from list of 3 iterations.
 #> ✔ Phyloseq object and rarefied otu_table sample names are identical.
 #> ✔ All samples kept after rarefaction at depth of: 200
-#> ℹ Building phyloseq object with 26 samples and 1476 taxa
+#> ℹ Building phyloseq object with 26 samples and 19216 taxa
 #> ✔ Update complete!
 
-# Array output (.as_array = TRUE)
+# Array output (.as = "array")
 otu_array <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
     depth_level = 200,
     num_iter = 3,
-    .as_array = TRUE,
+    .as = "array",
     set_seed = 123
   )
 #> 
@@ -134,9 +133,9 @@ otu_array <-
 #> ✔ No samples removed.
 #> 
 #> ── Taxa Removal 
-#> ! No taxa removed. 
-#> When using `.as_array = TRUE`, taxa are not removed across iterations to 
-#> maintain consistent dimensions.
+#> ✔ No taxa removed.
+#> ! Taxa are not removed across iterations to maintain consistent dimensions. 
+#> Downstream analyses should handle zero-abundance taxa appropriately.
 #> 
 #> ── Data Sparsity 
 #> • Rarefied matrix (across 3 iterations):

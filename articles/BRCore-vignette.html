@@ -60,10 +60,10 @@
                         <h4 data-toc-skip class="author">By Bolívar
 Aponte Rolón and Gian Maria Niccolò Benucci</h4>
             
-            <h4 data-toc-skip class="date">Last modified: 21 April,
+            <h4 data-toc-skip class="date">Last modified: 24 April,
 2026</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/HEAD/vignettes/BRCore-vignette.Rmd" class="external-link"><code>vignettes/BRCore-vignette.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.0/vignettes/BRCore-vignette.Rmd" class="external-link"><code>vignettes/BRCore-vignette.Rmd</code></a></small>
       <div class="d-none name"><code>BRCore-vignette.Rmd</code></div>
     </div>
 
@@ -156,7 +156,7 @@ the other three.</p>
 <span><span class="co">#&gt;   .. .. .. .. ..@ xp_list                    :List of 1</span></span>
 <span><span class="co">#&gt;   .. .. .. .. .. ..$ :&lt;externalptr&gt; </span></span>
 <span><span class="co">#&gt;   .. .. .. .. ..@ .link_to_cached_object_list:List of 1</span></span>
-<span><span class="co">#&gt;   .. .. .. .. .. ..$ :&lt;environment: 0x5ff63b45e6d8&gt; </span></span>
+<span><span class="co">#&gt;   .. .. .. .. .. ..$ :&lt;environment: 0x5f4493a140f8&gt; </span></span>
 <span><span class="co">#&gt;   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots</span></span>
 <span><span class="co">#&gt;   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
 <span><span class="co">#&gt;   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...</span></span>
@@ -206,7 +206,7 @@ below.</p>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>✔ Rarefaction diagnostic plots generated successfully</span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; ℹ Generating rarefaction diagnostic plots</span></span>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>✔ Generating rarefaction diagnostic plots [<span class="fl">1.4</span>s]</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>✔ Generating rarefaction diagnostic plots [<span class="dv">935</span>ms]</span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="fu">print</span>(rarefaction_plot)</span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="images/fig1_plot_metrics-1.png" alt="Figure 1: Rarefaction metrics. a-b, histograms of samples. c, Good's coverage per total number of sequences in a sample. d-e, log10 of sequences in a sample. f,  samples ranked by sequence reads in a sample."><p class="caption">
@@ -222,7 +222,7 @@ represented in a sample, based on the number of species encountered and
 the total number of individuals sampled. Essentially, it quantifies how
 well a sample represents the overall diversity of a population or
 ecosystem. Good’s coverage is calculated as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mn>1</mn><mi>/</mi><mi>N</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(1-(n1/N)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>n</mi><mn>1</mn><mi>/</mi><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">(1-(n1/N)</annotation></semantics></math>,
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">n1</annotation></semantics></math>
 is the number of unique ASV/OTUs (i.e. species) found only once, and
@@ -259,69 +259,17 @@ process as show below</p>
 <span>  <span class="fu"><a href="../reference/multi_rarefy.html">multi_rarefy</a></span><span class="op">(</span></span>
 <span>    physeq_obj <span class="op">=</span> <span class="va">bcse</span>,</span>
 <span>    depth_level <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>    num_iter <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>    num_iter <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>    .as_array <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    set_seed <span class="op">=</span> <span class="fl">7642</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Multiple Rarefaction ───────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Input Validation ──</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ✔ Input phyloseq object is valid!</span></span>
-<span><span class="co">#&gt; ℹ Seed: 7642</span></span>
-<span><span class="co">#&gt; ℹ Input (matrix/df dim): 47 samples x 2861 taxa</span></span>
-<span><span class="co">#&gt; ℹ Rarefaction depth: 1000</span></span>
-<span><span class="co">#&gt; ℹ Iterations: 10</span></span>
-<span><span class="co">#&gt; ℹ taxa_are_rows: TRUE</span></span>
-<span><span class="co">#&gt; ℹ OTU matrix/df rownames head: bcse50, bcse69, bcse73, bcse191, bcse82, bcse102</span></span>
-<span><span class="co">#&gt; ℹ OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78</span></span>
-<span><span class="co">#&gt; ℹ Row sums summary: Min=1193, Max=107643, Median=25209</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Rarefaction Results ──</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Sample Removal</span></span>
-<span><span class="co">#&gt; ! 3 samples removed (depth &lt; 1000)</span></span>
-<span><span class="co">#&gt; ! Samples removed: "bcse108, bcse105, bcse110"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Taxa Removal</span></span>
-<span><span class="co">#&gt; ℹ Original taxa input: 2861</span></span>
-<span><span class="co">#&gt; ! Max: 1822 taxa removed (zero abundance) in viable samples (depth_level &gt;= 1000).</span></span>
-<span><span class="co">#&gt; ! When using `.as_array = FALSE`, taxa removed may differ across iterations.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Data Sparsity</span></span>
-<span><span class="co">#&gt; ℹ Returning list of data frames for each iteration.</span></span>
-<span><span class="co">#&gt; • Rarefied matrix (across 10 iterations):</span></span>
-<span><span class="co">#&gt;   • Min: 44988 zeros (92.13% sparsity) out of 48833 entries</span></span>
-<span><span class="co">#&gt;   • Max: 47965 zeros (92.52% sparsity) out of 51841 entries</span></span>
-<span><span class="co">#&gt;   • Avg: 46579.7 zeros (92.36% sparsity) out of 50431 entries</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Final Data Dimensions</span></span>
-<span><span class="co">#&gt; ✔ Output: 10 iterations with 50 unique samples</span></span>
-<span><span class="co">#&gt; • Samples per iteration:</span></span>
-<span><span class="co">#&gt;   • Min: 47</span></span>
-<span><span class="co">#&gt;   • Max: 47</span></span>
-<span><span class="co">#&gt; • Non-zero taxa per iteration:</span></span>
-<span><span class="co">#&gt;   • Min: 1039</span></span>
-<span><span class="co">#&gt;   • Max: 1103</span></span>
-<span><span class="co">#&gt;   • Avg: 1073</span></span></code></pre></div>
+<span><span class="co">#&gt; Error in multi_rarefy(physeq_obj = bcse, depth_level = 1000, num_iter = 3, : unused argument (.as_array = FALSE)</span></span></code></pre></div>
 <p>Let’s explore the results.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">bcse_rarefied_list</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "list"</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_rarefied_list' not found</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bcse_rarefied_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, list.len <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="co"># Dimensions of iteration #1</span></span>
-<span><span class="co">#&gt; 'data.frame':    47 obs. of  1046 variables:</span></span>
-<span><span class="co">#&gt;  $ OTU_11   : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_253  : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_148  : int  0 1 0 11 2 0 0 0 0 78 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_3    : int  261 86 651 272 249 114 192 73 96 320 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_78   : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_58   : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_152  : int  0 0 0 0 0 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_16   : int  2 0 0 1 1 0 0 1 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_34   : int  0 0 0 0 2 0 0 0 0 0 ...</span></span>
-<span><span class="co">#&gt;  $ OTU_18   : int  0 0 0 87 1 0 0 265 0 0 ...</span></span>
-<span><span class="co">#&gt;   [list output truncated]</span></span></code></pre></div>
+<span><span class="co">#&gt; Error: object 'bcse_rarefied_list' not found</span></span></code></pre></div>
 <p>And plot the variance (the noise we talked above) across the 10
 iterations of rarefaction. We can use the
 <code><a href="../reference/plot_variance_propagation.html">plot_variance_propagation()</a></code> function to visualize this
@@ -337,21 +285,10 @@ Raw (non-rarefied) vs. Rarefied data.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; ✔ Input phyloseq object is valid!</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Rarefaction Variance Propagation Visualization ─────────────────</span></span>
-<span><span class="co">#&gt; ℹ Hill number order selected, q= 0</span></span>
-<span><span class="co">#&gt; ℹ Number of rarefaction iterations, n_iter= 10</span></span>
-<span><span class="co">#&gt; ℹ Comparison plot generated!</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">rarefaction_variance_plot</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig2_rarefaction_variance-1.png" alt="Figure 2: Alpha diversity variance propagation (variance between rarefaction iteration) across 10 iterations of rarefaction. Points represent samples. The  x-axis represent the grouping variable (Crop). The y-axis represent the alpha diversity metric (q = 0, i.e. richness) calculated on the samples. The color of the points represent the 'Plot' variable, which is a nested variable within 'Crop'."><p class="caption">
-Figure 2: Alpha diversity variance propagation (variance between
-rarefaction iteration) across 10 iterations of rarefaction. Points
-represent samples. The x-axis represent the grouping variable (Crop).
-The y-axis represent the alpha diversity metric (q = 0, i.e. richness)
-calculated on the samples. The color of the points represent the ‘Plot’
-variable, which is a nested variable within ‘Crop’.
-</p>
-</div>
+<span><span class="co">#&gt; ── Rarefaction Variance Propagation Visualization ────────────────────</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_rarefied_list' not found</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">rarefaction_variance_plot</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'rarefaction_variance_plot' not found</span></span></code></pre></div>
 <p>Review the rarefaction and variance plots to determine the ideal
 sampling depth. You are looking for a “sweet spot” that maintains high
 diversity and sample sizes while keeping variance across iterations low.
@@ -378,16 +315,12 @@ specific goals of your analysis. The <code><a href="../reference/update_otu_tabl
 function allows for replacing the <code><a href="https://rdrr.io/pkg/phyloseq/man/otu_table-methods.html" class="external-link">otu_table()</a></code> with the
 rarefied table you prefer.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bcse_updated_rare</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/update_otu_table.html">update_otu_table</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">bcse_rare_single</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/update_otu_table.html">update_otu_table</a></span><span class="op">(</span></span>
 <span>  physeq_obj <span class="op">=</span> <span class="va">bcse</span>,</span>
 <span>  rarefied_otus <span class="op">=</span> <span class="va">bcse_rarefied_list</span>,</span>
 <span>  iteration <span class="op">=</span> <span class="fl">1</span> <span class="co"># Speficify which iteration to use for the updated OTU table</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; ℹ Extracting iteration 1 from list of 10 iterations.</span></span>
-<span><span class="co">#&gt; ! Phyloseq object and rarefied otu_table sample names are NOT identical. Check samples removed by rarefaction below.</span></span>
-<span><span class="co">#&gt; ! 3 samples removed due to rarefaction: "bcse108, bcse105, bcse110"</span></span>
-<span><span class="co">#&gt; ℹ Building phyloseq object with 47 samples and 1046 taxa</span></span>
-<span><span class="co">#&gt; ✔ Update complete!</span></span></code></pre></div>
+<span><span class="co">#&gt; Error: object 'bcse_rarefied_list' not found</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -405,29 +338,30 @@ core taxa is that you can specify a variable (in the case of the
 for a level of the variable but possibly not for others. This comes form
 the idea that core microbiome can be transient in space and time as show
 by <span class="citation">Shade and Stopnisek (<a href="#ref-Shade2019Abundance">2019</a>)</span>.</p>
-<p><em>We continue with the <code>bcse</code> phyloseq object throughout
-the vignette.</em></p>
+<p><em>We continue with the <code>bcse</code> phyloseq object and the
+rarefied data <code>bcse_rarefied_list</code> throughout the
+vignette.</em></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bcse_rare_core</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_core.html">identify_core</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">bcse_core_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_core.html">identify_core</a></span><span class="op">(</span></span>
 <span>  physeq_obj <span class="op">=</span> <span class="va">bcse</span>,</span>
+<span>  rarefied_list <span class="op">=</span> <span class="va">bcse_rarefied_list</span>,</span>
 <span>  priority_var <span class="op">=</span> <span class="st">"Crop"</span>,</span>
 <span>  increase_value <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>  abundance_weight <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  depth_level <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  num_iter <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">2134</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Seed used: 2134</span></span>
 <span><span class="co">#&gt; ✔ Input phyloseq object is valid!</span></span>
-<span><span class="co">#&gt; ! The otu_table() is not rarefied! </span></span>
-<span><span class="co">#&gt; Using depth_level=1000 for rarefaction and normalization in Bray-Curtis calculations. </span></span>
-<span><span class="co">#&gt; Adjust depth_level according to your objectives.</span></span>
-<span><span class="co">#&gt; ✔ Core prioritizing variable: Crop</span></span>
-<span><span class="co">#&gt; ℹ Ranked by Index only</span></span>
-<span><span class="co">#&gt; ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 15:28:55.649374</span></span>
-<span><span class="co">#&gt; ✔ Elbow method identified 2 core OTUs</span></span>
-<span><span class="co">#&gt; ✔ % increase method identified 21 core OTUs</span></span>
-<span><span class="co">#&gt; ✔ Analysis complete!</span></span></code></pre></div>
+<span><span class="co">#&gt; Error: object 'bcse_rarefied_list' not found</span></span>
+<span></span>
+<span><span class="co"># With a single iteration </span></span>
+<span><span class="co"># bcse_core_single &lt;- identify_core(</span></span>
+<span><span class="co">#   physeq_obj = bcse_rare_single,</span></span>
+<span><span class="co">#   priority_var = "Crop",</span></span>
+<span><span class="co">#   increase_value = 0.02,</span></span>
+<span><span class="co">#   seed = 2134</span></span>
+<span><span class="co"># )</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="how-the-is-the-core-identified">
@@ -462,7 +396,7 @@ adding taxa until improvements fall below this percentage.</p></li>
 </ul>
 <p>Both methods measure improvement using Bray-Curtis similarity through
 the equation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mn>1</mn><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mi>B</mi><msub><mi>C</mi><mrow><mi>c</mi><mi>o</mi><mi>r</mi><mi>e</mi></mrow></msub><mi>/</mi><mi>B</mi><msub><mi>C</mi><mrow><mi>a</mi><mi>l</mi><mi>l</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">C = 1 - (BC_{core}/BC_{all})</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mn>1</mn><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><msub><mi>C</mi><mrow><mi>c</mi><mi>o</mi><mi>r</mi><mi>e</mi></mrow></msub><mi>/</mi><mi>B</mi><msub><mi>C</mi><mrow><mi>a</mi><mi>l</mi><mi>l</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">C = 1 - (BC_{core}/BC_{all})</annotation></semantics></math>,
 where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
 represents the contribution of ranked taxa to total similarity,
@@ -478,55 +412,8 @@ automatically identifying natural breakpoints where additional taxa
 provide marginal returns in explanatory power.</p>
 <p><strong>The output is a list of 13 named items.</strong></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bcse_rare_core</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 13</span></span>
-<span><span class="co">#&gt;  $ bray_curtis_ranked : tibble [2,861 × 5] (S3: tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ rank             : Factor w/ 2861 levels "1","10","100",..: 1112 2085 2196 2307 2418 2529 2640 2751 2 113 ...</span></span>
-<span><span class="co">#&gt;   ..$ MeanBC           : num [1:2861] 0.0672 0.1433 0.146 0.2007 0.2248 ...</span></span>
-<span><span class="co">#&gt;   ..$ proportionBC     : num [1:2861] 0.112 0.239 0.244 0.335 0.375 ...</span></span>
-<span><span class="co">#&gt;   ..$ IncreaseBC       : num [1:2861] 2.13 1.02 1.37 1.12 1.28 ...</span></span>
-<span><span class="co">#&gt;   ..$ elbow_slope_diffs: num [1:2861] -0.000186 0.037871 0.026107 0.033231 0.031392 ...</span></span>
-<span><span class="co">#&gt;  $ otu_ranked         :'data.frame': 2861 obs. of  8 variables:</span></span>
-<span><span class="co">#&gt;   ..$ otu    : chr [1:2861] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...</span></span>
-<span><span class="co">#&gt;   ..$ otu_occ: num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ otu_rel: num [1:2861] 0.21728 0.01799 0.03296 0.00278 0.05897 ...</span></span>
-<span><span class="co">#&gt;   ..$ sumF   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...</span></span>
-<span><span class="co">#&gt;   ..$ sumG   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...</span></span>
-<span><span class="co">#&gt;   ..$ nS     : int [1:2861] 20 20 20 20 20 20 20 20 20 20 ...</span></span>
-<span><span class="co">#&gt;   ..$ Index  : num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ rank   : num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;  $ abundance_occupancy:'data.frame': 2861 obs. of  3 variables:</span></span>
-<span><span class="co">#&gt;   ..$ otu    : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...</span></span>
-<span><span class="co">#&gt;   ..$ otu_occ: num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...</span></span>
-<span><span class="co">#&gt;   ..$ otu_rel: num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...</span></span>
-<span><span class="co">#&gt;  $ priority_var       : chr "Crop"</span></span>
-<span><span class="co">#&gt;  $ abundance_weight   : num 0</span></span>
-<span><span class="co">#&gt;  $ elbow              : int 2</span></span>
-<span><span class="co">#&gt;  $ bc_increase        : int 21</span></span>
-<span><span class="co">#&gt;  $ increase_value     : num 0.02</span></span>
-<span><span class="co">#&gt;  $ elbow_core         : chr [1:2] "OTU_3" "OTU_12"</span></span>
-<span><span class="co">#&gt;  $ increase_core      : chr [1:21] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...</span></span>
-<span><span class="co">#&gt;  $ otu_table          : int [1:2861, 1:50] 0 1 0 0 27777 0 7 2 119 0 ...</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "dimnames")=List of 2</span></span>
-<span><span class="co">#&gt;   .. ..$ : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...</span></span>
-<span><span class="co">#&gt;   .. ..$ : chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...</span></span>
-<span><span class="co">#&gt;  $ metadata           :'data.frame': 50 obs. of  4 variables:</span></span>
-<span><span class="co">#&gt;   ..$ Niche    : chr [1:50] "Leaf" "Leaf" "Leaf" "Leaf" ...</span></span>
-<span><span class="co">#&gt;   ..$ Crop     : chr [1:50] "Corn" "Sorghum" "Switchgrass" "Miscanthus" ...</span></span>
-<span><span class="co">#&gt;   ..$ Plot     : chr [1:50] "R2" "R4" "R5" "R5" ...</span></span>
-<span><span class="co">#&gt;   ..$ sample_id: chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...</span></span>
-<span><span class="co">#&gt;  $ taxonomy           :'data.frame': 2861 obs. of  10 variables:</span></span>
-<span><span class="co">#&gt;   ..$ OTU_ID   : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...</span></span>
-<span><span class="co">#&gt;   ..$ Kingdom  : chr [1:2861] "Bacteria" "Bacteria" "Bacteria" "Bacteria" ...</span></span>
-<span><span class="co">#&gt;   ..$ Phylum   : chr [1:2861] "Myxococcota" "Actinobacteriota" "Proteobacteria" "Proteobacteria" ...</span></span>
-<span><span class="co">#&gt;   ..$ Class    : chr [1:2861] "Polyangia" "Actinobacteria" "Alphaproteobacteria" "Gammaproteobacteria" ...</span></span>
-<span><span class="co">#&gt;   ..$ Order    : chr [1:2861] "Polyangiales" "Streptomycetales" "Rhizobiales" "Enterobacterales" ...</span></span>
-<span><span class="co">#&gt;   ..$ Family   : chr [1:2861] "Polyangiaceae" "Streptomycetaceae" "Rhizobiaceae" "Enterobacteriaceae" ...</span></span>
-<span><span class="co">#&gt;   ..$ Genus    : chr [1:2861] "Aetherobacter" "Streptomyces" "Mesorhizobium" NA ...</span></span>
-<span><span class="co">#&gt;   ..$ Species  : chr [1:2861] "Uncultured_bacterium_3097" NA "Mesorhizobium_sophorae" NA ...</span></span>
-<span><span class="co">#&gt;   ..$ BestMatch: chr [1:2861] "Uncultured bacterium 3097" "Streptomyces" "Mesorhizobium sophorae" "Enterobacteriaceae" ...</span></span>
-<span><span class="co">#&gt;   ..$ Taxonomy : chr [1:2861] "OTU_427-Uncultured bacterium 3097" "OTU_11-Streptomyces" "OTU_253-Mesorhizobium sophorae" "OTU_148-Enterobacteriaceae" ...</span></span>
-<span><span class="co">#&gt;  - attr(*, "class")= chr [1:2] "identify_core_result" "list"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bcse_core_multi</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="visualize-the-abundance-occupancy-distribution-and-the-core-asvotus-set">Visualize the abundance-occupancy distribution and the core ASV/OTUs
 set<a class="anchor" aria-label="anchor" href="#visualize-the-abundance-occupancy-distribution-and-the-core-asvotus-set"></a>
@@ -535,20 +422,15 @@ set<a class="anchor" aria-label="anchor" href="#visualize-the-abundance-occupanc
 as below:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bcse_identified_core</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_identified_core.html">plot_identified_core</a></span><span class="op">(</span></span>
-<span>  bray_curtis_ranked <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">bray_curtis_ranked</span>,</span>
-<span>  elbow <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">elbow</span>,</span>
-<span>  lastCall <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">bc_increase</span>,</span>
-<span>  increase_value <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">increase_value</span></span>
+<span>  bray_curtis_ranked <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">bray_curtis_ranked</span>,</span>
+<span>  elbow <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">elbow</span>,</span>
+<span>  lastCall <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">bc_increase</span>,</span>
+<span>  increase_value <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">increase_value</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcse_identified_core</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig3_identified_core-1.png" alt="Figure 3: Percent Bray-Curtis similarity between samples per ranked ASV/OTUs. Number of core ASV/OTUs identified by Elbow and Last 2% increase in Bray-Curtis similarity are shown."><p class="caption">
-Figure 3: Percent Bray-Curtis similarity between samples per ranked
-ASV/OTUs. Number of core ASV/OTUs identified by Elbow and Last 2%
-increase in Bray-Curtis similarity are shown.
-</p>
-</div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">bcse_identified_core</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_identified_core' not found</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualize-the-abundance-occupancy-curve">Visualize the abundance-occupancy curve<a class="anchor" aria-label="anchor" href="#visualize-the-abundance-occupancy-curve"></a>
@@ -556,36 +438,23 @@ increase in Bray-Curtis similarity are shown.
 <p>Abundance-Occupancy distributions can be plotted:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_abund_occ_increase</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_abundance_occupancy.html">plot_abundance_occupancy</a></span><span class="op">(</span></span>
-<span>  core_result <span class="op">=</span> <span class="va">bcse_rare_core</span>,</span>
+<span>  core_result <span class="op">=</span> <span class="va">bcse_core_multi</span>,</span>
 <span>  core_set <span class="op">=</span> <span class="st">"increase"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_abund_occ_increase</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig4_plot_increase-1.png" alt="Figure 4: Abundance-occupancy distribution for the 'bcse' dataset. The core ASV/OTUs identified by the last 2% increase method are highlighted in red."><p class="caption">
-Figure 4: Abundance-occupancy distribution for the ‘bcse’ dataset. The
-core ASV/OTUs identified by the last 2% increase method are highlighted
-in red.
-</p>
-</div>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_abund_occ_increase</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'plot_abund_occ_increase' not found</span></span></code></pre></div>
 <p>And for the <code>elbow</code> method.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_abund_occ_elbow</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_abundance_occupancy.html">plot_abundance_occupancy</a></span><span class="op">(</span></span>
-<span>  core_result <span class="op">=</span> <span class="va">bcse_rare_core</span>,</span>
+<span>  core_result <span class="op">=</span> <span class="va">bcse_core_multi</span>,</span>
 <span>  core_set <span class="op">=</span> <span class="st">"elbow"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span>
 <span></span>
 <span><span class="va">plot_abund_occ_elbow</span> <span class="op">+</span></span>
 <span>  <span class="fu">scale_fill_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"darkgreen"</span>, <span class="st">"grey"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Scale for fill is already present.</span></span>
-<span><span class="co">#&gt; Adding another scale for fill, which will replace the existing</span></span>
-<span><span class="co">#&gt; scale.</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig5_plot_elbow-1.png" alt="Figure 5: Abundance-occupancy distribution for the 'bcse' dataset. The core ASV/OTUs identified by the elbow method are highlighted in dark green."><p class="caption">
-Figure 5: Abundance-occupancy distribution for the ‘bcse’ dataset. The
-core ASV/OTUs identified by the elbow method are highlighted in dark
-green.
-</p>
-</div>
+<span><span class="co">#&gt; Error: object 'plot_abund_occ_elbow' not found</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualize-the-core-set-across-the-variable-used-for-detecting-the-core">Visualize the core set across the variable used for detecting the
@@ -599,45 +468,33 @@ argument. The optimal choice often depends on the number of levels in
 your grouping variable. For instance, bar or line plots are highly
 effective for up to five levels, whereas heatmaps are better suited for
 more complex datasets. While these are general recommendations, the core
-data is fully accessible in <code>bcse_rare_core</code> should you wish
+data is fully accessible in <code>bcse_core_multi</code> should you wish
 to develop a custom visualization.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_core_dist_bar</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_core_distribution.html">plot_core_distribution</a></span><span class="op">(</span></span>
-<span>  core_result <span class="op">=</span> <span class="va">bcse_rare_core</span>,</span>
+<span>  core_result <span class="op">=</span> <span class="va">bcse_core_multi</span>,</span>
 <span>  core_set <span class="op">=</span> <span class="st">"increase"</span>,</span>
 <span>  group_var <span class="op">=</span> <span class="st">"Crop"</span>,</span>
 <span>  plot_type <span class="op">=</span> <span class="st">"bar"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_core_dist_bar</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig6_plot_type_bar-1.png" alt="Figure 6: Occupancy of core ASV/OTUs across the 'Crop' variable. Each bar represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A bar plot won't work here, way too many variable levels."><p class="caption">
-Figure 6: Occupancy of core ASV/OTUs across the ‘Crop’ variable. Each
-bar represents the average occupancy of core ASV/OTUs in samples
-belonging to each level of the ‘Crop’ variable. A bar plot won’t work
-here, way too many variable levels.
-</p>
-</div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_core_dist_bar</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'plot_core_dist_bar' not found</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_core_dist_line</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_core_distribution.html">plot_core_distribution</a></span><span class="op">(</span></span>
-<span>  core_result <span class="op">=</span> <span class="va">bcse_rare_core</span>,</span>
+<span>  core_result <span class="op">=</span> <span class="va">bcse_core_multi</span>,</span>
 <span>  core_set <span class="op">=</span> <span class="st">"increase"</span>,</span>
 <span>  group_var <span class="op">=</span> <span class="st">"Crop"</span>,</span>
 <span>  plot_type <span class="op">=</span> <span class="st">"line"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_core_dist_line</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig7_plot_type_line-1.png" alt="Figure 7: Occupancy of core ASV/OTUs across the 'Crop' variable. Each point represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A line plot is better than a bar plot but still not ideal for this many variable levels."><p class="caption">
-Figure 7: Occupancy of core ASV/OTUs across the ‘Crop’ variable. Each
-point represents the average occupancy of core ASV/OTUs in samples
-belonging to each level of the ‘Crop’ variable. A line plot is better
-than a bar plot but still not ideal for this many variable levels.
-</p>
-</div>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_core_dist_line</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'plot_core_dist_line' not found</span></span></code></pre></div>
 <p>We can reorder the variable levels following logic before
 plotting.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">metadata</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">metadata</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
 <span>    Crop <span class="op">=</span> <span class="fu">recode</span><span class="op">(</span></span>
 <span>      <span class="va">Crop</span>,</span>
@@ -667,26 +524,20 @@ plotting.</p>
 <span>        <span class="st">"Poplar"</span></span>
 <span>      <span class="op">)</span></span>
 <span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_core_dist_heatmap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_core_distribution.html">plot_core_distribution</a></span><span class="op">(</span></span>
-<span>  core_result <span class="op">=</span> <span class="va">bcse_rare_core</span>,</span>
+<span>  core_result <span class="op">=</span> <span class="va">bcse_core_multi</span>,</span>
 <span>  core_set <span class="op">=</span> <span class="st">"increase"</span>,</span>
 <span>  group_var <span class="op">=</span> <span class="st">"Crop"</span>,</span>
 <span>  plot_type <span class="op">=</span> <span class="st">"heatmap"</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">viridis</span><span class="fu">::</span><span class="fu"><a href="https://sjmgarnier.github.io/viridis/reference/scale_viridis.html" class="external-link">scale_fill_viridis</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"plasma"</span>, name <span class="op">=</span> <span class="st">"Occupancy"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_core_dist_heatmap</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig8_plot_type_heatmap-1.png" alt="Figure 8: Occupancy of core ASV/OTUs across the 'Crop' variable. Each cell represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A heatmap is more compact and shows well enough the average occupancy across samples in each variable level."><p class="caption">
-Figure 8: Occupancy of core ASV/OTUs across the ‘Crop’ variable. Each
-cell represents the average occupancy of core ASV/OTUs in samples
-belonging to each level of the ‘Crop’ variable. A heatmap is more
-compact and shows well enough the average occupancy across samples in
-each variable level.
-</p>
-</div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_core_dist_heatmap</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'plot_core_dist_heatmap' not found</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -707,92 +558,25 @@ make these powerful ecological tools easy to use without losing the
 conceptual rigor of the original math.</p>
 <p>To get started, we first fit the neutral model:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bcse_rare_core_neutral_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_neutral_model.html">fit_neutral_model</a></span><span class="op">(</span></span>
-<span>  otu_table <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">otu_table</span>,</span>
-<span>  core_set <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">increase_core</span>,</span>
-<span>  abundance_occupancy <span class="op">=</span> <span class="va">bcse_rare_core</span><span class="op">$</span><span class="va">abundance_occupancy</span></span>
+<code class="sourceCode R"><span><span class="va">bcse_core_multi_neutral_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_neutral_model.html">fit_neutral_model</a></span><span class="op">(</span></span>
+<span>  otu_table <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">otu_table</span>,</span>
+<span>  core_set <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">increase_core</span>,</span>
+<span>  abundance_occupancy <span class="op">=</span> <span class="va">bcse_core_multi</span><span class="op">$</span><span class="va">abundance_occupancy</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Waiting for profiling to be done...</span></span>
-<span><span class="co">#&gt; ℹ Neutral model fitting:</span></span>
-<span><span class="co">#&gt; • Average individuals per community (N): 40276.38</span></span>
-<span><span class="co">#&gt; • Binomial model using rounded N: 40276</span></span>
-<span><span class="co">#&gt; • Poisson model using N: 40276.38</span></span>
-<span><span class="co">#&gt; • Maximum likelihood estimation using N: 40276.38, and starting</span></span>
-<span><span class="co">#&gt;   parameters: mu = 0, sigma = 0.1</span></span>
-<span><span class="co">#&gt; ✔ Model fitting complete!</span></span></code></pre></div>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi' not found</span></span></code></pre></div>
 <p>What we get is</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bcse_rare_core_neutral_fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 2</span></span>
-<span><span class="co">#&gt;  $ goodness_of_fit :'data.frame':    1 obs. of  24 variables:</span></span>
-<span><span class="co">#&gt;   ..$ m         : num 0.0205</span></span>
-<span><span class="co">#&gt;   ..$ m.ci      : num 0.00186</span></span>
-<span><span class="co">#&gt;   ..$ m.mle     : num 0.0205</span></span>
-<span><span class="co">#&gt;   ..$ maxLL     : num -2279</span></span>
-<span><span class="co">#&gt;   ..$ binoLL    : num -720</span></span>
-<span><span class="co">#&gt;   ..$ poisLL    : num -720</span></span>
-<span><span class="co">#&gt;   ..$ Rsqr      : num 0.528</span></span>
-<span><span class="co">#&gt;   ..$ Rsqr.bino : num -0.833</span></span>
-<span><span class="co">#&gt;   ..$ Rsqr.pois : num -0.833</span></span>
-<span><span class="co">#&gt;   ..$ RMSE      : num 0.109</span></span>
-<span><span class="co">#&gt;   ..$ RMSE.bino : num 0.215</span></span>
-<span><span class="co">#&gt;   ..$ RMSE.pois : num 0.215</span></span>
-<span><span class="co">#&gt;   ..$ AIC       : num -4554</span></span>
-<span><span class="co">#&gt;   ..$ BIC       : num -4542</span></span>
-<span><span class="co">#&gt;   ..$ AIC.bino  : num -1435</span></span>
-<span><span class="co">#&gt;   ..$ BIC.bino  : num -1423</span></span>
-<span><span class="co">#&gt;   ..$ AIC.pois  : num -1435</span></span>
-<span><span class="co">#&gt;   ..$ BIC.pois  : num -1423</span></span>
-<span><span class="co">#&gt;   ..$ N         : num 40276</span></span>
-<span><span class="co">#&gt;   ..$ Samples   : num 50</span></span>
-<span><span class="co">#&gt;   ..$ Richness  : num 2861</span></span>
-<span><span class="co">#&gt;   ..$ Detect    : num 2.48e-05</span></span>
-<span><span class="co">#&gt;   ..$ above.pred: num 0.165</span></span>
-<span><span class="co">#&gt;   ..$ below.pred: num 0.035</span></span>
-<span><span class="co">#&gt;  $ model_prediction:'data.frame':    2861 obs. of  14 variables:</span></span>
-<span><span class="co">#&gt;   ..$ otu       : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...</span></span>
-<span><span class="co">#&gt;   ..$ otu_occ   : num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...</span></span>
-<span><span class="co">#&gt;   ..$ otu_rel   : num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...</span></span>
-<span><span class="co">#&gt;   ..$ membership: chr [1:2861] "Not core" "Not core" "Not core" "Not core" ...</span></span>
-<span><span class="co">#&gt;   ..$ p         : num [1:2861] 3.48e-06 6.31e-05 2.48e-06 7.98e-03 2.54e-01 ...</span></span>
-<span><span class="co">#&gt;   ..$ freq      : num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...</span></span>
-<span><span class="co">#&gt;   ..$ freq.pred : num [1:2861] 0.00951 0.16077 0.0068 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ pred.lwr  : num [1:2861] 0.000953 0.083916 0.000514 0.928652 0.928652 ...</span></span>
-<span><span class="co">#&gt;   ..$ pred.upr  : num [1:2861] 0.088 0.286 0.0835 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ bino.pred : num [1:2861] 0.1306 0.9211 0.0952 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ bino.lwr  : num [1:2861] 0.0632 0.8131 0.0405 0.9287 0.9287 ...</span></span>
-<span><span class="co">#&gt;   ..$ bino.upr  : num [1:2861] 0.251 0.969 0.208 1 1 ...</span></span>
-<span><span class="co">#&gt;   ..$ y         : chr [1:2861] NA NA NA NA ...</span></span>
-<span><span class="co">#&gt;   ..$ fit_class : chr [1:2861] "As predicted" "Above prediction" "As predicted" "Below prediction" ...</span></span>
-<span><span class="co">#&gt;  - attr(*, "class")= chr [1:2] "fit_neutral_model" "list"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">bcse_core_multi_neutral_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi_neutral_fit' not found</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="plot-the-neutral-model-and-the-core-set">Plot the neutral model and the core set<a class="anchor" aria-label="anchor" href="#plot-the-neutral-model-and-the-core-set"></a>
 </h4>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot_bcse_neutral_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_neutral_model.html">plot_neutral_model</a></span><span class="op">(</span><span class="va">bcse_rare_core_neutral_fit</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">plot_bcse_neutral_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_neutral_model.html">plot_neutral_model</a></span><span class="op">(</span><span class="va">bcse_core_multi_neutral_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'bcse_core_multi_neutral_fit' not found</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_bcse_neutral_fit</span><span class="op">)</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="images/fig9_plot_neutral_fit-1.png" alt="Figure 9: Neutral model fit illustrates the neutral model of abundance-occupancy distributions for the 'bcse' dataset. The $R^2$ value represents a standard coefficient of determination, calculated as $R^2 = 1 - \frac{SS_{err}}{SS_{total}}$, providing a measure of goodness of fit. The immigration parameter ($m$) estimates the probability that an individual in a local sample originates from the metacommunity rather than from local dispersal. We also observe that the neutral model provides a poor fit; the $R^2$ is notably low, and the majority of taxa (including both core and non-core ASV/OTUs) fall above the model's prediction line. Furthermore, the estimated immigration parameter ($m = 0.63$) suggests that the local community is dominated by strong dispersal and mixing from the metacommunity. "><p class="caption">
-Figure 9: Neutral model fit illustrates the neutral model of
-abundance-occupancy distributions for the ‘bcse’ dataset. The
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>
-value represents a standard coefficient of determination, calculated as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>R</mi><mn>2</mn></msup><mo>=</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mi>S</mi><msub><mi>S</mi><mrow><mi>e</mi><mi>r</mi><mi>r</mi></mrow></msub></mrow><mrow><mi>S</mi><msub><mi>S</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">R^2 = 1 - \frac{SS_{err}}{SS_{total}}</annotation></semantics></math>,
-providing a measure of goodness of fit. The immigration parameter
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>)
-estimates the probability that an individual in a local sample
-originates from the metacommunity rather than from local dispersal. We
-also observe that the neutral model provides a poor fit; the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>R</mi><mn>2</mn></msup><annotation encoding="application/x-tex">R^2</annotation></semantics></math>
-is notably low, and the majority of taxa (including both core and
-non-core ASV/OTUs) fall above the model’s prediction line. Furthermore,
-the estimated immigration parameter
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mo>=</mo><mn>0.63</mn></mrow><annotation encoding="application/x-tex">m = 0.63</annotation></semantics></math>)
-suggests that the local community is dominated by strong dispersal and
-mixing from the metacommunity.
-</p>
-</div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">plot_bcse_neutral_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: object 'plot_bcse_neutral_fit' not found</span></span></code></pre></div>
 <div class="note">
 <strong>Note:</strong> Interpretations of the Migration Parameter, as a
 rule of thumb:
@@ -827,7 +611,7 @@ using only the first iteration of our <code>bcse</code> phyloseq object
 with rarefied <code><a href="https://rdrr.io/pkg/phyloseq/man/otu_table-methods.html" class="external-link">otu_table()</a></code> generated above using
 <code><a href="../reference/update_otu_table.html">update_otu_table()</a></code>, we obtain the following results:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bcse_rare_core_iter1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_core.html">identify_core</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">bcse_core_multi_iter1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/identify_core.html">identify_core</a></span><span class="op">(</span></span>
 <span>  physeq_obj <span class="op">=</span> <span class="va">bcse_updated_rare</span>,</span>
 <span>  priority_var <span class="op">=</span> <span class="st">"Crop"</span>,</span>
 <span>  increase_value <span class="op">=</span> <span class="fl">0.02</span>,</span>
@@ -835,14 +619,7 @@ with rarefied <code><a href="https://rdrr.io/pkg/phyloseq/man/otu_table-methods.
 <span>  seed <span class="op">=</span> <span class="fl">2135</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Seed used: 2135</span></span>
-<span><span class="co">#&gt; ✔ Input phyloseq object is valid!</span></span>
-<span><span class="co">#&gt; ℹ otu_table() is rarefied at a depth of: 1000</span></span>
-<span><span class="co">#&gt; ✔ Core prioritizing variable: Crop</span></span>
-<span><span class="co">#&gt; ℹ Ranked by Index only</span></span>
-<span><span class="co">#&gt; ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-21 15:37:56.576808</span></span>
-<span><span class="co">#&gt; ✔ Elbow method identified 3 core OTUs</span></span>
-<span><span class="co">#&gt; ✔ % increase method identified 25 core OTUs</span></span>
-<span><span class="co">#&gt; ✔ Analysis complete!</span></span></code></pre></div>
+<span><span class="co">#&gt; Error: object 'bcse_updated_rare' not found</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="further-customization-of-identify_core">Further Customization of <code>identify_core()</code><a class="anchor" aria-label="anchor" href="#further-customization-of-identify_core"></a>
 </h3>
@@ -876,9 +653,10 @@ different core set than an occupancy-only approach.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Burns2015Contribution" class="csl-entry">
-Burns, Andrew R., Wesley Z. Stephens, Katie Stagaman, et al. 2015.
+Burns, Andrew R., Wesley Z. Stephens, Katie Stagaman, Sean Wong, John F.
+Rawls, Karen Guillemin, and Brendan J. M. Bohannan. 2015.
 <span>“Contribution of Neutral Processes to the Assembly of Gut
 Microbial Communities in the Zebrafish over Host Development.”</span>
 <em>The ISME Journal</em> 10: 655–64. <a href="https://doi.org/10.1038/ismej.2015.142" class="external-link">https://doi.org/10.1038/ismej.2015.142</a>.
@@ -916,8 +694,8 @@ Approach to Control for Uneven Sequencing Effort in Amplicon Sequence
 Analyses.”</span> <em>mSphere</em> 9: e00354–23. <a href="https://doi.org/10.1128/msphere.00354-23" class="external-link">https://doi.org/10.1128/msphere.00354-23</a>.
 </div>
 <div id="ref-Schloss2024Waste" class="csl-entry">
-Schloss, Patrick D. 2024b. <span>“Waste Not, Want Not: Revisiting the
-Analysis That Called into Question the Practice of Rarefaction.”</span>
+———. 2024b. <span>“Waste Not, Want Not: Revisiting the Analysis That
+Called into Question the Practice of Rarefaction.”</span>
 <em>mSphere</em> 9: e00355–23. <a href="https://doi.org/10.1128/msphere.00355-23" class="external-link">https://doi.org/10.1128/msphere.00355-23</a>.
 </div>
 <div id="ref-Shade2019Abundance" class="csl-entry">
@@ -932,7 +710,8 @@ Immigration and Chance in Shaping Prokaryote Community
 Structure.”</span> <em>Environmental Microbiology</em> 8: 732–40. <a href="https://doi.org/10.1111/j.1462-2920.2005.00956.x" class="external-link">https://doi.org/10.1111/j.1462-2920.2005.00956.x</a>.
 </div>
 <div id="ref-Weiss2017Normalization" class="csl-entry">
-Weiss, Sejin, ZhenZhen Xu, Shyamal Peddada, et al. 2017.
+Weiss, Sejin, ZhenZhen Xu, Shyamal Peddada, Amnon Amir, Kenneth
+Bittinger, Antonio Gonzalez, Catherine Lozupone, et al. 2017.
 <span>“Normalization and Microbial Differential Abundance Strategies
 Depend Upon Data Characteristics.”</span> <em>Microbiome</em> 5: 27. <a href="https://doi.org/10.1186/s40168-017-0237-y" class="external-link">https://doi.org/10.1186/s40168-017-0237-y</a>.
 </div>

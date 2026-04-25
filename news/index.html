@@ -33,15 +33,25 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/germs-lab/BRCore/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="brcore-200">BRCore 2.0.0<a class="anchor" aria-label="anchor" href="#brcore-200"></a></h2>
-<p>Date: 2026-04-13</p>
+<p>Date: 2026-04-24</p>
 <div class="section level3">
 <h3 id="breaking-changes-2-0-0">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-0-0"></a></h3>
 <ul><li>
+<a href="https://github.com/germs-lab/BRCore/commit/de1fa425d7466f7e652136b949884f795d878e0c" class="external-link">de1fa42</a> <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code>: <code>.as_array</code> logical argument replaced with <code>.as</code> character argument (e.g. <code>"list"</code>, <code>"array"</code>). Single-iteration handling improved to support all <code>.as</code> formats and seeds.</li>
+<li>
+<a href="https://github.com/germs-lab/BRCore/commit/fbb3b907b7010a3c64e6efb096b5d797b8f90fd9" class="external-link">fbb3b90</a> <code><a href="../reference/identify_core.html">identify_core()</a></code>: output column renamed from <code>Index</code> to <code>rank</code>.</li>
+<li>
+<a href="https://github.com/germs-lab/BRCore/commit/fa7387e6e74e9cb4ac5dafe4f993288717a8ba54" class="external-link">fa7387e</a> <code>find_core()</code> removed; ground truth logic moved to <code>debugging</code> branch.</li>
+<li>
+<a href="https://github.com/germs-lab/BRCore/commit/28b8821a49e438c0a0bd5d14dd878689b9b97bff" class="external-link">28b8821</a> and <a href="https://github.com/germs-lab/BRCore/commit/4f5a9c91ea4e5972d0937680a63704a3d2a0c9ab" class="external-link">4f5a9c9</a> <code><a href="../reference/identify_core.html">identify_core()</a></code> major rewrite: <code><a href="https://vegandevs.github.io/vegan/reference/avgdist.html" class="external-link">vegan::avgdist()</a></code> replaced with <code><a href="https://vegandevs.github.io/vegan/reference/vegdist.html" class="external-link">vegan::vegdist()</a></code> via new <code>.mean_bc_over_iters()</code> internal helper; <code>rarefied_list</code> is now optional and requires ≥ 2 iterations when provided. This fixes incorrect results on unrarefied datasets caused by how <code><a href="https://vegandevs.github.io/vegan/reference/avgdist.html" class="external-link">vegan::avgdist()</a></code> handles zeros in a matrix of ones.</li>
+<li>
+<a href="https://github.com/germs-lab/BRCore/commit/9f3b3ae29b999b4691c4e0fffb9b9e358063e389" class="external-link">9f3b3ae</a> <code><a href="../reference/plot_identified_core.html">plot_identified_core()</a></code> now returns a named list with <code>$df</code> and <code>$plot</code> instead of a bare plot object.</li>
+<li>
 <a href="https://github.com/germs-lab/BRCore/commit/3a590aa0b3a1ebccf868ae1186804d64ccab7f21" class="external-link">3a590aa</a> General update/refactor of tests to include new function parameters and logic. Regenerated <code>tests/testthat/test_sets/test_vignette_data.rda</code> reference dataset.</li>
 <li>
 <a href="https://github.com/germs-lab/BRCore/commit/2677cd23ecf5a35513fd6a40b5d6ee4a3bc76919" class="external-link">2677cd2</a> Fixed binomial neutral model fitting: <code><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">pbinom()</a></code> now receives <code>N.int</code>, an integer <code>size</code> argument (<code>round(N)</code>) instead of a floating-point mean. This changes model output relative to prior versions. We also added comprehensive messaging to inform user of species (<code>N</code> or <code>N.int</code>) used in model fitting.</li>
@@ -49,12 +59,23 @@
 <a href="https://github.com/germs-lab/BRCore/commit/200100b8306371cb1ca7aacf130f97bf056f66fb" class="external-link">200100b</a> <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code> internal logic: Replaced <code>.single_rarefy()</code> with internal <code><a href="https://vegandevs.github.io/vegan/reference/rarefy.html" class="external-link">vegan::rrarefy()</a></code> engine.</li>
 <li>
 <a href="https://github.com/germs-lab/BRCore/commit/34c41caa1477aa29dfa8dfde02c7d6324082c96c" class="external-link">34c41ca</a> and <a href="https://github.com/germs-lab/BRCore/commit/114468cf60b6276e5cd9a3829ae43874a8e087bf" class="external-link">114468c</a> Refactored <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code> to output 3D array or list. This handling increased speed of computation and eliminated the need for parallelization. CLI messages were improved to handle these new types and present summary statistics and information to users.</li>
-<li>
-<a href="https://github.com/germs-lab/BRCore/commit/79153cabcdd93f44080566ea09d18f194afbae9d" class="external-link">79153ca</a> <code><a href="../reference/identify_core.html">identify_core()</a></code> gained new internal logic (originally tested in <code>identify_core_avgdist()</code>, see <a href="https://github.com/germs-lab/BRCore/pull/91" class="external-link">#91</a> and <a href="https://github.com/germs-lab/BRCore/commit/704f2ee2216a6354113877713571a5dbd3b77322" class="external-link">704f2ee</a>) based on <code><a href="https://vegandevs.github.io/vegan/reference/avgdist.html" class="external-link">vegan::avgdist()</a></code>. Rarefactions and iterations handled by <code><a href="https://vegandevs.github.io/vegan/reference/avgdist.html" class="external-link">vegan::avgdist()</a></code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-2-0-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-2-0-0"></a></h3>
 <ul><li>
+<a href="https://github.com/germs-lab/BRCore/commit/dbdf9fecd5dbecde83bba3a72038ffcbfa267e71" class="external-link">dbdf9fe</a> Added <code>.brcore_theme()</code> internal helper (<code>brcore_theme.R</code>) to unify plot styling (borders, title sizes, viridis palettes) across all plotting functions.</li>
+<li>
+<code><a href="../reference/plot_identified_core.html">plot_identified_core()</a></code> gains an optional <code>dataset_name</code> parameter for plot titles.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-2-0-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-0-0"></a></h3>
+<ul><li>
+<a href="https://github.com/germs-lab/BRCore/commit/3225bd4c28180ded6e36bc0e7fbdfa2a2496f7cd" class="external-link">3225bd4</a> <code><a href="../reference/identify_core.html">identify_core()</a></code>: fixed <code>proportionBC</code> normalisation to use <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max()</a></code> instead of <code>last()</code>.</li>
+<li>
+<a href="https://github.com/germs-lab/BRCore/commit/b3824ab272ec16b65c0136e10e65e5925ff74474" class="external-link">b3824ab</a> <code><a href="../reference/identify_core.html">identify_core()</a></code>: fixed BC ranking and pair alignment using unique time points.</li>
+<li>
+<a href="https://github.com/germs-lab/BRCore/commit/7439ed31dc496d60165f7a250e957b6eabfc7f82" class="external-link">7439ed3</a> <code><a href="../reference/plot_identified_core.html">plot_identified_core()</a></code>: fixed deprecated <code>size</code> → <code>linewidth</code> in <code>panel.border</code>.</li>
+<li>
 <a href="https://github.com/germs-lab/BRCore/commit/5c2c57eaa574b61bfa8045ef4614d64413680a68" class="external-link">5c2c57e</a> and <a href="https://github.com/germs-lab/BRCore/commit/bfd74da34cd63c1ef59c491679fda49299cd7701" class="external-link">bfd74da</a> Added <code><a href="../reference/plot_variance_propagation.html">plot_variance_propagation()</a></code> to plot results from <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code>.</li>
 <li>
 <a href="https://github.com/germs-lab/BRCore/commit/79153cabcdd93f44080566ea09d18f194afbae9d" class="external-link">79153ca</a> <code><a href="../reference/update_otu_table.html">update_otu_table()</a></code> has new parameter <code>iteration</code> to handle results from <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code>.</li>
@@ -62,10 +83,17 @@
 <a href="https://github.com/germs-lab/BRCore/commit/e4ac648420ceaa6bb3d5d946e8f7170029e6f615" class="external-link">e4ac648</a> <code><a href="../reference/identify_core.html">identify_core()</a></code> now has a progress bar powered by <code><a href="https://cli.r-lib.org/reference/cli_progress_bar.html" class="external-link">cli::cli_progress_bar()</a></code> in <code>.calculate_bc()</code>.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="smaller-changes-2-0-0">Smaller changes<a class="anchor" aria-label="anchor" href="#smaller-changes-2-0-0"></a></h3>
-<ul><li><p><a href="https://github.com/germs-lab/BRCore/commit/e4ac648420ceaa6bb3d5d946e8f7170029e6f615" class="external-link">e4ac648</a> Extracted Bray-Curtis dissimilarity calculation into <code>.calculate_bc()</code> internal helper.</p></li>
+<h3 id="smaller-changes-2-0-0">Smaller Changes<a class="anchor" aria-label="anchor" href="#smaller-changes-2-0-0"></a></h3>
+<ul><li><p><a href="https://github.com/germs-lab/BRCore/commit/36285d232d595702ce9846566b40957febd4777a" class="external-link">36285d2</a> Tidy eval compliance enforced throughout using <code>.data$</code> pronouns and quoted column names; <code>globals.R</code> significantly trimmed.</p></li>
+<li><p>Vignette and README updated to reflect the required multi-iteration workflow for <code><a href="../reference/identify_core.html">identify_core()</a></code>.</p></li>
+<li><p>Test suite updated for <code>identify_core</code>, <code>multi_rarefy</code>, <code>plot_identified_core</code>, <code>plot_variance_propagation</code>, <code>update_otu_table</code>, and the full vignette workflow. Test data regenerated (<code>test_vignette_data.rda</code> grew ~250 KB).</p></li>
 <li><p>Vignette updated to include <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code> and <code><a href="../reference/plot_variance_propagation.html">plot_variance_propagation()</a></code> as part of the Data Exploration and Parameter Selection section. This new workflow allows users to determine the adequate sequence read depth for their data and input that into <code><a href="../reference/identify_core.html">identify_core()</a></code>.</p></li>
-</ul></div>
+</ul><p><strong>See PR <a href="https://github.com/germs-lab/BRCore/pull/97" class="external-link">#97</a> and <a href="https://github.com/germs-lab/BRCore/pull/95" class="external-link">#95</a> for more details</strong></p>
+</div>
+<div class="section level3">
+<h3 id="contributors-2-0-0">Contributors<a class="anchor" aria-label="anchor" href="#contributors-2-0-0"></a></h3>
+<p><a href="https://github.com/jibarozzo" class="external-link">@jibarozzo</a> <a href="https://github.com/Gian77" class="external-link">@Gian77</a></p>
+</div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.2" id="brcore-102">BRCore 1.0.2<a class="anchor" aria-label="anchor" href="#brcore-102"></a></h2>

@@ -100,51 +100,59 @@
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/germs-lab/BRCore" class="external-link">BRCore</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://dx.plos.org/10.1371/journal.pone.0061217" class="external-link">phyloseq</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Load example data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"bcse"</span>, package <span class="op">=</span> <span class="st">"BRCore"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Add rarefaction metrics</span></span>
-<span><span class="va">bcse_metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/add_rarefaction_metrics.html">add_rarefaction_metrics</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">bcse</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Perform multiple rarefaction</span></span>
-<span><span class="va">bcse_rarefied</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/multi_rarefy.html">multi_rarefy</a></span><span class="op">(</span></span>
-<span>  physeq_obj <span class="op">=</span> <span class="va">bcse</span>,</span>
-<span>  depth_level <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  num_iter <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  set_seed <span class="op">=</span> <span class="fl">7642</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Explore the structure of the rarefied data</span></span>
-<span><span class="fu"><a href="reference/plot_rarefaction_metrics.html">plot_rarefaction_metrics</a></span><span class="op">(</span><span class="va">bcse_metrics</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_variance_propagation.html">plot_variance_propagation</a></span><span class="op">(</span><span class="va">bcse_rarefied</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Decide on "depth_level" and "num_iter" based on the plots above, and then perform core selection.</span></span>
-<span></span>
-<span><span class="co"># Identify core microbiome</span></span>
-<span><span class="va">bcse_core</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/identify_core.html">identify_core</a></span><span class="op">(</span></span>
-<span>  physeq_obj <span class="op">=</span> <span class="va">bcse</span>,</span>
-<span>  priority_var <span class="op">=</span> <span class="st">"Crop"</span>,</span>
-<span>  increase_value <span class="op">=</span> <span class="fl">0.02</span>,</span>
-<span>  depth_level <span class="op">=</span> <span class="fl">1000</span>,</span>
-<span>  num_iter <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  seed <span class="op">=</span> <span class="fl">2134</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Visualize abundance-occupancy distribution</span></span>
-<span><span class="fu"><a href="reference/plot_abundance_occupancy.html">plot_abundance_occupancy</a></span><span class="op">(</span>core_result <span class="op">=</span> <span class="va">bcse_core</span>, core_set <span class="op">=</span> <span class="st">"increase"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Fit and plot neutral model</span></span>
-<span><span class="va">bcse_neutral</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_neutral_model.html">fit_neutral_model</a></span><span class="op">(</span></span>
-<span>  otu_table <span class="op">=</span> <span class="va">bcse_core</span><span class="op">$</span><span class="va">otu_table</span>,</span>
-<span>  core_set <span class="op">=</span> <span class="va">bcse_core</span><span class="op">$</span><span class="va">increase_core</span>,</span>
-<span>  abundance_occupancy <span class="op">=</span> <span class="va">bcse_core</span><span class="op">$</span><span class="va">abundance_occupancy</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/plot_neutral_model.html">plot_neutral_model</a></span><span class="op">(</span><span class="va">bcse_neutral</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(BRCore)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(phyloseq)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Load example data</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"bcse"</span>, <span class="at">package =</span> <span class="st">"BRCore"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># Add rarefaction metrics</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>bcse_metrics <span class="ot">&lt;-</span> <span class="fu">add_rarefaction_metrics</span>(<span class="at">data =</span> bcse)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Perform multiple rarefaction</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>bcse_rarefied_list <span class="ot">&lt;-</span> <span class="fu">multi_rarefy</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">physeq_obj =</span> bcse,</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="at">depth_level =</span> <span class="dv">1000</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="at">num_iter =</span> <span class="dv">3</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">set_seed =</span> <span class="dv">7642</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co"># Update phyloseq object with rarefied data</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>bcse_rare_single <span class="ot">&lt;-</span> <span class="fu">update_otu_table</span>(<span class="at">physeq_obj =</span> bcse, <span class="at">rarefied_otus =</span> bcse_rarefied_list, <span class="at">iteration =</span> <span class="dv">2</span>) <span class="co"># Your preffered iteration can be used here</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co"># Identify core microbiome</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co"># With a single iteration of rarefaction</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>bcse_core <span class="ot">&lt;-</span> <span class="fu">identify_core</span>(</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">physeq_obj =</span> bcse_rare_single,</span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="at">priority_var =</span> <span class="st">"Crop"</span>,</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>  <span class="at">increase_value =</span> <span class="fl">0.02</span>,</span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2134</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>)</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co"># With multiple iterations of rarefaction</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>bcse_core_multi <span class="ot">&lt;-</span> <span class="fu">identify_core</span>(</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>  <span class="at">physeq_obj =</span> bcse, </span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>  <span class="at">rarefied_list =</span> bcse_rarefied_list</span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>  <span class="at">priority_var =</span> <span class="st">"Crop"</span>,</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a>  <span class="at">increase_value =</span> <span class="fl">0.02</span>,</span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>  <span class="at">depth_level =</span> <span class="dv">1000</span>,</span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>  <span class="at">num_iter =</span> <span class="dv">10</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">2134</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>)</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co"># Visualize abundance-occupancy distribution</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="fu">plot_abundance_occupancy</span>(<span class="at">core_result =</span> bcse_core, <span class="at">core_set =</span> <span class="st">"increase"</span>)</span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co"># Fit and plot neutral model</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a>bcse_neutral <span class="ot">&lt;-</span> <span class="fu">fit_neutral_model</span>(</span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a>  <span class="at">otu_table =</span> bcse_core<span class="sc">$</span>otu_table,</span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a>  <span class="at">core_set =</span> bcse_core<span class="sc">$</span>increase_core,</span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a>  <span class="at">abundance_occupancy =</span> bcse_core<span class="sc">$</span>abundance_occupancy</span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a>)</span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a></span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="fu">plot_neutral_model</span>(bcse_neutral)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>

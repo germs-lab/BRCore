@@ -12,7 +12,14 @@ data.
 ## Usage
 
 ``` r
-plot_variance_propagation(physeq_obj, rarefied, q = 0, group_var, group_color)
+plot_variance_propagation(
+  physeq_obj,
+  rarefied,
+  q = 0,
+  group_var,
+  group_color,
+  convert_to_factor = FALSE
+)
 ```
 
 ## Arguments
@@ -38,6 +45,15 @@ plot_variance_propagation(physeq_obj, rarefied, q = 0, group_var, group_color)
 
   A color variable to use present in the sample_data()
 
+- convert_to_factor:
+
+  Logical. If `TRUE`, both `group_var` and `group_color` are coerced to
+  `factor` before plotting, which is useful when those columns are
+  numeric/continuous (e.g. dates, counts) but should be treated as
+  discrete groups. When `TRUE` a discrete colour scale
+  (`scale_color_viridis_d`) is used; otherwise the continuous scale
+  (`scale_color_viridis_c`) is used. Default `FALSE`.
+
 ## Value
 
 ggplot object comparing raw vs rarefied diversity distributions across
@@ -57,7 +73,7 @@ bcse_rarefied_otutable_filt <-
        physeq_obj = bcse_filt,
        depth_level = 1000,
        num_iter = 100,
-       .as_array = FALSE,
+       .as = "list",
        set_seed = 7643
    )
 #> 
@@ -81,16 +97,16 @@ bcse_rarefied_otutable_filt <-
 #> ✔ No samples removed.
 #> 
 #> ── Taxa Removal 
-#> ℹ Original taxa input: 2861
-#> ! Max: 2688 taxa removed (zero abundance) in viable samples (depth_level >= 1000).
-#> ! When using `.as_array = FALSE`, taxa removed may differ across iterations.
+#> ✔ No taxa removed.
+#> ! Taxa are not removed across iterations to maintain consistent dimensions. 
+#> Downstream analyses should handle zero-abundance taxa appropriately.
 #> 
 #> ── Data Sparsity 
 #> ℹ Returning list of data frames for each iteration.
 #> • Rarefied matrix (across 100 iterations):
-#>   • Min: 1145 zeros (66.18% sparsity) out of 1730 entries
-#>   • Max: 1483 zeros (70.96% sparsity) out of 2090 entries
-#>   • Avg: 1336.3 zeros (69% sparsity) out of 1936.6 entries
+#>   • Min: 27982 zeros (97.8% sparsity) out of 28610 entries
+#>   • Max: 28035 zeros (97.99% sparsity) out of 28610 entries
+#>   • Avg: 28009.7 zeros (97.9% sparsity) out of 28610 entries
 #> 
 #> ── Final Data Dimensions 
 #> ✔ Output: 100 iterations with 10 unique samples
