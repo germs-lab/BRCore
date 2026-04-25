@@ -10,3 +10,7 @@
 ^codecov\.yml$
 ^\.vscode$
 ^[.]?air[.]toml$
+^cran-comments\.md$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

@@ -21,7 +21,7 @@ test_that("plot_variance_propagation returns ggplot with list input", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,
@@ -47,7 +47,7 @@ test_that("plot works with q = 1 (Shannon)", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,
@@ -73,7 +73,7 @@ test_that("plot works with q = 2 (Simpson)", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,
@@ -101,7 +101,7 @@ test_that("plot_variance_propagation returns ggplot with array input", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,
@@ -132,7 +132,7 @@ test_that("plot has correct facets (Raw vs Rarefied)", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,
@@ -161,7 +161,7 @@ test_that("plot y-axis label reflects q value", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,
@@ -190,7 +190,7 @@ test_that("plot handles rarefied subset of samples", {
   skip_if_not_installed("phyloseq")
   skip_if_not_installed("ggplot2")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   bcse_sub <- phyloseq::subset_samples(bcse, Crop == "Switchgrass")
 
@@ -219,7 +219,7 @@ test_that("plot handles rarefied subset of samples", {
 test_that("plot_variance_propagation errors with vector q", {
   skip_if_not_installed("phyloseq")
 
-  data("bcse", package = "BRCore")
+  data("bcse", package = "BRCore", envir = environment())
 
   rarefied <- multi_rarefy(
     physeq_obj = bcse,

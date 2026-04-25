@@ -1,0 +1,54 @@
+url: http://www.germslab.org/BRCore/
+template:
+  bootstrap: 5
+  bootswatch: minty
+home:
+  title: BRCore • Unified Framework for Microbiome Analysis
+reference:
+  - title: Core Identification Functions
+    contents:
+      - identify_core
+      - plot_identified_core
+      - plot_core_distribution
+  - title: Data Exploration Functions
+    contents:
+      - plot_rarefaction_metrics
+      - plot_abundance_occupancy
+      - plot_core_distribution
+      - plot_identified_core
+      - plot_variance_propagation
+      - plot_neutral_model
+  - title: Neutral Model Functions
+    contents:
+      - fit_neutral_model
+      - plot_neutral_model
+      - sncm.fit
+  - title: Rarefaction Functions
+    contents:
+      - add_rarefaction_metrics
+      - multi_rarefy
+      - plot_rarefaction_metrics
+  - title: Parallel Computing Utilities
+    contents:
+      - detect_hpc_type
+      - get_available_cores
+      - is_hpc_environment
+      - setup_parallel_backend
+  - title: OTU Table Utilities
+    contents: update_otu_table
+  - title: Datasets
+    contents:
+      - bcse
+      - bean
+      - mimulus
+      - switchgrass
+
+authors:
+  Bolívar Aponte Rolón:
+    href: "https://www.bolaponte.com/"
+  Adina Howe:
+    href: "https://www.germslab.org/about/"
+  Center for Advanced Bioenergy and Bioproducts Innovation:
+    href: "https://cabbi.bio/"
+  Great Lakes Bioenergy Research Center:
+    href: "https://www.glbrc.org/"

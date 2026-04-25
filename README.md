@@ -15,29 +15,39 @@ coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.c
 
 <!-- badges: end -->
 
+## Overview
+
 BRCore provides a unified framework for identification and ecological
 interpretation of core microbiomes across time and space, enhancing
 robustness and reproducibility in microbiome data analysis.
 
-## Features
-
 BRCore provides tools for:
 
-- **Rarefaction analysis**: Calculate pre-rarefaction metrics
-  (`add_rarefaction_metrics()`) and perform multiple rarefaction
-  (`multi_rarefy()`)
-- **Core microbiome identification**: Identify core microbial taxa using
-  abundance-occupancy distributions (`identify_core()`)
-- **Neutral model fitting**: Fit and visualize neutral community models
-  (`fit_neutral_model()`, `plot_neutral_model()`)
-- **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
-  curves, and core distributions (`plot_rarefaction_metrics()`,
-  `plot_abundance_occupancy()`, `plot_core_distribution()`,
-  `plot_identified_core()`)
+**Rarefaction analysis**: Calculate pre-rarefaction metrics and perform
+multiple rarefactions
+
+- `add_rarefaction_metrics()`
+- `multi_rarefy()`
+
+**Core microbiome identification**: Identify core microbial taxa using
+abundance-occupancy distributions
+
+- `identify_core()`
+
+**Neutral model fitting**: Fit and visualize neutral community models
+
+- `fit_neutral_model()`
+- `plot_neutral_model()`
+
+**Visualization**: Plot rarefaction diagnostics, abundance-occupancy
+curves, and core distributions
+
+- `plot_rarefaction_metrics()`
+- `plot_abundance_occupancy()`
+- `plot_core_distribution()`
+- `plot_identified_core()`
 
 ## Installation
-
-### Quick Install (Recommended)
 
 Install the latest *stable* version of BRCore from CRAN with:
 
@@ -94,6 +104,8 @@ bcse_core_multi <- identify_core(
   rarefied_list = bcse_rarefied_list
   priority_var = "Crop",
   increase_value = 0.02,
+  depth_level = 1000,
+  num_iter = 10,
   seed = 2134
 )
 
@@ -106,6 +118,7 @@ bcse_neutral <- fit_neutral_model(
   core_set = bcse_core$increase_core,
   abundance_occupancy = bcse_core$abundance_occupancy
 )
+
 plot_neutral_model(bcse_neutral)
 ```
 

@@ -103,7 +103,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x653676834b28> 
+#>   .. .. .. .. .. ..$ :<environment: 0x5f4493a140f8> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -152,7 +152,7 @@ bcse_metrics
 rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Processing 50 samples
 #> ℹ Generating rarefaction diagnostic plots                                         ✔ Rarefaction diagnostic plots generated successfully
-#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [958ms]
+#> ℹ Generating rarefaction diagnostic plots✔ Generating rarefaction diagnostic plots [935ms]
 print(rarefaction_plot)
 ```
 
@@ -231,7 +231,7 @@ rarefaction_variance_plot <- plot_variance_propagation(
 )
 #> ✔ Input phyloseq object is valid!
 #> 
-#> ── Rarefaction Variance Propagation Visualization ─────────────────────────────────────────
+#> ── Rarefaction Variance Propagation Visualization ────────────────────
 #> Error: object 'bcse_rarefied_list' not found
 print(rarefaction_variance_plot)
 #> Error: object 'rarefaction_variance_plot' not found
