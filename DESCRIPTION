@@ -12,7 +12,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-1589-947X", "Co-maintainer")),
     person("Brandon", "Kristy", 
            role = "aut", 
-           comment = c(ORCID = "0000-0003-1589-947X")),
+           comment = c(ORCID = "0000-0003-2421-7143")),
     person("Ashley", "Shade", 
            role = "aut", 
            comment = c(ORCID = "0000-0002-7189-3067")),
@@ -27,9 +27,10 @@ Authors@R: c(
     person("Great Lakes Bioenergy Research Center", 
            role = c("cph", "fnd"))
   )
-Description: BRCore provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
+Description: This package provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
+Language: en
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
