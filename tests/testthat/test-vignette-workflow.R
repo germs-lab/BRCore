@@ -65,7 +65,7 @@ test_that("1: Vignette test data structures are valid", {
   }
 
   expect_s3_class(
-    test_vignette_data$test_bcse_identified_core$plot_identified_core,
+    test_vignette_data$test_bcse_identified_core[[2]],
     "ggplot"
   )
 })
