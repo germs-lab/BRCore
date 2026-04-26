@@ -15,3 +15,4 @@
 ^docs$
 ^pkgdown$
 ^CRAN-SUBMISSION$
+^tests/testthat/test_sets/test_vignette_data\.rda$

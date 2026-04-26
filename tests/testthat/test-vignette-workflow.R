@@ -6,6 +6,10 @@ test_that("1: Vignette test data structures are valid", {
     "brcore_test_data_path",
     default = test_path("test_sets/test_vignette_data.rda")
   )
+  skip_if_not(
+    file.exists(rda_path),
+    "Test data file not available for testing in this environment: CRAN or R CMD check"
+  )
   load(rda_path)
 
   # Test: Rarefied OTU table is correctly structured and has expected properties
@@ -81,6 +85,10 @@ test_that("2: Vignette workflow produces consistent results", {
   rda_path <- getOption(
     "brcore_test_data_path",
     default = test_path("test_sets/test_vignette_data.rda")
+  )
+  skip_if_not(
+    file.exists(rda_path),
+    "Test data file not available for testing in this environment: CRAN or R CMD check"
   )
   load(rda_path)
 
@@ -264,6 +272,10 @@ test_that("3: Vignette core distribution plots are consistent", {
     "brcore_test_data_path",
     default = test_path("test_sets/test_vignette_data.rda")
   )
+  skip_if_not(
+    file.exists(rda_path),
+    "Test data file not available for testing in this environment: CRAN or R CMD check"
+  )
   load(rda_path)
 
   # Recreate necessary objects for plotting
@@ -399,6 +411,10 @@ test_that("4: Vignette neutral model fitting is consistent", {
   rda_path <- getOption(
     "brcore_test_data_path",
     default = test_path("test_sets/test_vignette_data.rda")
+  )
+  skip_if_not(
+    file.exists(rda_path),
+    "Test data file not available for testing in this environment: CRAN or R CMD check"
   )
   load(rda_path)
 
