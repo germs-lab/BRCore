@@ -27,7 +27,7 @@ Authors@R: c(
     person("Great Lakes Bioenergy Research Center", 
            role = c("cph", "fnd"))
   )
-Description: This package provides a unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
+Description: A unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en
@@ -65,5 +65,5 @@ Depends:
     R (>= 4.4)
 LazyData: true
 VignetteBuilder: knitr
-URL: https://github.com/germs-lab/BRCore, http://www.germslab.org/BRCore/
+URL: https://github.com/germs-lab/BRCore, https://www.germslab.org/BRCore/
 BugReports: https://github.com/germs-lab/BRCore/issues
