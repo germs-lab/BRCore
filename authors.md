@@ -9,7 +9,7 @@
   [](https://orcid.org/0000-0003-1589-947X)  
   Co-maintainer
 
-- **Brandon Kristy**. Author. [](https://orcid.org/0000-0003-1589-947X)
+- **Brandon Kristy**. Author. [](https://orcid.org/0000-0003-2421-7143)
 
 - **Ashley Shade**. Author. [](https://orcid.org/0000-0002-7189-3067)
 
