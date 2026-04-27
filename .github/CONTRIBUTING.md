@@ -4,7 +4,7 @@ Thank you for your interest in contributing to BRCore! This document provides ge
 
 ## Table of Contents
 
--   [Getting Help]
+-   [Getting Help](#getting-help)
 -   [Code of Conduct](#code-of-conduct)
 -   [Getting Started](#getting-started)
 -   [How to Contribute](#how-to-contribute)

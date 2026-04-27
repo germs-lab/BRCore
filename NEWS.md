@@ -1,4 +1,9 @@
-# BRCore 2.0.0
+# BRCore 2.0.1
+Date: 2026-04-25
+
+* Resubmission to CRAN to address auto-check issues on Debian and Windows.
+
+BRCore 2.0.0
 Date: 2026-04-24
 
 ## Breaking Changes
