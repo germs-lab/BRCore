@@ -39,7 +39,7 @@ plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [805ms]
+#> ✔ Generating rarefaction diagnostic plots [849ms]
 #> 
 
 
@@ -51,7 +51,7 @@ plot_rarefaction_metrics(sample_data_df)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [778ms]
+#> ✔ Generating rarefaction diagnostic plots [859ms]
 #> 
 
 # }

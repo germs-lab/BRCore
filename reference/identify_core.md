@@ -171,12 +171,12 @@ res <- identify_core(
 #> ℹ No taxonomy found (or empty). Continuing without taxonomy.
 #> ✔ Core prioritizing variable: sampling_date
 #> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-26 05:52:35.272135
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:09:48.554335
 #> ■■■■■■                            15% | ETA:  6s
-#> ■■■■■■■■■■■■■                     41% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■              63% | ETA:  4s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        83% | ETA:  2s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   99% | ETA:  0s
+#> ■■■■■■■■■■                        29% | ETA:  5s
+#> ■■■■■■■■■■■■■■■■■■                55% | ETA:  4s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  3s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     93% | ETA:  1s
 #> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 34 core OTUs

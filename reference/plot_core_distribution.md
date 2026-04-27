@@ -79,12 +79,11 @@ switchgrass_core <- identify_core(
 #> ℹ No taxonomy found (or empty). Continuing without taxonomy.
 #> ✔ Core prioritizing variable: sampling_date
 #> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-26 05:53:12.014876
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:10:25.728293
 #> ■■■■■■                            16% | ETA:  5s
-#> ■■■■■■■■■■■                       35% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■               59% | ETA:  4s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■         81% | ETA:  2s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+#> ■■■■■■■■■■■■■■■                   48% | ETA:  4s
+#> ■■■■■■■■■■■■■■■■■■■■■■            69% | ETA:  3s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      90% | ETA:  1s
 #> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 34 core OTUs

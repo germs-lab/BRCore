@@ -42,6 +42,8 @@ install.packages("BRCore")
 
 Install the *development* version of BRCore from GitHub with:
 
+Install the *development* version of BRCore from GitHub with:
+
 ``` r
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
@@ -118,11 +120,11 @@ vignette("BRCore-vignette", package = "BRCore")
 ## Contributing
 
 Contributions to BRCore are welcome! Please see the
-[CONTRIBUTING.md](http://www.germslab.org/BRCore/CONTRIBUTING.md) file
-for guidelines on how to contribute.
+[CONTRIBUTING.md](https://github.com/germs-lab/BRCore/blob/main/.github/CONTRIBUTING.md)
+file for guidelines on how to contribute.
 
 ## Code of Conduct
 
 Please note that this project is released with a [Contributor Code of
-Conduct](http://www.germslab.org/BRCore/CODE_OF_CONDUCT.md). By
-participating in this project you agree to abide by its terms.
+Conduct](https://github.com/germs-lab/BRCore/blob/main/.github/CODE_OF_CONDUCT.md).
+By participating in this project you agree to abide by its terms.
