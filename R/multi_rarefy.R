@@ -1,8 +1,7 @@
-#' Run multiple rarefaction for microbiome count tables
+#' Run rarefaction for microbiome count tables
 #'
-#' This function performs multiple rarefaction on a `phyloseq` object by randomly
-#' sub-sampling OTUs/ASVs within samples without replacement. The process is
-#' repeated for a specified number of iterations, and the results are averaged.
+#' This function performs rarefaction on a `phyloseq` object by randomly
+#' sub-sampling OTUs/ASVs within samples without replacement for a number of iterations specified by the user.
 #' Samples with fewer OTUs/ASVs than the specified `depth_level` are discarded.
 #'
 #' @param physeq_obj A `phyloseq` object containing an OTU/ASV table.
@@ -23,14 +22,12 @@
 #'   Samples with less than `depth_level` sequences are discarded.
 #'
 #'
-#' @importFrom parallelly availableCores
-#' @importFrom parallel makeCluster stopCluster clusterExport parLapply
-#' @importFrom parallel clusterEvalQ
 #' @importFrom dplyr group_by summarise across everything filter near
 #' @importFrom dplyr where
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom phyloseq otu_table
-#' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning cli_alert_success cli_alert_danger
+#' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning
+#' @importFrom cli cli_alert_success cli_alert_danger
 #' @importFrom utils head
 #' @importFrom vegan rrarefy
 #'
@@ -61,7 +58,7 @@ multi_rarefy <- function(
   set_seed = NULL
 ) {
   # Input validation ----
-  cli::cli_h1("Multiple Rarefaction")
+  cli::cli_h1("Rarefaction iterations starting...")
   cli::cli_h2("Input Validation")
 
   if (!requireNamespace("phyloseq", quietly = TRUE)) {

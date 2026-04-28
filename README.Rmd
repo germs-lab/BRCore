@@ -26,10 +26,11 @@ BRCore provides a unified framework for identification and ecological interpreta
 
 BRCore provides tools for:
 
-**Rarefaction analysis**: Calculate pre-rarefaction metrics and perform multiple rarefactions
+**Rarefaction analysis**: Calculate pre-rarefaction metrics and perform rarefactions
 
 -   `add_rarefaction_metrics()`
 -   `multi_rarefy()`
+-   `plot_variance_propagation()`
 
 **Core microbiome identification**: Identify core microbial taxa using abundance-occupancy distributions
 
@@ -77,7 +78,7 @@ data("bcse", package = "BRCore")
 # Add rarefaction metrics
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
-# Perform multiple rarefaction
+# Perform rarefaction
 bcse_rarefied_list <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
@@ -86,7 +87,10 @@ bcse_rarefied_list <- multi_rarefy(
 )
 
 # Update phyloseq object with rarefied data
-bcse_rare_single <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied_list, iteration = 2) # Your preffered iteration can be used here
+bcse_rare_single <- update_otu_table(
+  physeq_obj = bcse, 
+  rarefied_otus = bcse_rarefied_list, 
+  iteration = 2) # Your preffered iteration can be used here
 
 # Identify core microbiome
 

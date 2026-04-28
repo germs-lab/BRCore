@@ -27,7 +27,7 @@ plot_variance_propagation(
 \item{convert_to_factor}{Logical. If \code{TRUE}, both \code{group_var} and
 \code{group_color} are coerced to \code{factor} before plotting, which is
 useful when those columns are numeric/continuous (e.g. dates, counts) but
-should be treated as discrete groups. When \code{TRUE} a discrete colour
+should be treated as discrete groups. When \code{TRUE} a discrete color
 scale (\code{scale_color_viridis_d}) is used; otherwise the continuous
 scale (\code{scale_color_viridis_c}) is used. Default \code{FALSE}.}
 }
@@ -35,7 +35,7 @@ scale (\code{scale_color_viridis_c}) is used. Default \code{FALSE}.}
 ggplot object comparing raw vs rarefied diversity distributions across iterations.
 }
 \description{
-This function evaluate the variance generated during multiple rarefaction by plotting comparing raw vs. rarefied alpha diversity metrics calculated at each iterations. It is possible to plot observed richness (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting the \code{q} parameter to "richness" or \code{q} = 0, "shannon" or \code{q} = 1, or "shannon" or \code{q} = 2. The plot is faceted by method (raw vs rarefied) and colored by a specified grouping variable from the sample data.
+This function evaluate the variance between rarefaction iterations from \code{multi_rarefy()} by visually comparing raw vs. rarefied alpha diversity metrics calculated at each iterations. It is possible to plot observed richness (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting the \code{q} parameter to "richness" or \code{q} = 0, "shannon" or \code{q} = 1, or "shannon" or \code{q} = 2. The plot is faceted by method (raw vs rarefied) and colored by a specified grouping variable from the sample data.
 }
 \examples{
 \donttest{

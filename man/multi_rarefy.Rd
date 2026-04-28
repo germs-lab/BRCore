@@ -2,7 +2,7 @@
 % Please edit documentation in R/multi_rarefy.R
 \name{multi_rarefy}
 \alias{multi_rarefy}
-\title{Run multiple rarefaction for microbiome count tables}
+\title{Run rarefaction for microbiome count tables}
 \usage{
 multi_rarefy(
   physeq_obj,
@@ -36,9 +36,8 @@ represent the average sequence counts calculated across all iterations.
 Samples with less than \code{depth_level} sequences are discarded.
 }
 \description{
-This function performs multiple rarefaction on a \code{phyloseq} object by randomly
-sub-sampling OTUs/ASVs within samples without replacement. The process is
-repeated for a specified number of iterations, and the results are averaged.
+This function performs rarefaction on a \code{phyloseq} object by randomly
+sub-sampling OTUs/ASVs within samples without replacement for a number of iterations specified by the user.
 Samples with fewer OTUs/ASVs than the specified \code{depth_level} are discarded.
 }
 \examples{

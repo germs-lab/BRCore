@@ -1,9 +1,17 @@
+# BRCore 2.0.2
+Date: 2026-04-28
+
+* Fixes to vignette and function documentation prior to CRAN submission.
+* Removed "multiple rarefaction" concept from documentation.
+* Removed `parallel_helpers.R` since we have moved away from parallel implementations.
+* Cleaned NAMESPACE and DESCRIPTION.
+
 # BRCore 2.0.1
 Date: 2026-04-25
 
 * Resubmission to CRAN to address auto-check issues on Debian and Windows.
 
-BRCore 2.0.0
+# BRCore 2.0.0
 Date: 2026-04-24
 
 ## Breaking Changes

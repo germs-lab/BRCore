@@ -30,7 +30,7 @@ Authors@R: c(
 Description: A unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Language: en
+Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Imports: 
@@ -39,12 +39,9 @@ Imports:
     ggplot2 (>= 4.0.1),
     ggpubr (>= 0.6.2),
     ggrepel (>= 0.9.6),
-    ggsci (>= 4.1.0),
     Hmisc (>= 5.2.4),
     magrittr (>= 2.0.4),
     minpack.lm (>= 1.2.4),
-    parallel (>= 4.5.2),
-    parallelly (>= 1.45.1),
     phyloseq (>= 1.54.0),
     rlang (>= 1.1.6),
     scales (>= 1.4.0),

@@ -40,7 +40,7 @@ using the increase method.
 A ggplot2 object that can be further customized.
 }
 \description{
-Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
+Creates a plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
 a grouping variable.
 }
 \examples{

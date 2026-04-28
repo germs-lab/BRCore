@@ -38,7 +38,8 @@ iteration.}
 sampling_date", "site") that is used for prioritizing the core microbiome.}
 
 \item{increase_value}{Increase value (numeric, scalar) used in the
-calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).}
+calculation (default 0.02) for "increase". The "elbow" is always calculated
+and returned as \code{elbow_core} (see below for details).}
 
 \item{abundance_weight}{Numeric in \verb{[0,1]}; how much to weight mean relative
 abundance in the ranking score. \code{0} (default) uses occupancy/composite only.
@@ -124,7 +125,7 @@ and \pkg{vegan}.
 \donttest{
 library(phyloseq)
 library(BRCore)
-# Example using your switchgrass phyloseq object and grouping variable
+# Example using switchgrass phyloseq object and grouping variable
 # 'sampling_date'
 data("switchgrass", package = "BRCore")
 

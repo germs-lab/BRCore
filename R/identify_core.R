@@ -19,7 +19,8 @@
 #' @param priority_var The column name in the `sample_data` (e.g.
 #' sampling_date", "site") that is used for prioritizing the core microbiome.
 #' @param increase_value Increase value (numeric, scalar) used in the
-#' calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
+#' calculation (default 0.02) for "increase". The "elbow" is always calculated
+#' and returned as \code{elbow_core} (see below for details).
 #' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
 #' abundance in the ranking score. `0` (default) uses occupancy/composite only.
 #' `1` ranks purely by abundance. Values in between blend the two (e.g.,
@@ -93,8 +94,10 @@
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
 #' and \pkg{vegan}.
 #'
-#' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data tax_table
-#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last select slice_head
+#' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data
+#' @importFrom phyloseq tax_table
+#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate
+#' @importFrom dplyr n last select slice_head
 #' @importFrom tidyr pivot_longer
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom rlang ensym as_name .data
@@ -106,7 +109,7 @@
 #' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
-#' # Example using your switchgrass phyloseq object and grouping variable
+#' # Example using switchgrass phyloseq object and grouping variable
 #' # 'sampling_date'
 #' data("switchgrass", package = "BRCore")
 #'
@@ -144,7 +147,8 @@ identify_core <- function(
   .phyloseq_class_check(physeq_obj)
 
   # Define arguments ----
-  # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
+  # Check if samples are rarefied (all have same depth, accounting for
+  # floating-point precision)
   ## Validate / generate rarefied_list ----
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))

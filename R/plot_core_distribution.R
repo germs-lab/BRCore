@@ -1,6 +1,6 @@
 #' Plot Core Taxa  Occupancy Across Metadata Groups
 #'
-#' Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
+#' Creates a plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
 #' a grouping variable.
 #'
 #' @param core_result A list object returned by \code{\link{identify_core}},
@@ -57,7 +57,6 @@
 #' @importFrom ggplot2 theme_classic theme element_text element_line
 #' @importFrom ggplot2 element_blank labs geom_line geom_point facet_wrap
 #' @importFrom ggplot2 scale_y_continuous geom_tile
-#' @importFrom ggsci scale_fill_npg
 #' @importFrom vegan decostand
 #' @importFrom grid unit
 #'
