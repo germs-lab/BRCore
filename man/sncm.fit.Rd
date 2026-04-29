@@ -7,66 +7,78 @@
 sncm.fit(spp, pool = NULL, stats = TRUE, taxon = NULL)
 }
 \arguments{
-\item{spp}{A matrix or data frame where rows represent communities (samples) and
-columns represent species/taxa. Values should be abundances or counts.}
+\item{spp}{A matrix or data frame where rows represent communities (samples)
+and columns represent species/taxa. Values should be abundances or counts.}
 
 \item{pool}{Optional. A matrix or data frame representing the source pool for
-calculating relative abundances. If NULL, the source pool is calculated from
-the spp matrix. Default is NULL.}
+calculating relative abundances. If NULL, the source pool is calculated
+from the spp matrix. Default is \code{NULL}.}
 
-\item{stats}{Logical. If TRUE, returns fit statistics including AIC, BIC, R-squared,
-and RMSE for model comparison. If FALSE, returns predicted vs observed frequencies
-with confidence intervals. Default is TRUE.}
+\item{stats}{Logical. If \code{TRUE}, returns fit statistics including AIC, BIC,
+R-squared, and RMSE for model comparison. If \code{FALSE}, returns predicted vs.
+observed frequencies with confidence intervals. Default is \code{TRUE}.}
 
-\item{taxon}{Optional. A data frame containing taxonomic information to merge with
-results when stats=FALSE. Should have row names matching species names. Default is NULL.}
+\item{taxon}{Optional. A data frame containing taxonomic information to
+merge with results when \code{stats = FALSE}. Should have row names matching species
+names. Default is \code{NULL}.}
 }
 \value{
-If stats=TRUE, returns a data frame with model fit statistics including:
+If \code{stats = TRUE}, returns a data frame with model fit statistics including:
 \itemize{
-\item m: Migration rate parameter from NLS fit
-\item m.ci: Confidence interval for m parameter
-\item m.mle: Migration rate from maximum likelihood estimation
-\item maxLL, binoLL, poisLL: Log-likelihood values for SNCM, binomial, and Poisson models
-\item Rsqr, Rsqr.bino, Rsqr.pois: R-squared values for each model
-\item RMSE, RMSE.bino, RMSE.pois: Root mean squared error for each model
-\item AIC, BIC: Information criteria for model selection
-\item N: Average number of individuals per community
-\item Samples: Number of samples/communities
-\item Richness: Number of taxa analyzed
-\item Detect: Detection limit (1/N)
+\item \code{m}: Migration rate parameter from NLS fit
+\item \code{m.ci}: Confidence interval for m parameter
+\item \code{m.mle}: Migration rate from maximum likelihood estimation
+\item \code{maxLL}, \code{binoLL}, \code{poisLL}: Log-likelihood values for SNCM, binomial, and Poisson models
+\item \code{Rsqr}, \code{Rsqr.bino}, \code{Rsqr.pois}: R-squared values for each model
+\item \code{RMSE}, \code{RMSE.bino}, \code{RMSE.pois}: Root mean squared error for each model
+\item \code{AIC}, \code{BIC}: Information criteria for model selection
+\item \code{N}: Average number of individuals per community
+\item \code{Samples}: Number of samples/communities
+\item \code{Richness}: Number of taxa analyzed
+\item \code{Detect}: Detection limit (1/N)
 }
-If stats=FALSE, returns a data frame with observed and predicted frequencies
-along with confidence intervals for visualization.
+If \code{stats = FALSE}, returns a data frame with observed and predicted
+frequencies along with confidence intervals for visualization.
 }
 \description{
-This function fits the Sloan Neutral Community Model to community data to assess
-neutral processes in community assembly. It compares the neutral model against
-binomial and Poisson null models using various statistical measures.
+The function implements the Sloan Neutral Community Model which
+predicts the occurrence frequency of taxa based on their relative abundance
+in the source pool and a migration parameter (\code{m}).  It compares the
+neutral model against binomial and Poisson null models using various
+statistical measures.
 }
 \details{
-The function implements the Sloan Neutral Community Model which predicts
-the occurrence frequency of taxa based on their relative abundance in the source
-pool and a migration parameter (m). The model assumes neutral processes govern
-community assembly. Three models are compared: SNCM (beta distribution),
-binomial null model, and Poisson null model.
+The model assumes neutral processes govern community assembly. Three models are compared: SNCM (beta distribution), binomial null model, and Poisson null model.
 }
 \examples{
-\dontrun{
-# Generate example community data
-spp_data <- matrix(rpois(100 * 50, 5), nrow = 100, ncol = 50)
-colnames(spp_data) <- paste0("Species_", 1:50)
+# Generate community data
+set.seed(42)
+n_samples <- 100
+n_species <- 80
 
-# Fit SNCM and get statistics
+# Log-normal abundances
+mean_abund <- rlnorm(n_species, meanlog = 2, sdlog = 1.5)
+# Simulate community matrix with multinomial sampling
+spp_data <- t(sapply(seq_len(n_samples), function(i) {
+  rmultinom(
+    1,
+    size = sample(500:2000, 1),
+    prob = mean_abund / sum(mean_abund)
+  )[, 1]
+}))
+colnames(spp_data) <- paste0("Species_", seq_len(n_species))
+
 fit_stats <- sncm.fit(spp_data, stats = TRUE)
-print(fit_stats)
-
-# Get predictions for plotting
 predictions <- sncm.fit(spp_data, stats = FALSE)
-}
+
 
 }
 \references{
-Sloan, W.T. et al. (2006) Quantifying the roles of immigration and chance in
-shaping prokaryote community structure. Environmental Microbiology, 8, 732-740.
+Sloan WT, Lunn M, Woodcock S, Head IM, Nee S, Curtis TP. (2006) Quantifying
+the roles of immigration and chance in shaping prokaryote community
+structure. Environ Microbiol. 8(4):732-40.
+\url{https://doi.org/10.1111/j.1462-2920.2005.00956.x}
+}
+\seealso{
+\code{\link{plot_neutral_model}}, \code{\link{fit_neutral_model}}
 }

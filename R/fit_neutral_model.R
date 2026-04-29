@@ -1,7 +1,7 @@
 #' Fit a Neutral Model to Microbial Community Data
 #'
 #' The function fits the neutral distribution model developed by Sloan et al.
-#' 2006, and implemented in R by Burns et al. 2015, to an OTU/ASV table and
+#' 2006, and implemented in R by Burns et al. (2015), to an OTU/ASV table and
 #' returns several goodness of fit statistics alongside a data.frame
 #' with predicted occurrence frequencies for each OTU/ASV based on their
 #' abundance in the metacommunity for plotting the abundance-occupancy
@@ -28,16 +28,16 @@
 #' Sloan WT, Lunn M, Woodcock S, Head IM, Nee S, Curtis TP. (2006) Quantifying
 #' the roles of immigration and chance in shaping prokaryote community
 #' structure. Environ Microbiol. 8(4):732-40.
-#' doi: https://doi.org/10.1111/j.1462-2920.2005.00956.x
+#' <https://doi.org/10.1111/j.1462-2920.2005.00956.x>
 #'
 #' Burns AR, Stephens WZ, Stagaman K, Wong S, Rawls JF, Guillemin K, Bohannan
 #' BJ. (2015) Contribution of neutral processes to the assembly of gut microbial
 #' communities in the zebrafish over host development. ISME J.
-#' 10(3):655-64. doi: https://doi.org/10.1038/ismej.2015.142
+#' 10(3):655-64. <https://doi.org/10.1038/ismej.2015.142>
 #'
 #' Shade A, Stopnisek N (2019) Abundance-occupancy distributions to prioritize
 #' plant core microbiome membership. Current Opinion in Microbiology, 49:50-58
-#' doi: https://doi.org/10.1016/j.mib.2019.09.008
+#' <https://doi.org/10.1016/j.mib.2019.09.008>
 #'
 #' @seealso \code{\link{plot_neutral_model}}
 #'
@@ -45,8 +45,6 @@
 #' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
-#' # Example using your switchgrass phyloseq object and grouping variable
-#' # 'sampling_date'
 #' data("switchgrass", package = "BRCore")
 #'
 #' switchgrass_core <- identify_core(
@@ -64,7 +62,8 @@
 #'
 #' str(switchgrass_core_fit)
 #' switchgrass_core_fit$goodness_of_fit
-#' switchgrass_core_fit$model_prediction |> head()
+#' switchgrass_core_fit$model_prediction |>
+#' head()
 #' }
 #'
 #' @importFrom stats confint pbeta pbinom ppois dnorm AIC BIC coef

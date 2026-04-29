@@ -27,8 +27,9 @@ predictions and metrics.
 }
 \description{
 This function plots ASV/OTUs log abundances into a fitted neutral model of
-microbial abundance-occupancy distribution. ASV/OTUs that are \emph{Core}, \emph{As predicted} (i.e. Neutral),
-\emph{Below} and \emph{Above} model predictions are drawn with distinct point colors, see details.
+microbial abundance-occupancy distribution. ASV/OTUs that are \emph{Core}, \emph{As
+predicted} (i.e. Neutral), \emph{Below} and \emph{Above} model predictions are drawn
+with distinct point colors, see details.
 }
 \details{
 Points are split into four groups for display:
@@ -40,10 +41,21 @@ Points are split into four groups for display:
 }
 }
 \examples{
-\dontrun{
-# Assuming you have run a neutral model fit on the switchgrass data.frames
-is.data.frame(switchgrass_core_fit$model_prediction)
-is.data.frame(switchgrass_core_fit$goodness_of_fit)
+\donttest{
+data("switchgrass", package = "BRCore")
+
+switchgrass_core <- identify_core(
+  physeq_obj     = switchgrass,
+  priority_var   = "sampling_date",
+  increase_value = 0.02,
+  seed           = 092825
+)
+
+switchgrass_core_fit <- fit_neutral_model(
+  otu_table = switchgrass_core$otu_table,
+  core_set = switchgrass_core$increase_core,
+  abundance_occupancy = switchgrass_core$abundance_occupancy
+)
 
 p <- plot_neutral_model(switchgrass_core_fit)
 print(p)
