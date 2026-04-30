@@ -1,6 +1,6 @@
 Package: BRCore
 Title: Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers
-Version: 2.0.2
+Version: 2.0.3
 Authors@R: c(
     person("Bolívar", "Aponte Rolón",
            email = "bolaponte@pm.me", 

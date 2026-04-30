@@ -1,3 +1,14 @@
+# BRCore 2.0.3
+Date: 2026-04-30
+
+* Fixes to documentation: 
+    * DOI links updated to correct format
+    * New example for `scnm.fit()`
+    * New `@seealso` cross-refences in documentation
+    * Unwrapped examples from `\dontrun` and `\donttest`
+    * Gained new `swithchgrass_core` object, identified microbial core, for examples
+    * New APA 7th edition style for references
+
 # BRCore 2.0.2
 Date: 2026-04-28
 
