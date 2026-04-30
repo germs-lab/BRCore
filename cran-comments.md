@@ -1,19 +1,20 @@
-## Resubmission notes (v2.0.3)
+## Resubmission notes (v2.0.4)
 
 This is a resubmission. Previous submissions:
 
+- v2.0.3: Passed auto-checks: authors found error in `scnm.fit()` and retracted by maintainer.
 - v2.0.2: Passed auto-checks; requested resubmission by manual inspection
 - v2.0.1: Passed auto-checks; retracted by maintainer due to typos
 - v2.0.0: Rejected by CRAN auto-check service
 
-**The following issues from v2.0.2 were resolved:**
+**The following issues from v2.0.3 were resolved:**
 
-1. **DOI** links in the documentation were updated to use the correct format (`<doi:...>`).
-2. Minor typos and formatting issues in the documentation were corrected.
-3. Examples were unwrapped from `\dontrun` and `\donttest`. Only example for `identify_core()` remains wrapped due to long execution time (> 5s).
-4. We removed `options(warn=-1)` from `scnm.fit()` as it was not needed and remained from a debugging phase.
-5. An appropriate example for `scnm.fit()` was included.
+1. Adding `suppressWarnings()` around `stats::dnorm()` calls in `scnm.fit()` to handle warnings previously suppressed by `options(warn=-1)` used a debugging phase.
 
+2. **DOI** links in the documentation were updated to use the correct format (`<doi:...>`).
+3. Minor typos and formatting issues in the documentation were corrected.
+4. Examples were unwrapped from `\dontrun` and `\donttest`. Only example for `identify_core()` remains wrapped due to long execution time (> 5s).
+   6. An appropriate example for `scnm.fit()` was included.
 
 
 ### R CMD check results 

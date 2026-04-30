@@ -1,4 +1,4 @@
-# BRCore 2.0.3
+# BRCore 2.0.4
 Date: 2026-04-30
 
 * Fixes to documentation: 
