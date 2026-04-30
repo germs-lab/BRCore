@@ -37,6 +37,7 @@ reference:
       - bean
       - mimulus
       - switchgrass
+      - switchgrass_core
 
 authors:
   Bolívar Aponte Rolón:
