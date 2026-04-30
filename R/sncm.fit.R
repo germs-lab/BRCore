@@ -118,7 +118,7 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   sncm.LL <- function(m, sigma) {
     R <- freq -
       stats::pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE)
-    R <- stats::dnorm(R, 0, sigma)
+    R <- suppressWarnings(stats::dnorm(R, 0, sigma))
     -base::sum(base::log(R))
   }
   m.mle <- stats4::mle(
@@ -156,7 +156,7 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   ## Calculate AIC for binomial model
   bino.LL <- function(mu, sigma) {
     R <- freq - stats::pbinom(d, N.int, p, lower.tail = FALSE)
-    R <- stats::dnorm(R, mu, sigma)
+    R <- suppressWarnings(stats::dnorm(R, mu, sigma))
     -base::sum(base::log(R))
   }
   bino.mle <- stats4::mle(
@@ -188,7 +188,7 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   ## Calculate AIC for Poisson model
   pois.LL <- function(mu, sigma) {
     R <- freq - stats::ppois(d, N * p, lower.tail = FALSE)
-    R <- stats::dnorm(R, mu, sigma)
+    R <- suppressWarnings(stats::dnorm(R, mu, sigma))
     -base::sum(base::log(R))
   }
   pois.mle <- stats4::mle(
