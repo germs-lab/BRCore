@@ -41,3 +41,5 @@ renv.lock
 /doc/
 /Meta/
 docs
+
+/.quarto/
