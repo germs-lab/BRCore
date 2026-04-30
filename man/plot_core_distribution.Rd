@@ -44,26 +44,16 @@ Creates a plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
 a grouping variable.
 }
 \examples{
-\donttest{
 library(BRCore)
-# Generate an object from identify_core and then plot
-data("switchgrass", package = "BRCore")
+data("switchgrass_core", package = "BRCore")
 
-switchgrass_core <- identify_core(
-  physeq_obj = switchgrass,
-  priority_var = "sampling_date",
-  increase_value = 0.02,
-  abundance_weight = 0,
-  seed = 1234
-)
-
-plot_core_distribution(
+p <- plot_core_distribution(
   core_result = switchgrass_core,
   core_set = "increase",
   group_var = "sampling_date",
   plot_type = "bar"
 )
-}
+print(p)
 
 }
 \seealso{

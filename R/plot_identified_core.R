@@ -25,27 +25,16 @@
 #' @seealso \link[=identify_core]{identify_core()}
 #'
 #' @examples
-#' \donttest{
 #' library(BRCore)
-#' # Example with the package switchgrass dataset
-#' data("switchgrass", package = "BRCore")
+#' data("switchgrass_core", package = "BRCore")
 #'
-#' # Identify core taxa
-#' res <- identify_core(
-#'   physeq_obj = switchgrass,
-#'   priority_var = "sampling_date",
-#'   increase_value = 0.02,
-#'   seed = 48821
+#' p <- plot_identified_core(
+#'   bray_curtis_ranked = switchgrass_core$bray_curtis_ranked,
+#'   elbow = switchgrass_core$elbow,
+#'   lastCall = switchgrass_core$bc_increase,
+#'   increase_value = switchgrass_core$increase_value
 #' )
-#'
-#' # Plot using the returned curve and cut indices; label from increase_value
-#' plot_identified_core(
-#'   bray_curtis_ranked = res$bray_curtis_ranked,
-#'   elbow = res$elbow,
-#'   lastCall = res$bc_increase,
-#'   increase_value = res$increase_value
-#' )
-#' }
+#' print(p)
 #'
 #' @seealso \code{\link{identify_core}}
 #'

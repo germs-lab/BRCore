@@ -20,9 +20,9 @@ A phyloseq containing 2861 97\% sequence similarity OTUs
 microbiome only.
 }
 \references{
-Haan NL, Benucci GNM, Fiser CM, Bonito G, Landis DA.
-Contrasting effects of bioenergy crops on biodiversity. Sci Adv. 2023 Sep
-22;9(38):eadh7960. doi: 10.1126/sciadv.adh7960. Epub 2023 Sep 22. PMID:
-37738354; PMCID: PMC10516493.
+Haan, N. L., Benucci, G. N. M., Fiser, C. M., Bonito, G., &
+Landis, D. A. (2023). Contrasting effects of bioenergy crops on
+biodiversity. Science Advances, 9(38), eadh7960.
+\url{https://doi.org/10.1126/sciadv.adh7960}
 }
 \keyword{datasets}

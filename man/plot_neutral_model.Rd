@@ -41,15 +41,8 @@ Points are split into four groups for display:
 }
 }
 \examples{
-\donttest{
-data("switchgrass", package = "BRCore")
-
-switchgrass_core <- identify_core(
-  physeq_obj     = switchgrass,
-  priority_var   = "sampling_date",
-  increase_value = 0.02,
-  seed           = 092825
-)
+library(BRCore)
+data("switchgrass_core", package = "BRCore")
 
 switchgrass_core_fit <- fit_neutral_model(
   otu_table = switchgrass_core$otu_table,
@@ -59,7 +52,6 @@ switchgrass_core_fit <- fit_neutral_model(
 
 p <- plot_neutral_model(switchgrass_core_fit)
 print(p)
-}
 
 }
 \seealso{

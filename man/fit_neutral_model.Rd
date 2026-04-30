@@ -38,16 +38,8 @@ above (i.e. interpreted as deterministically or predictably selected) and
 below (i.e. interpreted as dispersally limited) the model predictions.
 }
 \examples{
-\donttest{
 library(BRCore)
-data("switchgrass", package = "BRCore")
-
-switchgrass_core <- identify_core(
-  physeq_obj     = switchgrass,
-  priority_var   = "sampling_date",
-  increase_value = 0.02,
-  seed           = 092825
-)
+data("switchgrass_core", package = "BRCore")
 
 switchgrass_core_fit <- fit_neutral_model(
   otu_table = switchgrass_core$otu_table,
@@ -59,19 +51,19 @@ str(switchgrass_core_fit)
 switchgrass_core_fit$goodness_of_fit
 switchgrass_core_fit$model_prediction |>
 head()
-}
 
 }
 \references{
-Sloan WT, Lunn M, Woodcock S, Head IM, Nee S, Curtis TP. (2006) Quantifying
-the roles of immigration and chance in shaping prokaryote community
-structure. Environ Microbiol. 8(4):732-40.
+Sloan, W. T., Lunn, M., Woodcock, S., Head, I. M., Nee, S., & Curtis, T. P.
+(2006). Quantifying the roles of immigration and chance in shaping
+prokaryote community structure. Environmental Microbiology, 8(4), 732–740.
 \url{https://doi.org/10.1111/j.1462-2920.2005.00956.x}
 
-Burns AR, Stephens WZ, Stagaman K, Wong S, Rawls JF, Guillemin K, Bohannan
-BJ. (2015) Contribution of neutral processes to the assembly of gut microbial
-communities in the zebrafish over host development. ISME J.
-10(3):655-64. \url{https://doi.org/10.1038/ismej.2015.142}
+Burns, A. R., Stephens, W. Z., Stagaman, K., Wong, S., Rawls, J. F.,
+Guillemin, K., & Bohannan, B. J. M. (2016). Contribution of neutral
+processes to the assembly of gut microbial communities in the zebrafish over
+host development. The ISME Journal, 10(3), 655–664.
+\url{https://doi.org/10.1038/ismej.2015.142}
 
 Shade A, Stopnisek N (2019) Abundance-occupancy distributions to prioritize
 plant core microbiome membership. Current Opinion in Microbiology, 49:50-58
