@@ -65,7 +65,7 @@
 #' predictions <- sncm.fit(spp_data, stats = FALSE)
 #'
 #'
-#' @seealso \code{\link{plot_neutral_model}}, \code{\link{fit_neutral_model}}
+#' @seealso [plot_neutral_model()], [fit_neutral_model()]
 #'
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
@@ -74,8 +74,6 @@
 #'
 #' @export
 sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
-  base::options(warn = -1)
-
   # Calculate the number of individuals per community
   N <- base::mean(base::apply(spp, 1, sum))
   N.int <- base::round(N)

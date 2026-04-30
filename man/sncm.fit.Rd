@@ -80,5 +80,5 @@ structure. Environ Microbiol. 8(4):732-40.
 \url{https://doi.org/10.1111/j.1462-2920.2005.00956.x}
 }
 \seealso{
-\code{\link{plot_neutral_model}}, \code{\link{fit_neutral_model}}
+\code{\link[=plot_neutral_model]{plot_neutral_model()}}, \code{\link[=fit_neutral_model]{fit_neutral_model()}}
 }
