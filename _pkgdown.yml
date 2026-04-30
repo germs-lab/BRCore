@@ -28,14 +28,9 @@ reference:
       - add_rarefaction_metrics
       - multi_rarefy
       - plot_rarefaction_metrics
-  - title: Parallel Computing Utilities
-    contents:
-      - detect_hpc_type
-      - get_available_cores
-      - is_hpc_environment
-      - setup_parallel_backend
   - title: OTU Table Utilities
-    contents: update_otu_table
+    contents:
+      - update_otu_table
   - title: Datasets
     contents:
       - bcse
