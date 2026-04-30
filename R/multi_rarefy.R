@@ -1,8 +1,9 @@
 #' Run rarefaction for microbiome count tables
 #'
 #' This function performs rarefaction on a `phyloseq` object by randomly
-#' sub-sampling OTUs/ASVs within samples without replacement for a number of iterations specified by the user.
-#' Samples with fewer OTUs/ASVs than the specified `depth_level` are discarded.
+#' sub-sampling OTUs/ASVs within samples without replacement for a number of
+#' iterations specified by the user. Samples with fewer OTUs/ASVs than the
+#' specified `depth_level` are discarded.
 #'
 #' @param physeq_obj A `phyloseq` object containing an OTU/ASV table.
 #' @param depth_level An integer specifying the sequencing depth (number of
@@ -21,6 +22,25 @@
 #'   represent the average sequence counts calculated across all iterations.
 #'   Samples with less than `depth_level` sequences are discarded.
 #'
+#' @seealso [update_otu_table()] for updating the OTU table in a `phyloseq`
+#' object and [vegan::rrarefy()] for the underlying rarefaction method used in
+#' this function.
+#'
+#' @examples
+#' library(BRCore)
+#' data("bcse", package = "BRCore")
+#'
+#' # Example rarefaction (single iteration, single core to keep examples fast)
+#' otu_table_rare <- multi_rarefy(
+#'   physeq_obj = bcse,
+#'   depth_level = 1000,
+#'   num_iter = 10,
+#'   .as = "list",
+#'   set_seed = 7642
+#' )
+#'
+#' rowSums(otu_table_rare[[1]])
+#'
 #'
 #' @importFrom dplyr group_by summarise across everything filter near
 #' @importFrom dplyr where
@@ -30,24 +50,6 @@
 #' @importFrom cli cli_alert_success cli_alert_danger
 #' @importFrom utils head
 #' @importFrom vegan rrarefy
-#'
-#' @examples
-#' \donttest{
-#' library(phyloseq)
-#' library(BRCore)
-#' data("bcse", package = "BRCore")
-#'
-#' # Example rarefaction (single iteration, single core to keep examples fast)
-#' otu_table_rare <- multi_rarefy(
-#'   physeq_obj = bcse,
-#'   depth_level = 1000,
-#'   num_iter = 100,
-#'   .as = "list",
-#'   set_seed = 7642
-#' )
-#'
-#' rowSums(otu_table_rare[[1]])
-#' }
 #'
 #' @export
 multi_rarefy <- function(

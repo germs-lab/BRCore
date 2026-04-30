@@ -39,7 +39,6 @@ found in microbiome data.
 }
 \examples{
 \donttest{
-library(phyloseq)
 library(BRCore)
 # Generate an object from `identify_core()` and then plot
 
@@ -61,5 +60,5 @@ plot_abundance_occupancy(
 
 }
 \seealso{
-\code{\link{plot_core_distribution}} and \code{\link{identify_core}}
+\code{\link[=plot_core_distribution]{plot_core_distribution()}} and \code{\link[=identify_core]{identify_core()}}
 }

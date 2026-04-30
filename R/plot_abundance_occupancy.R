@@ -26,11 +26,10 @@
 #'   highlighted in red and non-core taxa in grey. The x-axis shows log10-transformed
 #'   mean abundance and the y-axis shows occupancy (0-1).
 #'
-#' @seealso \code{\link{plot_core_distribution}} and \code{\link{identify_core}}
+#' @seealso [plot_core_distribution()] and [identify_core()]
 #'
 #' @examples
 #' \donttest{
-#' library(phyloseq)
 #' library(BRCore)
 #' # Generate an object from `identify_core()` and then plot
 #'

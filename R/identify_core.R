@@ -94,6 +94,47 @@
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
 #' and \pkg{vegan}.
 #'
+#' @seealso [multi_rarefy()], [plot_identified_core()], and
+#' [plot_core_distribution()]
+#'
+#' @examples
+#' \donttest{
+#' library(BRCore)
+#'
+#' data("switchgrass", package = "BRCore")
+#' data("bcse", package = "BRCore")
+#'
+#' # With rarefied data
+#' res <- identify_core(
+#'   physeq_obj     = switchgrass,
+#'   priority_var   = "sampling_date",
+#'   increase_value = 0.02,
+#'   seed           = 091825
+#' )
+#'
+#' str(res)
+#'
+#' # With unrarefied data (requires multi_rarefy step)
+#' rarefied_list <- multi_rarefy(
+#'   physeq_obj = bcse,
+#'   depth_level = 1000,
+#'   num_iter = 3,
+#'   .as = "list",
+#'   set_seed = 7642
+#' )
+#'
+#'
+#' res_rare <- identify_core(
+#'   physeq_obj = bcse,
+#'   rarefied_list = rarefied_list,
+#'   priority_var = "sampling_date",
+#'   increase_value = 0.02,
+#'   seed = 091825
+#' )
+#'
+#' str(res_rare)
+#' }
+#'
 #' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data
 #' @importFrom phyloseq tax_table
 #' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate
@@ -104,26 +145,6 @@
 #' @importFrom vegan decostand
 #' @importFrom cli cli_text cli_warn cli_abort cli_alert_success cli_alert_info
 #' @importFrom utils combn tail
-#'
-#' @examples
-#' \donttest{
-#' library(phyloseq)
-#' library(BRCore)
-#' # Example using switchgrass phyloseq object and grouping variable
-#' # 'sampling_date'
-#' data("switchgrass", package = "BRCore")
-#'
-#' res <- identify_core(
-#'   physeq_obj     = switchgrass,
-#'   priority_var   = "sampling_date",
-#'   increase_value = 0.02,
-#'   seed           = 091825
-#' )
-#'
-#' # Inspect results
-#' str(res)
-#' }
-#'
 #' @export
 identify_core <- function(
   physeq_obj,

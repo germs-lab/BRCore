@@ -123,12 +123,12 @@ and \pkg{vegan}.
 
 \examples{
 \donttest{
-library(phyloseq)
 library(BRCore)
-# Example using switchgrass phyloseq object and grouping variable
-# 'sampling_date'
-data("switchgrass", package = "BRCore")
 
+data("switchgrass", package = "BRCore")
+data("bcse", package = "BRCore")
+
+# With rarefied data
 res <- identify_core(
   physeq_obj     = switchgrass,
   priority_var   = "sampling_date",
@@ -136,8 +136,27 @@ res <- identify_core(
   seed           = 091825
 )
 
-# Inspect results
 str(res)
+
+# With unrarefied data (requires multi_rarefy step)
+rarefied_list <- multi_rarefy(
+  physeq_obj = bcse,
+  depth_level = 1000,
+  num_iter = 3,
+  .as = "list",
+  set_seed = 7642
+)
+
+
+res_rare <- identify_core(
+  physeq_obj = bcse,
+  rarefied_list = rarefied_list,
+  priority_var = "sampling_date",
+  increase_value = 0.02,
+  seed = 091825
+)
+
+str(res_rare)
 }
 
 }
@@ -146,4 +165,8 @@ Shade A, Stopnisek N (2019) Abundance-occupancy
 distributions to prioritize plant core microbiome membership. Current
 Opinion in Microbiology, 49:50-58
 doi:https://doi.org/10.1016/j.mib.2019.09.008
+}
+\seealso{
+\code{\link[=multi_rarefy]{multi_rarefy()}}, \code{\link[=plot_identified_core]{plot_identified_core()}}, and
+\code{\link[=plot_core_distribution]{plot_core_distribution()}}
 }

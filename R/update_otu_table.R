@@ -16,20 +16,14 @@
 #'
 #' @return A `phyloseq` object.
 #'
-#' @importFrom phyloseq otu_table sample_data tax_table phy_tree refseq
-#' @importFrom phyloseq phyloseq sample_names prune_taxa prune_samples
-#' @importFrom phyloseq sample_sums taxa_sums
-#' @importFrom cli cli_inform cli_alert_success cli_alert_warning cli_alert_info
-#' @importFrom cli cli_abort
-#' @importFrom magrittr %>%
+#' @seealso [multi_rarefy()]
 #'
 #' @examples
-#' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
 #' data(GlobalPatterns, package = "phyloseq")
 #'
-#' # List output (.as = "list")
+#' # List output
 #' otu_list <-
 #'   multi_rarefy(
 #'     physeq_obj = GlobalPatterns,
@@ -42,7 +36,7 @@
 #' # Extract iteration 2
 #' rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 #'
-#' # Array output (.as = "array")
+#' # Array output
 #' otu_array <-
 #'   multi_rarefy(
 #'     physeq_obj = GlobalPatterns,
@@ -54,8 +48,13 @@
 #'
 #' # Extract iteration 1
 #' rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
-#' }
 #'
+#' @importFrom phyloseq otu_table sample_data tax_table phy_tree refseq
+#' @importFrom phyloseq phyloseq sample_names prune_taxa prune_samples
+#' @importFrom phyloseq sample_sums taxa_sums
+#' @importFrom cli cli_inform cli_alert_success cli_alert_warning cli_alert_info
+#' @importFrom cli cli_abort
+#' @importFrom magrittr %>%
 #' @export
 update_otu_table <- function(physeq_obj, rarefied_otus, iteration = NULL) {
   suppressMessages(.phyloseq_class_check(physeq_obj))

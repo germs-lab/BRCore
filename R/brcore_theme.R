@@ -34,7 +34,6 @@
 #'   to any \code{ggplot} with \code{+}.
 #'
 #' @examples
-#' \donttest{
 #' library(ggplot2)
 #' ggplot(mtcars, aes(wt, mpg)) +
 #'   geom_point() +
@@ -47,7 +46,6 @@
 #'     dashed_grid  = TRUE,
 #'     extra_themes = list(no_legend = theme(legend.position = "none"))
 #'   )
-#' }
 #'
 #' @importFrom ggplot2 theme_classic theme element_text element_line
 #'   element_blank element_rect

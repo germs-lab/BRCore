@@ -42,7 +42,6 @@ observed \code{proportionBC} range to avoid overlap.
 }
 \examples{
 \donttest{
-library(phyloseq)
 library(BRCore)
 # Example with the package switchgrass dataset
 data("switchgrass", package = "BRCore")

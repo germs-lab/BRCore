@@ -27,9 +27,11 @@
 #'
 #' @return A ggplot2 object that can be further customized.
 #'
+#' @seealso [identify_core()], [plot_abundance_occupancy()], and
+#' [plot_identified_core()]
+#'
 #' @examples
 #' \donttest{
-#' library(phyloseq)
 #' library(BRCore)
 #' # Generate an object from identify_core and then plot
 #' data("switchgrass", package = "BRCore")

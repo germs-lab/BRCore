@@ -26,7 +26,6 @@
 #'
 #' @examples
 #' \donttest{
-#' library(phyloseq)
 #' library(BRCore)
 #' # Example with the package switchgrass dataset
 #' data("switchgrass", package = "BRCore")
@@ -52,7 +51,10 @@
 #'
 #' @importFrom grid unit
 #' @importFrom dplyr mutate filter
-#' @importFrom ggplot2 ggplot aes geom_point geom_vline annotate labs theme_classic theme element_text scale_x_continuous scale_y_continuous expansion
+#' @importFrom ggplot2 ggplot aes geom_point geom_vline annotate labs
+#' @importFrom ggplot2 theme_classic theme element_text scale_x_continuous
+#' @importFrom ggplot2 scale_y_continuous expansion
+#'
 #' @export
 plot_identified_core <- function(
   bray_curtis_ranked,
@@ -175,13 +177,6 @@ plot_identified_core <- function(
     ) +
     .brcore_theme() +
     scale_x_continuous(breaks = seq(0, max(new_data$rank_num), by = 5))
-
-  # To add some more fancy graphics later...
-  # axis.title = element_text(size = 11),
-  # axis.text = element_text(size = 9),
-  # panel.grid.minor = element_blank(),
-  # panel.grid.major.x = element_line(color = "gray90", size = 0.3),
-  # panel.grid.major.y = element_line(color = "gray90", size = 0.3))
 
   return(list(
     df_for_plot = new_data,

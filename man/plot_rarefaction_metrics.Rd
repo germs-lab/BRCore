@@ -19,7 +19,6 @@ Good's coverage, and outlier behavior based on a data frame or a
 \code{phyloseq} object with rare stats already added via \code{add_rare_stats()}.
 }
 \examples{
-\donttest{
 library(phyloseq)
 library(BRCore)
 
@@ -35,6 +34,8 @@ plot_rarefaction_metrics(bcse_metrics)
 # pre-computed read_num, goods_cov, and outlier columns
 sample_data_df <- data.frame(sample_data(bcse_metrics))
 plot_rarefaction_metrics(sample_data_df)
-}
 
+}
+\seealso{
+\code{\link[=add_rarefaction_metrics]{add_rarefaction_metrics()}}
 }

@@ -45,7 +45,6 @@ a grouping variable.
 }
 \examples{
 \donttest{
-library(phyloseq)
 library(BRCore)
 # Generate an object from identify_core and then plot
 data("switchgrass", package = "BRCore")
@@ -66,4 +65,8 @@ plot_core_distribution(
 )
 }
 
+}
+\seealso{
+\code{\link[=identify_core]{identify_core()}}, \code{\link[=plot_abundance_occupancy]{plot_abundance_occupancy()}}, and
+\code{\link[=plot_identified_core]{plot_identified_core()}}
 }

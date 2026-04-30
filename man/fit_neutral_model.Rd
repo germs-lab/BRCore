@@ -39,7 +39,6 @@ below (i.e. interpreted as dispersally limited) the model predictions.
 }
 \examples{
 \donttest{
-library(phyloseq)
 library(BRCore)
 data("switchgrass", package = "BRCore")
 
@@ -79,5 +78,5 @@ plant core microbiome membership. Current Opinion in Microbiology, 49:50-58
 \url{https://doi.org/10.1016/j.mib.2019.09.008}
 }
 \seealso{
-\code{\link{plot_neutral_model}}
+\code{\link[=plot_neutral_model]{plot_neutral_model()}}
 }

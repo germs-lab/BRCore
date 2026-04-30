@@ -14,27 +14,24 @@
 #'   scale (\code{scale_color_viridis_d}) is used; otherwise the continuous
 #'   scale (\code{scale_color_viridis_c}) is used. Default \code{FALSE}.
 #'
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom phyloseq otu_table sample_data taxa_are_rows
-#' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning cli_alert_success cli_alert_danger
-#' @importFrom utils head
-#' @importFrom vegan rrarefy
-#' @importFrom dplyr left_join all_of
+
 #'
 #' @return ggplot object comparing raw vs rarefied diversity distributions across iterations.
 #'
+#'
 #' @examples
-#' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
-#' # Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
+#' # Example comparing hill q=1 between Poplar and Switchgrass plots
+#' data("bcse", package = "BRCore")
 #' bcse_filt <- bcse |>
 #' subset_samples(Crop %in% c("Poplar", "Switchgrass"))
+#'
 #' bcse_rarefied_otutable_filt <-
 #'  multi_rarefy(
 #'        physeq_obj = bcse_filt,
 #'        depth_level = 1000,
-#'        num_iter = 100,
+#'        num_iter = 10,
 #'        .as = "list",
 #'        set_seed = 7643
 #'    )
@@ -46,7 +43,14 @@
 #'    group_var = "Crop",
 #'    group_color = "Plot"
 #')
-#' }
+#'
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom phyloseq otu_table sample_data taxa_are_rows
+#' @importFrom cli cli_h1 cli_h2 cli_alert_info cli_alert_warning
+#' @importFrom cli cli_alert_success cli_alert_danger
+#' @importFrom utils head
+#' @importFrom vegan rrarefy
+#' @importFrom dplyr left_join all_of
 #'
 #' @export
 plot_variance_propagation <- function(

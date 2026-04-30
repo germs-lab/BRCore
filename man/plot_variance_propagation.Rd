@@ -38,17 +38,18 @@ ggplot object comparing raw vs rarefied diversity distributions across iteration
 This function evaluate the variance between rarefaction iterations from \code{multi_rarefy()} by visually comparing raw vs. rarefied alpha diversity metrics calculated at each iterations. It is possible to plot observed richness (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting the \code{q} parameter to "richness" or \code{q} = 0, "shannon" or \code{q} = 1, or "shannon" or \code{q} = 2. The plot is faceted by method (raw vs rarefied) and colored by a specified grouping variable from the sample data.
 }
 \examples{
-\donttest{
 library(phyloseq)
 library(BRCore)
-# Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
+# Example comparing hill q=1 between Poplar and Switchgrass plots
+data("bcse", package = "BRCore")
 bcse_filt <- bcse |>
 subset_samples(Crop \%in\% c("Poplar", "Switchgrass"))
+
 bcse_rarefied_otutable_filt <-
  multi_rarefy(
        physeq_obj = bcse_filt,
        depth_level = 1000,
-       num_iter = 100,
+       num_iter = 10,
        .as = "list",
        set_seed = 7643
    )
@@ -60,6 +61,5 @@ plot_variance_propagation(
    group_var = "Crop",
    group_color = "Plot"
 )
-}
 
 }
