@@ -88,7 +88,7 @@
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy
 #' distributions to prioritize plant core microbiome membership. Current
 #' Opinion in Microbiology, 49:50-58
-#' doi:https://doi.org/10.1016/j.mib.2019.09.008
+#' <doi:10.1016/j.mib.2019.09.008>
 #'
 #' @section Dependencies:
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
@@ -127,7 +127,7 @@
 #' res_rare <- identify_core(
 #'   physeq_obj = bcse,
 #'   rarefied_list = rarefied_list,
-#'   priority_var = "sampling_date",
+#'   priority_var = "Crop",
 #'   increase_value = 0.02,
 #'   seed = 091825
 #' )

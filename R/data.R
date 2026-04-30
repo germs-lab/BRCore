@@ -9,7 +9,7 @@
 #'
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy distributions to
 #' prioritize plant core microbiome membership. Current Opinion in
-#' Microbiology, 49:50-58 <https://doi.org/10.1016/j.mib.2019.09.008>
+#' Microbiology, 49:50-58 <doi:10.1016/j.mib.2019.09.008>
 #'
 #' @source Internal test dataset.
 "switchgrass"
@@ -35,7 +35,7 @@
 #'
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy distributions to
 #' prioritize plant core microbiome membership. Current Opinion in
-#' Microbiology, 49:50-58 <https://doi.org/10.1016/j.mib.2019.09.008>
+#' Microbiology, 49:50-58 <doi:10.1016/j.mib.2019.09.008>
 #'
 #' @source Internal test dataset.
 "switchgrass_core"
@@ -51,7 +51,7 @@
 #'
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy distributions to
 #' prioritize plant core microbiome membership. Current Opinion in
-#' Microbiology, 49:50-58 <https://doi.org/10.1016/j.mib.2019.09.008>
+#' Microbiology, 49:50-58 <doi:10.1016/j.mib.2019.09.008>
 #'
 #' @source Internal test dataset.
 "mimulus"
@@ -67,7 +67,7 @@
 #'
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy distributions to
 #' prioritize plant core microbiome membership. Current Opinion in
-#' Microbiology, 49:50-58 <https://doi.org/10.1016/j.mib.2019.09.008>
+#' Microbiology, 49:50-58 <doi:10.1016/j.mib.2019.09.008>
 #'
 #'
 #' @source Internal test dataset.
@@ -87,7 +87,7 @@
 #' @references Haan, N. L., Benucci, G. N. M., Fiser, C. M., Bonito, G., &
 #' Landis, D. A. (2023). Contrasting effects of bioenergy crops on
 #' biodiversity. Science Advances, 9(38), eadh7960.
-#' <https://doi.org/10.1126/sciadv.adh7960>
+#' <doi:10.1126/sciadv.adh7960>
 
 #'
 #' @source Internal test dataset.

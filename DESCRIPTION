@@ -27,7 +27,7 @@ Authors@R: c(
     person("Great Lakes Bioenergy Research Center", 
            role = c("cph", "fnd"))
   )
-Description: A unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis. BRCore implements the workflow proposed by Shade and Stopnisek (2019) and incorporates additional rarefaction steps. The proposed workflow aims to identify persistent microbiomes using abundance-occupancy distributions and neutral community model fitting. For more details on abundance-occupancy distributions see Shade A, Stopnisek N (2019) <https://doi.org/10.1016/j.mib.2019.09.008> <https://doi.org/10.1016/j.mib.2019.09.008>, for neutral models, see Sloan et al. (2006) <https://doi.org/10.1111/j.1462-2920.2005.00956.x> and Burns et al. (2015) <https://doi.org/10.1038/ismej.2015.142>.
+Description: A unified framework for identification and ecological interpretation of core microbiomes across time and space, enhancing robustness and reproducibility in microbiome data analysis. BRCore implements the workflow proposed by Shade and Stopnisek (2019) and incorporates additional rarefaction steps. The proposed workflow aims to identify persistent microbiomes using abundance-occupancy distributions and neutral community model fitting. For more details on abundance-occupancy distributions see Shade A, Stopnisek N (2019) <doi:10.1016/j.mib.2019.09.008>, for neutral models, see Sloan et al. (2006) <doi:10.1111/j.1462-2920.2005.00956.x> and Burns et al. (2015) <doi:10.1038/ismej.2015.142>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: en-US

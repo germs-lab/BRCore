@@ -23,6 +23,6 @@ microbiome only.
 Haan, N. L., Benucci, G. N. M., Fiser, C. M., Bonito, G., &
 Landis, D. A. (2023). Contrasting effects of bioenergy crops on
 biodiversity. Science Advances, 9(38), eadh7960.
-\url{https://doi.org/10.1126/sciadv.adh7960}
+\url{doi:10.1126/sciadv.adh7960}
 }
 \keyword{datasets}

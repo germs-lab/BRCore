@@ -151,7 +151,7 @@ rarefied_list <- multi_rarefy(
 res_rare <- identify_core(
   physeq_obj = bcse,
   rarefied_list = rarefied_list,
-  priority_var = "sampling_date",
+  priority_var = "Crop",
   increase_value = 0.02,
   seed = 091825
 )
@@ -164,7 +164,7 @@ str(res_rare)
 Shade A, Stopnisek N (2019) Abundance-occupancy
 distributions to prioritize plant core microbiome membership. Current
 Opinion in Microbiology, 49:50-58
-doi:https://doi.org/10.1016/j.mib.2019.09.008
+\url{doi:10.1016/j.mib.2019.09.008}
 }
 \seealso{
 \code{\link[=multi_rarefy]{multi_rarefy()}}, \code{\link[=plot_identified_core]{plot_identified_core()}}, and

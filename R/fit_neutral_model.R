@@ -1,7 +1,7 @@
 #' Fit a Neutral Model to Microbial Community Data
 #'
 #' The function fits the neutral distribution model developed by Sloan et al.
-#' 2006, and implemented in R by Burns et al. (2015), to an OTU/ASV table and
+#' (2006), and implemented in R by Burns et al. (2015), to an OTU/ASV table and
 #' returns several goodness of fit statistics alongside a data.frame
 #' with predicted occurrence frequencies for each OTU/ASV based on their
 #' abundance in the metacommunity for plotting the abundance-occupancy
@@ -28,17 +28,17 @@
 #' Sloan, W. T., Lunn, M., Woodcock, S., Head, I. M., Nee, S., & Curtis, T. P.
 #' (2006). Quantifying the roles of immigration and chance in shaping
 #' prokaryote community structure. Environmental Microbiology, 8(4), 732–740.
-#' <https://doi.org/10.1111/j.1462-2920.2005.00956.x>
+#' <doi:10.1111/j.1462-2920.2005.00956.x>
 #'
 #' Burns, A. R., Stephens, W. Z., Stagaman, K., Wong, S., Rawls, J. F.,
 #' Guillemin, K., & Bohannan, B. J. M. (2016). Contribution of neutral
 #' processes to the assembly of gut microbial communities in the zebrafish over
 #' host development. The ISME Journal, 10(3), 655–664.
-#' <https://doi.org/10.1038/ismej.2015.142>
+#' <doi:10.1038/ismej.2015.142>
 #'
 #' Shade A, Stopnisek N (2019) Abundance-occupancy distributions to prioritize
 #' plant core microbiome membership. Current Opinion in Microbiology, 49:50-58
-#' <https://doi.org/10.1016/j.mib.2019.09.008>
+#' <doi:10.1016/j.mib.2019.09.008>
 #'
 #' @seealso [plot_neutral_model()]
 #'

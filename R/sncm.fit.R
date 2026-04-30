@@ -41,7 +41,7 @@
 #' Sloan WT, Lunn M, Woodcock S, Head IM, Nee S, Curtis TP. (2006) Quantifying
 #' the roles of immigration and chance in shaping prokaryote community
 #' structure. Environ Microbiol. 8(4):732-40.
-#' <https://doi.org/10.1111/j.1462-2920.2005.00956.x>
+#' <doi:10.1111/j.1462-2920.2005.00956.x>
 #'
 #' @examples
 #' # Generate community data
