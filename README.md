@@ -39,6 +39,7 @@ abundance-occupancy distributions
 
 - `fit_neutral_model()`
 - `plot_neutral_model()`
+- `scnm.fit()`
 
 **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
 curves, and core distributions
