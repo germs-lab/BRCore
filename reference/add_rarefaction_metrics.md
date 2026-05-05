@@ -41,113 +41,82 @@ OTUs (Operational Taxonomic Units) represented by only one individual
 For example, a Good's coverage of 0.95, means that 5% of the reads in
 that sample are from OTUs that appear only once.
 
+## See also
+
+[`plot_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md)
+for visualizing these metrics, and
+[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+for performing rarefaction on a `phyloseq` object.
+
 ## Examples
 
 ``` r
-# \donttest{
 library(phyloseq)
 library(BRCore)
-# From an object class "phyloseq" with added alpha metrics
 
 data("bcse", package = "BRCore")
+
+# Adding metrics to a "phyloseq" object
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
-sample_data(bcse_metrics)
-#>         Niche               Crop Plot read_num singleton_num goods_cov outlier
-#> bcse50   Leaf               Corn   R2   107643           160  99.85136      NA
-#> bcse69   Leaf            Sorghum   R4    54331           190  99.65029      NA
-#> bcse73   Leaf        Switchgrass   R5    67815            82  99.87908      NA
-#> bcse191  Leaf         Miscanthus   R5    83152            96  99.88455      NA
-#> bcse82   Leaf     Native Grasses   R2    32228           156  99.51595      NA
-#> bcse102  Leaf             Poplar   R3     9621            52  99.45952      NA
-#> bcse111  Leaf   Early Succession   R4     6699            43  99.35811      NA
-#> bcse86   Leaf         Miscanthus   R3   100940            85  99.91579      NA
-#> bcse97   Leaf   Early Succession   R3     4020            30  99.25373      NA
-#> bcse88   Leaf         Miscanthus   R1    70532            90  99.87240      NA
-#> bcse104  Leaf             Poplar   R1     7819            28  99.64190      NA
-#> bcse108  Leaf            Prairie   R2      627            29  95.37480      NA
-#> bcse81   Leaf     Native Grasses   R3     5532            66  98.80694      NA
-#> bcse77   Leaf        Switchgrass   R2     6425            45  99.29961      NA
-#> bcse78   Leaf        Switchgrass   R1    22305            93  99.58305      NA
-#> bcse96   Leaf     Native Grasses   R4    19814            83  99.58110      NA
-#> bcse66   Leaf    New Switchgrass   R2    18536           305  98.35455      NA
-#> bcse57   Leaf Continuous Sorghum   R5    60437           169  99.72037      NA
-#> bcse75   Leaf        Switchgrass   R4     3146            59  98.12460      NA
-#> bcse101  Leaf             Poplar   R4     4529            27  99.40384      NA
-#> bcse192  Leaf               Corn   R4    89228           161  99.81956      NA
-#> bcse98   Leaf   Early Succession   R2     2649            40  98.49000      NA
-#> bcse105  Leaf            Prairie   R5      151            19  87.41722      NA
-#> bcse106  Leaf            Prairie   R4     1354            32  97.63663      NA
-#> bcse76   Leaf        Switchgrass   R3     4936            33  99.33144      NA
-#> bcse103  Leaf             Poplar   R2     9552            39  99.59171      NA
-#> bcse51   Leaf               Corn   R1    94449           216  99.77131      NA
-#> bcse63   Leaf               Corn   R5    91353           141  99.84565      NA
-#> bcse68   Leaf            Sorghum   R5    78348           120  99.84684      NA
-#> bcse109  Leaf            Prairie   R1     3229            80  97.52245      NA
-#> bcse65   Leaf    New Switchgrass   R3     1193           165  86.16932      NA
-#> bcse58   Leaf Continuous Sorghum   R4    53594           102  99.80968      NA
-#> bcse107  Leaf            Prairie   R3     1725           313  81.85507      NA
-#> bcse62   Leaf Continuous Sorghum   R1    79380            78  99.90174      NA
-#> bcse59   Leaf Continuous Sorghum   R3    90635           261  99.71203      NA
-#> bcse99   Leaf   Early Succession   R1    60638            59  99.90270      NA
-#> bcse49   Leaf               Corn   R3    88058           109  99.87622      NA
-#> bcse85   Leaf         Miscanthus   R4    75760            64  99.91552      NA
-#> bcse79   Leaf    New Switchgrass   R5     4275           224  94.76023      NA
-#> bcse72   Leaf            Sorghum   R1    76278           138  99.81908      NA
-#> bcse80   Leaf    New Switchgrass   R4     1963           137  93.02089      NA
-#> bcse71   Leaf            Sorghum   R2   102787            77  99.92509      NA
-#> bcse110  Leaf   Early Succession   R5      944            27  97.13983      NA
-#> bcse95   Leaf     Native Grasses   R5    21592            61  99.71749      NA
-#> bcse67   Leaf    New Switchgrass   R1    24099           211  99.12444      NA
-#> bcse61   Leaf Continuous Sorghum   R2    86626           114  99.86840      NA
-#> bcse100  Leaf             Poplar   R5    16463            44  99.73273      NA
-#> bcse87   Leaf         Miscanthus   R2    74457            56  99.92479      NA
-#> bcse83   Leaf     Native Grasses   R1    25209           148  99.41291      NA
-#> bcse70   Leaf            Sorghum   R3    66743           145  99.78275      NA
+sample_data(bcse_metrics)|>
+head(10)
+#>         Niche             Crop Plot read_num singleton_num goods_cov outlier
+#> bcse50   Leaf             Corn   R2   107643           160  99.85136      NA
+#> bcse69   Leaf          Sorghum   R4    54331           190  99.65029      NA
+#> bcse73   Leaf      Switchgrass   R5    67815            82  99.87908      NA
+#> bcse191  Leaf       Miscanthus   R5    83152            96  99.88455      NA
+#> bcse82   Leaf   Native Grasses   R2    32228           156  99.51595      NA
+#> bcse102  Leaf           Poplar   R3     9621            52  99.45952      NA
+#> bcse111  Leaf Early Succession   R4     6699            43  99.35811      NA
+#> bcse86   Leaf       Miscanthus   R3   100940            85  99.91579      NA
+#> bcse97   Leaf Early Succession   R3     4020            30  99.25373      NA
+#> bcse88   Leaf       Miscanthus   R1    70532            90  99.87240      NA
 
-# From a class "data.frame" count table object
 
+# Adding metrics to a "data.frame" count table object
 bcse_otutable <- as.data.frame(
-  as(otu_table(bcse), "matrix")
+  as.matrix(otu_table(bcse))
 )
-test_otutable_metrics <- add_rarefaction_metrics(
+
+bcse_otutable_metrics <- add_rarefaction_metrics(
   data = bcse_otutable
 )
-test_otutable_metrics[
-  utils::tail(seq_len(nrow(test_otutable_metrics)), 10),
-  utils::tail(seq_len(ncol(test_otutable_metrics)), 20)
+bcse_otutable_metrics[
+  head(seq_len(nrow(bcse_otutable_metrics)), 10),
+  tail(seq_len(ncol(bcse_otutable_metrics)), 20)
 ]
-#>           bcse59 bcse99 bcse49 bcse85 bcse79 bcse72 bcse80 bcse71 bcse110
-#> OTU_15053      1      0      0      0      0      0      0      0       0
-#> OTU_14114      0      0      0      0      0      0      0      0       0
-#> OTU_9931       0      0      0      0      0      0      0      0       0
-#> OTU_13974      2      0      0      0      0      0      0      0       0
-#> OTU_10518      0      0      0      0      0      0      0      6       0
-#> OTU_12854      0      0      0      0      0      0      0      1       0
-#> OTU_15056      0      0      0      0      0      2      0      0       0
-#> OTU_14409      0      0      0      0      0      0      0      0       0
-#> OTU_11281      0      0      0      0      0      0      0      0       0
-#> OTU_15187      0      0      0      2      0      0      0      0       0
-#>           bcse95 bcse67 bcse61 bcse100 bcse87 bcse83 bcse70 read_num
-#> OTU_15053      0      0      0       0      0      0      0        2
-#> OTU_14114      0      0      0       0      0      0      0        1
-#> OTU_9931       0      0      0       0      0      0      0        1
-#> OTU_13974      0      0      0       0      0      0      0        2
-#> OTU_10518      0      0      0       0      0      0      0        6
-#> OTU_12854      0      0      0       0      0      0      0        2
-#> OTU_15056      0      0      0       0      0      0      0        2
-#> OTU_14409      0      0      0       0      0      0      0        2
-#> OTU_11281      0      0      0       0      0      0      0        2
-#> OTU_15187      0      0      0       0      0      0      0        2
-#>           singleton_num goods_cov outlier
-#> OTU_15053             2         0      NA
-#> OTU_14114             1         0      NA
-#> OTU_9931              1         0      NA
-#> OTU_13974             0       100      NA
-#> OTU_10518             0       100      NA
-#> OTU_12854             2         0      NA
-#> OTU_15056             0       100      NA
-#> OTU_14409             0       100      NA
-#> OTU_11281             0       100      NA
-#> OTU_15187             0       100      NA
-# }
+#>         bcse59 bcse99 bcse49 bcse85 bcse79 bcse72 bcse80 bcse71 bcse110 bcse95
+#> OTU_427      2      0      0      0      0      0      1      0       0      0
+#> OTU_11       5      0      0      0     12      0     37      0       1      2
+#> OTU_253      0      0      0      0      0      0      0      0       0      0
+#> OTU_148    323      0      6      1     15    711      7   1107       0      0
+#> OTU_3    30332  11876  34910  23513    111   6016    201   1130     163   3992
+#> OTU_78       0      1      0      0      1      2      0      0       0      0
+#> OTU_58       9      0      0      0      6      0      1      0       0      1
+#> OTU_152      0      0      0      0      0      0      0      5       0      0
+#> OTU_16      37    195     30     12     46     24      3      3       3     31
+#> OTU_35       0      0      0      0      0      0      0      0       0      0
+#>         bcse67 bcse61 bcse100 bcse87 bcse83 bcse70 read_num singleton_num
+#> OTU_427      3      0       0      0      0      0        7             2
+#> OTU_11       3      1       0      0     29      0      127            12
+#> OTU_253      2      0       0      0      0      0        5             0
+#> OTU_148     13   5093     184     34     70     13    16078             9
+#> OTU_3     8004  26526    3140  19678   5773   2838   510842             0
+#> OTU_78       1      0       0      0      0      0       30            10
+#> OTU_58      16      0       0      0      0      3       79             5
+#> OTU_152      0      0       0      0      0      0        8             1
+#> OTU_16      58     64      19      2     95     19     1463             5
+#> OTU_35       0      0       0      0      0      1        2             2
+#>         goods_cov outlier
+#> OTU_427  71.42857      NA
+#> OTU_11   90.55118      NA
+#> OTU_253 100.00000      NA
+#> OTU_148  99.94402   16078
+#> OTU_3   100.00000  510842
+#> OTU_78   66.66667      NA
+#> OTU_58   93.67089      NA
+#> OTU_152  87.50000      NA
+#> OTU_16   99.65824    1463
+#> OTU_35    0.00000      NA
+
 ```

@@ -58,12 +58,24 @@ Points are split into four groups for display:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-# Assuming you have run a neutral model fit on the switchgrass data.frames
-is.data.frame(switchgrass_core_fit$model_prediction)
-is.data.frame(switchgrass_core_fit$goodness_of_fit)
+library(BRCore)
+data("switchgrass_core", package = "BRCore")
+
+switchgrass_core_fit <- fit_neutral_model(
+  otu_table = switchgrass_core$otu_table,
+  core_set = switchgrass_core$increase_core,
+  abundance_occupancy = switchgrass_core$abundance_occupancy
+)
+#> Waiting for profiling to be done...
+#> ℹ Neutral model fitting:
+#> • Average individuals per community (N): 1000
+#> • Binomial model using rounded N: 1000
+#> • Poisson model using N: 1000
+#> • Maximum likelihood estimation using N: 1000, and starting parameters: mu = 0,
+#>   sigma = 0.1
+#> ✔ Model fitting complete!
 
 p <- plot_neutral_model(switchgrass_core_fit)
 print(p)
-} # }
+
 ```

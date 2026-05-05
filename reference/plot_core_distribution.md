@@ -1,6 +1,6 @@
 # Plot Core Taxa Occupancy Across Metadata Groups
 
-Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns
+Creates a plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns
 across a grouping variable.
 
 ## Usage
@@ -57,44 +57,25 @@ plot_core_distribution(
 
 A ggplot2 object that can be further customized.
 
+## See also
+
+[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md),
+[`plot_abundance_occupancy()`](http://www.germslab.org/BRCore/reference/plot_abundance_occupancy.md),
+and
+[`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+
 ## Examples
 
 ``` r
-# \donttest{
-library(phyloseq)
 library(BRCore)
-# Generate an object from identify_core and then plot
-data("switchgrass", package = "BRCore")
+data("switchgrass_core", package = "BRCore")
 
-switchgrass_core <- identify_core(
-  physeq_obj = switchgrass,
-  priority_var = "sampling_date",
-  increase_value = 0.02,
-  abundance_weight = 0,
-  seed = 1234
-)
-#> Seed used: 1234
-#> ✔ Input phyloseq object is valid!
-#> ℹ No `rarefied_list` provided. `physeq_obj` is already rarefied; wrapping as a single iteration.
-#> ℹ No taxonomy found (or empty). Continuing without taxonomy.
-#> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:10:25.728293
-#> ■■■■■■                            16% | ETA:  5s
-#> ■■■■■■■■■■■■■■■                   48% | ETA:  4s
-#> ■■■■■■■■■■■■■■■■■■■■■■            69% | ETA:  3s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      90% | ETA:  1s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
-#> ✔ Elbow method identified 3 core OTUs
-#> ✔ % increase method identified 34 core OTUs
-#> ✔ Analysis complete!
-
-plot_core_distribution(
+p <- plot_core_distribution(
   core_result = switchgrass_core,
   core_set = "increase",
   group_var = "sampling_date",
   plot_type = "bar"
 )
+print(p)
 
-# }
 ```

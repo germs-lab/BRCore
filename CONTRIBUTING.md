@@ -106,6 +106,7 @@ Example: library(reprex)
 
 sessionInfo() })
 
+
     ### Suggesting Features
 
     Feature requests are welcome! Please:
@@ -205,6 +206,7 @@ BREAKING CHANGE: identify_core() now returns a list instead of a data frame"
 1.  **Ensure your code passes all checks**:
 
     ``` r
+
     devtools::document()
     devtools::test()
     devtools::check()

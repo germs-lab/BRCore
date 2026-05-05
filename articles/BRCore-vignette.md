@@ -3,6 +3,7 @@
 ### Load R libraries
 
 ``` r
+
 invisible(
   lapply(
     c("BRCore", "phyloseq", "tidyverse", "viridis"),
@@ -19,10 +20,11 @@ The `BRCore` R package comes with a few datasets. Three 16S datasets:
 ([2019](#ref-Shade2019Abundance)); a 16S dataset, called `bcse`, from
 leaves of ten different cropping systems in the Bioenergy Crop Research
 Experiment from Haan et al. ([2023](#ref-Haan2023Contrasting)). Here we
-are going to use `bcse` since it is not rarefied in contrast of the
+are going to use `bcse` since it is not rarefied in contrast to the
 other three.
 
 ``` r
+
 data("bcse", package = "BRCore")
 str(bcse)
 #> Formal class 'phyloseq' [package "phyloseq"] with 5 slots
@@ -60,7 +62,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x5f4493a140f8> 
+#>   .. .. .. .. .. ..$ :<environment: 0x5ebe5ca4ea10> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -85,18 +87,19 @@ Schloss ([2024a](#ref-Schloss2024Rarefaction)), Schloss
 ([2022](#ref-Hong2022Rarefy)), and Weiss et al.
 ([2017](#ref-Weiss2017Normalization)) as a start.
 
-In `BRCore`, to identified the ideal rarefaction cutoff we can plot a
-simple series of visuals to guide us in the decision. As we all know, we
-can, more or less, estimate how well a DNA sample will sequence, but
-there are always some samples that fail to sequence (or sequence badly)
-and some others that will sequence “too well” for reasons that are
-outside our control or by chance.
+In `BRCore`, to identify the ideal rarefaction cutoff we can plot a
+simple series of visuals to guide us in the decision. We can, more or
+less, estimate how well a DNA sample will sequence, but there are always
+some samples that fail to sequence (or sequence badly) and some others
+that will sequence “too well” for reasons that are outside our control
+or by chance.
 
-In the end we will need to decide how many samples we are accepting to
+In the end we will need to decide how many samples we are willing to
 discard and how much diversity we want to retain in our data. To do that
 we can use some help by plotting some diagnostics plots as shown below.
 
 ``` r
+
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 bcse_metrics
 #> phyloseq-class experiment-level object
@@ -116,7 +119,7 @@ rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
 
-✔ Generating rarefaction diagnostic plots [935ms]
+✔ Generating rarefaction diagnostic plots [1.2s]
 print(rarefaction_plot)
 ```
 
@@ -134,64 +137,119 @@ estimates the proportion of species in a community that are represented
 in a sample, based on the number of species encountered and the total
 number of individuals sampled. Essentially, it quantifies how well a
 sample represents the overall diversity of a population or ecosystem.
-Good’s coverage is calculated as $(1 - (n1/N)$, where $n1$ is the number
-of unique ASV/OTUs (i.e. species) found only once, and $N$ is the total
-number of sequence reads (i.e. individuals); a high percentage (e.g.,
-\>95%) means most reads are from common taxa, suggesting sufficient
-sampling, while low coverage indicates many rare, potentially missed,
-taxa.
+Good’s coverage is calculated as $`(1-(n1/N)`$, where $`n1`$ is the
+number of unique ASV/OTUs (i.e. species) found only once, and $`N`$ is
+the total number of sequence reads (i.e. individuals); a high percentage
+(e.g., \>95%) means most reads are from common taxa, suggesting
+sufficient sampling, while low coverage indicates many rare, potentially
+missed, taxa.
 
 ### Rarefy the data and explore variance propagation
 
 Originally developed by Sanders ([1968](#ref-Sanders1968Marine))
-rarefaction has been adopted widely in ecology and microbiome research.
-It consists on randomly re sampling, multiple times, the same number of
-species (ASV/OTUs) across all samples, to calculate the expected number
-of species that would be found if all the samples were all the same. It
-basically prevents samples with more individuals (e.g., more sequencing
-reads) from appearing more diverse simply because they were sampled more
-heavily.
+rarefaction has been adopted widely in ecology and microbiome
+research. It consists of randomly resampling the same number of species
+(ASV/OTUs) multiple times across all samples to estimate the expected
+number of species that would be observed if all samples were identical.
+It prevents samples with more individuals (e.g., more sequencing reads)
+from appearing more diverse simply because they were sampled more in
+depth.
 
-Because rarefaction is a random process it add noise to the data, each
-re sampling is slightly different from others due to chance. This can be
-problematic, especially when a very low rarefaction cutoff is selected,
-when for example we want to compare 2 treatments. This is due to the
-fact that the lower the rarefaction cutoff the more chance you have that
-rarefaction iterations will differ one another as also showed by Cameron
-et al. ([2021](#ref-Cameron2021Rarefying)).
+Because rarefaction is a random process, it adds noise to the data. Each
+resampling event is slightly different from others due to chance. This
+can be problematic, especially when a very low rarefaction cutoff is
+selected, when, for example, we want to compare 2 treatments. With lower
+rarefaction cutoffs, the greater the chance you have that rarefaction
+iterations will differ from one another, as also shown by Cameron et al.
+([2021](#ref-Cameron2021Rarefying)).
 
 We developed functions that can perform and store all the rarefaction
-iterations so to evaluate (and visualize) the generated noise in the
-process as show below
+iterations to evaluate (and visualize) the noise generated in the
+process, as shown below:
 
 ``` r
+
 bcse_rarefied_list <-
   multi_rarefy(
     physeq_obj = bcse,
     depth_level = 1000,
     num_iter = 3,
-    .as_array = FALSE,
+    .as = "list",
     set_seed = 7642
   )
-#> Error in multi_rarefy(physeq_obj = bcse, depth_level = 1000, num_iter = 3, : unused argument (.as_array = FALSE)
+#> 
+#> ── Rarefaction iterations starting... ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#> 
+#> ── Input Validation ──
+#> 
+#> ✔ Input phyloseq object is valid!
+#> ℹ Seed: 7642
+#> ℹ Input (matrix/df dim): 47 samples x 2861 taxa
+#> ℹ Rarefaction depth: 1000
+#> ℹ Iterations: 3
+#> ℹ taxa_are_rows: TRUE
+#> ℹ OTU matrix/df rownames head: bcse50, bcse69, bcse73, bcse191, bcse82, bcse102
+#> ℹ OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78
+#> ℹ Row sums summary: Min=1193, Max=107643, Median=25209
+#> 
+#> ── Rarefaction Results ──
+#> 
+#> ── Sample Removal
+#> ! 3 samples removed (depth < 1000)
+#> ! Samples removed: "bcse108, bcse105, bcse110"
+#> 
+#> ── Taxa Removal
+#> ✔ No taxa removed.
+#> ! Taxa are not removed across iterations to maintain consistent dimensions. 
+#> Downstream analyses should handle zero-abundance taxa appropriately.
+#> 
+#> ── Data Sparsity
+#> ℹ Returning list of data frames for each iteration.
+#> • Rarefied matrix (across 3 iterations):
+#>   • Min: 130570 zeros (97.1% sparsity) out of 134467 entries
+#>   • Max: 130663 zeros (97.17% sparsity) out of 134467 entries
+#>   • Avg: 130608 zeros (97.13% sparsity) out of 134467 entries
+#> 
+#> ── Final Data Dimensions
+#> ✔ Output: 3 iterations with 50 unique samples
+#> • Samples per iteration:
+#>   • Min: 47
+#>   • Max: 47
+#> • Non-zero taxa per iteration:
+#>   • Min: 1046
+#>   • Max: 1098
+#>   • Avg: 1073
 ```
 
 Let’s explore the results.
 
 ``` r
+
 class(bcse_rarefied_list)
-#> Error: object 'bcse_rarefied_list' not found
+#> [1] "list"
 str(bcse_rarefied_list[[1]], list.len = 10) # Dimensions of iteration #1
-#> Error: object 'bcse_rarefied_list' not found
+#> 'data.frame':    47 obs. of  2861 variables:
+#>  $ OTU_427  : int  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ OTU_11   : int  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ OTU_253  : int  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ OTU_148  : int  0 1 0 11 2 0 0 0 0 78 ...
+#>  $ OTU_3    : int  261 86 651 272 249 114 192 73 96 320 ...
+#>  $ OTU_78   : int  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ OTU_58   : int  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ OTU_152  : int  0 0 0 0 0 0 0 0 0 0 ...
+#>  $ OTU_16   : int  2 0 0 1 1 0 0 1 0 0 ...
+#>  $ OTU_35   : int  0 0 0 0 0 0 0 0 0 0 ...
+#>   [list output truncated]
 ```
 
-And plot the variance (the noise we talked above) across the 10
+We can plot the variance (the noise we talked above) across the 3
 iterations of rarefaction. We can use the
 [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
 function to visualize this variance in Alpha diversity across samples
 and iterations and compare Raw (non-rarefied) vs. Rarefied data.
 
 ``` r
+
 rarefaction_variance_plot <- plot_variance_propagation(
   physeq_obj = bcse,
   rarefied = bcse_rarefied_list,
@@ -201,55 +259,87 @@ rarefaction_variance_plot <- plot_variance_propagation(
 )
 #> ✔ Input phyloseq object is valid!
 #> 
-#> ── Rarefaction Variance Propagation Visualization ────────────────────
-#> Error: object 'bcse_rarefied_list' not found
+#> ── Rarefaction Variance Propagation Visualization ────────────────────────────────────────────────────────────────────────────────────────────────────────
+#> ℹ Hill number order selected, q= 0
+#> ℹ Number of rarefaction iterations, n_iter= 3
+#> ℹ Comparison plot generated!
 print(rarefaction_variance_plot)
-#> Error: object 'rarefaction_variance_plot' not found
 ```
 
-Review the rarefaction and variance plots to determine the ideal
-sampling depth. You are looking for a “sweet spot” that maintains high
-diversity and sample sizes while keeping variance across iterations low.
-Pay extra attention when rarefaction cutoff is quite low, as show by
-Cameron et al. ([2021](#ref-Cameron2021Rarefying)). Note this depth, as
-it will serve as the cutoff for the
-[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
-step in your pipeline.
+![Figure 2: Alpha diversity variance propagation (variance between
+rarefaction iteration) across 3 iterations of rarefaction. Points
+represent samples. The x-axis represent the grouping variable (Crop).
+The y-axis represent the alpha diversity metric (q = 0, i.e. richness)
+calculated on the samples. The color of the points represent the 'Plot'
+variable, which is a nested variable within
+'Crop'.](images/fig2_rarefaction_variance-1.png)
 
-#### OPTIONAL: Recreate a phyloseq object with rarefied `otu_table()`
+Figure 2: Alpha diversity variance propagation (variance between
+rarefaction iteration) across 3 iterations of rarefaction. Points
+represent samples. The x-axis represent the grouping variable (Crop).
+The y-axis represent the alpha diversity metric (q = 0, i.e. richness)
+calculated on the samples. The color of the points represent the ‘Plot’
+variable, which is a nested variable within ‘Crop’.
+
+**Review the rarefaction and variance plots to determine the ideal
+sampling depth.** You are looking for a “sweet spot” that maintains high
+diversity and samples while keeping variance across iterations low. Pay
+extra attention when rarefaction cutoff is quite low, as show by Cameron
+et al. ([2021](#ref-Cameron2021Rarefying)). **Note this depth, as it
+will serve as the cutoff for the
+[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+step in your pipeline.**
+
+#### Recreate a phyloseq object with a rarefied `otu_table()`
+
+***This is an optional step.***
 
 The
 [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
-function, handles the rarefaction iterations internally, you do not need
-to worry about rarefaction. The results from
+function accepts a phyloseq object, whether rarefied or non-rarefied.
+When supplying a phyloseq object with a non-rarefied `otu_table`, you
+must provide a list of rarefied OTU tables that result from
+[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
+In our case, we generated `bcse_rarefied_list`.
+
+The results from
 [`add_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md),
 [`plot_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md),
 and
 [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
 are meant to explore the data and inform the chosen parameters for
 [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md).
-You will specify how many rarefaction iterations you decided to run
-within the function.
+Function
+[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+will calculate the distance matrix for all iterations supplied and rank
+OTUs based on the average distance across iterations.
 
 If you have a phyloseq object with a rarefied
 [`otu_table()`](https://rdrr.io/pkg/phyloseq/man/otu_table-methods.html)
-or if you want to use one specific rarefaction iteration generated by
-[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
-you also have these options. The choice is up to you and depends on your
-preferences and the specific goals of your analysis. The
+or if you want to use a specific rarefaction iteration generated by
+[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md),
+you also have these options. *The choice is up to you and depends on
+your preferences and the specific goals of your analysis.* The
 [`update_otu_table()`](http://www.germslab.org/BRCore/reference/update_otu_table.md)
 function allows for replacing the
 [`otu_table()`](https://rdrr.io/pkg/phyloseq/man/otu_table-methods.html)
 with the rarefied table you prefer.
 
 ``` r
+
 bcse_rare_single <- update_otu_table(
   physeq_obj = bcse,
   rarefied_otus = bcse_rarefied_list,
   iteration = 1 # Speficify which iteration to use for the updated OTU table
 )
-#> Error: object 'bcse_rarefied_list' not found
+#> ℹ Extracting iteration 1 from list of 3 iterations.
+#> ! Phyloseq object and rarefied otu_table sample names are NOT identical. Check samples removed by rarefaction below.
+#> ! 3 samples removed due to rarefaction: "bcse108, bcse105, bcse110"
+#> ℹ Building phyloseq object with 47 samples and 2861 taxa
+#> ✔ Update complete!
 ```
+
+Let’s proceed to the core analysis.
 
 ## Core analysis
 
@@ -258,17 +348,19 @@ bcse_rare_single <- update_otu_table(
 We can now identify how many core ASV/OTUs are present in the dataset.
 One important difference that separates
 [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
-form other methods of identification of core taxa is that you can
+from other methods of identification of core taxa is that you can
 specify a variable (in the case of the `bcse` dataset is `Crop`) so that
 OTUs can be core for a level of the variable but possibly not for
-others. This comes form the idea that core microbiome can be transient
-in space and time as show by Shade and Stopnisek
+others. The idea stems from the assumption that the microbiome can be
+transient in space and time, as shown by Shade and Stopnisek
 ([2019](#ref-Shade2019Abundance)).
 
-*We continue with the `bcse` phyloseq object and the rarefied data
-`bcse_rarefied_list` throughout the vignette.*
+**We continue with the `bcse` phyloseq object and the rarefied data
+`bcse_rarefied_list` throughout the vignette.** See below for example
+using a single iteration.
 
 ``` r
+
 bcse_core_multi <- identify_core(
   physeq_obj = bcse,
   rarefied_list = bcse_rarefied_list,
@@ -280,7 +372,13 @@ bcse_core_multi <- identify_core(
 )
 #> Seed used: 2134
 #> ✔ Input phyloseq object is valid!
-#> Error: object 'bcse_rarefied_list' not found
+#> ℹ Using provided `rarefied_list` (3 iterations).
+#> ✔ Core prioritizing variable: Crop
+#> ℹ Ranked by Rank only
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-28 12:10:58.310505
+#> ✔ Elbow method identified 7 core OTUs
+#> ✔ % increase method identified 30 core OTUs
+#> ✔ Analysis complete!
 
 # With a single iteration 
 # bcse_core_single <- identify_core(
@@ -294,17 +392,17 @@ bcse_core_multi <- identify_core(
 ### *How the is the core identified?*
 
 As shown by Shade and Stopnisek ([2019](#ref-Shade2019Abundance)), an
-interesting way explore the abundance and occupancy inclusion thresholds
-used to define the core microbiome is to evaluate how well the resulting
-core membership captures the overarching patterns of beta diversity
-found in the complete dataset. This approach treats the core microbiome
-as a representative subset that should preserve the main ecological
-relationships and sample-to-sample differences observed when using all
-taxa. By measuring how closely the beta diversity patterns calculated
-from core taxa alone match those from the full dataset, researchers can
-objectively assess whether their chosen thresholds produce a meaningful
-and informative core that maintains the essential structural information
-of the microbial community while reducing complexity.
+interesting way to explore the abundance and occupancy inclusion
+thresholds used to define the core microbiome is to evaluate how well
+the resulting core membership captures the overarching patterns of
+beta-diversity found in the complete dataset. This approach treats the
+core microbiome as a representative subset that should preserve the main
+ecological relationships and sample-to-sample differences observed when
+using all taxa. By measuring how closely the beta-diversity patterns
+calculated from core taxa alone match those from the full dataset,
+researchers can objectively assess whether their chosen thresholds yield
+a meaningful and informative core that retains the essential structural
+information of the microbial community while reducing complexity.
 
 To identify the optimal point where increasing the core inclusion
 threshold provides diminishing returns in explanatory value, we offer
@@ -315,18 +413,18 @@ two automated methods.
   progressively smaller improvements. This method calculates the
   first-order difference (numerical differentiation) by assigning a
   score to each potential cutoff point, splitting the curve into two
-  parts, and finding the point that maximizes the difference in average
-  rates of change between these parts.
+  parts, and finding the cutoff that maximizes the difference in average
+  rates of change between the two parts.
 
 - The second method uses a final percent `increase` threshold in
   beta-diversity (recommend 2% or more), which continues adding taxa
   until improvements fall below this percentage.
 
 Both methods measure improvement using Bray-Curtis similarity through
-the equation $C = 1 - \left( BC_{core}/BC_{all} \right)$, where $C$
-represents the contribution of ranked taxa to total similarity,
-$BC_{core}$ is the Bray-Curtis similarity using only core taxa, and
-$BC_{all}$ uses the complete dataset.
+the equation $`C = 1 - (BC_{core}/BC_{all})`$, where $`C`$ represents
+the contribution of ranked taxa to total similarity, $`BC_{core}`$ is
+the Bray-Curtis similarity using only core taxa, and $`BC_{all}`$ uses
+the complete dataset.
 
 The cumulative explanatory value of adding each next-ranked taxon can be
 plotted using the
@@ -339,8 +437,62 @@ additional taxa provide marginal returns in explanatory power.
 **The output is a list of 13 named items.**
 
 ``` r
+
 str(bcse_core_multi)
-#> Error: object 'bcse_core_multi' not found
+#> List of 13
+#>  $ bray_curtis_ranked : tibble [2,861 × 12] (S3: tbl_df/tbl/data.frame)
+#>   ..$ rank             : Factor w/ 2861 levels "1","10","100",..: 1 1112 2085 2196 2307 2418 2529 2640 2751 2 ...
+#>   ..$ rank_num         : num [1:2861] 1 2 3 4 5 6 7 8 9 10 ...
+#>   ..$ otu_added        : chr [1:2861] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>   ..$ MeanBC           : num [1:2861] 0.0744 0.0862 0.1019 0.1036 0.1264 ...
+#>   ..$ proportionBC     : num [1:2861] 0.12 0.139 0.164 0.167 0.203 ...
+#>   ..$ IncreaseBC       : num [1:2861] NA 1.16 1.18 1.02 1.22 ...
+#>   ..$ elbow_slope_diffs: num [1:2861] -0.000191 0.005744 0.009008 0.007127 0.010232 ...
+#>   ..$ delta_pct_max_BC : num [1:2861] NA 15.96 18.22 1.63 22 ...
+#>   ..$ is_BC_core       : logi [1:2861] TRUE TRUE TRUE TRUE TRUE TRUE ...
+#>   ..$ last_pctBC_cutoff: logi [1:2861] FALSE FALSE FALSE FALSE FALSE FALSE ...
+#>   ..$ is_elbow_core    : logi [1:2861] TRUE TRUE TRUE TRUE TRUE TRUE ...
+#>   ..$ last_elbow_cutoff: logi [1:2861] FALSE FALSE FALSE FALSE FALSE FALSE ...
+#>  $ otu_ranked         :'data.frame': 2861 obs. of  7 variables:
+#>   ..$ otu    : chr [1:2861] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>   ..$ otu_occ: num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
+#>   ..$ otu_rel: num [1:2861] 0.21728 0.01799 0.03296 0.00278 0.05897 ...
+#>   ..$ sumF   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ sumG   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ nS     : int [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ rank   : num [1:2861] 2 2 2 2 2 2 2 2 2 2 ...
+#>  $ abundance_occupancy:'data.frame': 2861 obs. of  3 variables:
+#>   ..$ otu    : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ otu_occ: num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ otu_rel: num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...
+#>  $ priority_var       : chr "Crop"
+#>  $ abundance_weight   : num 0
+#>  $ elbow              : int 7
+#>  $ bc_increase        : int 30
+#>  $ increase_value     : num 0.02
+#>  $ elbow_core         : chr [1:7] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>  $ increase_core      : chr [1:30] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>  $ otu_table          : int [1:2861, 1:50] 0 1 0 0 27777 0 7 2 119 0 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   .. ..$ : chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...
+#>  $ metadata           :'data.frame': 50 obs. of  4 variables:
+#>   ..$ Niche    : chr [1:50] "Leaf" "Leaf" "Leaf" "Leaf" ...
+#>   ..$ Crop     : chr [1:50] "Corn" "Sorghum" "Switchgrass" "Miscanthus" ...
+#>   ..$ Plot     : chr [1:50] "R2" "R4" "R5" "R5" ...
+#>   ..$ sample_id: chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...
+#>  $ taxonomy           :'data.frame': 2861 obs. of  10 variables:
+#>   ..$ OTU_ID   : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ Kingdom  : chr [1:2861] "Bacteria" "Bacteria" "Bacteria" "Bacteria" ...
+#>   ..$ Phylum   : chr [1:2861] "Myxococcota" "Actinobacteriota" "Proteobacteria" "Proteobacteria" ...
+#>   ..$ Class    : chr [1:2861] "Polyangia" "Actinobacteria" "Alphaproteobacteria" "Gammaproteobacteria" ...
+#>   ..$ Order    : chr [1:2861] "Polyangiales" "Streptomycetales" "Rhizobiales" "Enterobacterales" ...
+#>   ..$ Family   : chr [1:2861] "Polyangiaceae" "Streptomycetaceae" "Rhizobiaceae" "Enterobacteriaceae" ...
+#>   ..$ Genus    : chr [1:2861] "Aetherobacter" "Streptomyces" "Mesorhizobium" NA ...
+#>   ..$ Species  : chr [1:2861] "Uncultured_bacterium_3097" NA "Mesorhizobium_sophorae" NA ...
+#>   ..$ BestMatch: chr [1:2861] "Uncultured bacterium 3097" "Streptomyces" "Mesorhizobium sophorae" "Enterobacteriaceae" ...
+#>   ..$ Taxonomy : chr [1:2861] "OTU_427-Uncultured bacterium 3097" "OTU_11-Streptomyces" "OTU_253-Mesorhizobium sophorae" "OTU_148-Enterobacteriaceae" ...
+#>  - attr(*, "class")= chr [1:2] "identify_core_result" "list"
 ```
 
 #### Visualize the abundance-occupancy distribution and the core ASV/OTUs set
@@ -350,88 +502,135 @@ The output from
 can be used for plotting as below:
 
 ``` r
+
 bcse_identified_core <- plot_identified_core(
   bray_curtis_ranked = bcse_core_multi$bray_curtis_ranked,
   elbow = bcse_core_multi$elbow,
   lastCall = bcse_core_multi$bc_increase,
   increase_value = bcse_core_multi$increase_value
 )
-#> Error: object 'bcse_core_multi' not found
 
-print(bcse_identified_core)
-#> Error: object 'bcse_identified_core' not found
+# plot_identified_core() outputs a list with a dataframe and a ggplot
+
+print(bcse_identified_core$plot_identified_core)
 ```
+
+![Figure 3: Percent Bray-Curtis similarity between samples per ranked
+ASV/OTUs. Number of core ASV/OTUs identified by Elbow and Last 2%
+increase in Bray-Curtis similarity are
+shown.](images/fig3_identified_core-1.png)
+
+Figure 3: Percent Bray-Curtis similarity between samples per ranked
+ASV/OTUs. Number of core ASV/OTUs identified by Elbow and Last 2%
+increase in Bray-Curtis similarity are shown.
 
 #### Visualize the abundance-occupancy curve
 
 Abundance-Occupancy distributions can be plotted:
 
 ``` r
+
 plot_abund_occ_increase <- plot_abundance_occupancy(
   core_result = bcse_core_multi,
   core_set = "increase"
 )
-#> Error: object 'bcse_core_multi' not found
 print(plot_abund_occ_increase)
-#> Error: object 'plot_abund_occ_increase' not found
 ```
+
+![Figure 4: Abundance-occupancy distribution for the 'bcse' dataset. The
+core ASV/OTUs identified by the last 2% increase method are highlighted
+in red.](images/fig4_plot_increase-1.png)
+
+Figure 4: Abundance-occupancy distribution for the ‘bcse’ dataset. The
+core ASV/OTUs identified by the last 2% increase method are highlighted
+in red.
 
 And for the `elbow` method.
 
 ``` r
+
 plot_abund_occ_elbow <- plot_abundance_occupancy(
   core_result = bcse_core_multi,
   core_set = "elbow"
 )
-#> Error: object 'bcse_core_multi' not found
 
 plot_abund_occ_elbow +
   scale_fill_manual(values = c("darkgreen", "grey"))
-#> Error: object 'plot_abund_occ_elbow' not found
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
 ```
+
+![Figure 5: Abundance-occupancy distribution for the 'bcse' dataset. The
+core ASV/OTUs identified by the elbow method are highlighted in dark
+green.](images/fig5_plot_elbow-1.png)
+
+Figure 5: Abundance-occupancy distribution for the ‘bcse’ dataset. The
+core ASV/OTUs identified by the elbow method are highlighted in dark
+green.
 
 #### Visualize the core set across the variable used for detecting the core
 
 The
 [`plot_core_distribution()`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)
-it can be used to visualize ASV/OTUs occupancy across the variable
-specified during the identification of the core. The function provides
-three visualization methods—bar, line, and heatmap—which can be toggled
-using the plot_type argument. The optimal choice often depends on the
-number of levels in your grouping variable. For instance, bar or line
-plots are highly effective for up to five levels, whereas heatmaps are
-better suited for more complex datasets. While these are general
+function can be used to visualize ASV/OTU occupancy across the variable
+specified during core identification. The function provides three
+visualization methods (bar, line, and heatmap) that can be toggled via
+the plot_type argument. The optimal choice often depends on the number
+of levels in your grouping variable. For instance, bar or line plots are
+highly effective for up to five levels, whereas heatmaps are better
+suited for more complex datasets. While these are general
 recommendations, the core data is fully accessible in `bcse_core_multi`
 should you wish to develop a custom visualization.
 
 ``` r
+
 plot_core_dist_bar <- plot_core_distribution(
   core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "bar"
 )
-#> Error: object 'bcse_core_multi' not found
 
 print(plot_core_dist_bar)
-#> Error: object 'plot_core_dist_bar' not found
 ```
 
+![Figure 6: Occupancy of core ASV/OTUs across the 'Crop' variable. Each
+bar represents the average occupancy of core ASV/OTUs in samples
+belonging to each level of the 'Crop' variable. A bar plot won't work
+here, way too many variable levels.](images/fig6_plot_type_bar-1.png)
+
+Figure 6: Occupancy of core ASV/OTUs across the ‘Crop’ variable. Each
+bar represents the average occupancy of core ASV/OTUs in samples
+belonging to each level of the ‘Crop’ variable. A bar plot won’t work
+here, way too many variable levels.
+
 ``` r
+
 plot_core_dist_line <- plot_core_distribution(
   core_result = bcse_core_multi,
   core_set = "increase",
   group_var = "Crop",
   plot_type = "line"
 )
-#> Error: object 'bcse_core_multi' not found
 print(plot_core_dist_line)
-#> Error: object 'plot_core_dist_line' not found
 ```
 
-We can reorder the variable levels following logic before plotting.
+![Figure 7: Occupancy of core ASV/OTUs across the 'Crop' variable. Each
+point represents the average occupancy of core ASV/OTUs in samples
+belonging to each level of the 'Crop' variable. A line plot is better
+than a bar plot but still not ideal for this many variable
+levels.](images/fig7_plot_type_line-1.png)
+
+Figure 7: Occupancy of core ASV/OTUs across the ‘Crop’ variable. Each
+point represents the average occupancy of core ASV/OTUs in samples
+belonging to each level of the ‘Crop’ variable. A line plot is better
+than a bar plot but still not ideal for this many variable levels.
+
+We can reorder the variable levels with the following logic before
+plotting.
 
 ``` r
+
 bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
   mutate(
     Crop = recode(
@@ -463,10 +662,10 @@ bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
       )
     )
   )
-#> Error: object 'bcse_core_multi' not found
 ```
 
 ``` r
+
 plot_core_dist_heatmap <- plot_core_distribution(
   core_result = bcse_core_multi,
   core_set = "increase",
@@ -474,11 +673,23 @@ plot_core_dist_heatmap <- plot_core_distribution(
   plot_type = "heatmap"
 ) +
   viridis::scale_fill_viridis(option = "plasma", name = "Occupancy")
-#> Error: object 'bcse_core_multi' not found
+#> Scale for fill is already present.
+#> Adding another scale for fill, which will replace the existing scale.
 
 print(plot_core_dist_heatmap)
-#> Error: object 'plot_core_dist_heatmap' not found
 ```
+
+![Figure 8: Occupancy of core ASV/OTUs across the 'Crop' variable. Each
+cell represents the average occupancy of core ASV/OTUs in samples
+belonging to each level of the 'Crop' variable. A heatmap is more
+compact and shows well enough the average occupancy across samples in
+each variable level.](images/fig8_plot_type_heatmap-1.png)
+
+Figure 8: Occupancy of core ASV/OTUs across the ‘Crop’ variable. Each
+cell represents the average occupancy of core ASV/OTUs in samples
+belonging to each level of the ‘Crop’ variable. A heatmap is more
+compact and shows well enough the average occupancy across samples in
+each variable level.
 
 ## Fitting Neutral Model
 
@@ -486,53 +697,128 @@ Neutral models in ecology assume that species (ASVs/OTUs) are
 functionally equivalent and that community patterns arise from random
 chance rather than deterministic niches or selection. As a specific case
 of null models ([Gotelli and McGill 2006](#ref-Gotelli2006Null)), they
-act as a baseline: if real-world data significantly differs from the
+act as a baseline. If real-world data significantly differ from the
 model’s predictions, we can infer that non-random ecological forces are
 at play.
 
-Drawing on the influential work of Sloan et al.
-([2006](#ref-Sloan2006Quantifying)) and Burns et al.
-([2015](#ref-Burns2015Contribution)), BRCore implements accessible
-functions to fit and visualize these models. Our goal is to make these
-powerful ecological tools easy to use without losing the conceptual
-rigor of the original math.
+Building on the work of Sloan et al. ([2006](#ref-Sloan2006Quantifying))
+and Burns et al. ([2015](#ref-Burns2015Contribution)), BRCore implements
+accessible functions to fit and visualize these models. Our goal is to
+make these powerful ecological tools easy to use without losing the
+conceptual rigor of the original math.
 
 To get started, we first fit the neutral model:
 
 ``` r
+
 bcse_core_multi_neutral_fit <- fit_neutral_model(
   otu_table = bcse_core_multi$otu_table,
   core_set = bcse_core_multi$increase_core,
   abundance_occupancy = bcse_core_multi$abundance_occupancy
 )
-#> Error: object 'bcse_core_multi' not found
+#> Waiting for profiling to be done...
+#> ℹ Neutral model fitting:
+#> • Average individuals per community (N): 40276.38
+#> • Binomial model using rounded N: 40276
+#> • Poisson model using N: 40276.38
+#> • Maximum likelihood estimation using N: 40276.38, and starting parameters: mu = 0, sigma = 0.1
+#> ✔ Model fitting complete!
 ```
 
-What we get is
+What we get is…
 
 ``` r
+
 str(bcse_core_multi_neutral_fit)
-#> Error: object 'bcse_core_multi_neutral_fit' not found
+#> List of 2
+#>  $ goodness_of_fit :'data.frame':    1 obs. of  24 variables:
+#>   ..$ m         : num 0.0205
+#>   ..$ m.ci      : num 0.00186
+#>   ..$ m.mle     : num 0.0205
+#>   ..$ maxLL     : num -2279
+#>   ..$ binoLL    : num -720
+#>   ..$ poisLL    : num -720
+#>   ..$ Rsqr      : num 0.528
+#>   ..$ Rsqr.bino : num -0.833
+#>   ..$ Rsqr.pois : num -0.833
+#>   ..$ RMSE      : num 0.109
+#>   ..$ RMSE.bino : num 0.215
+#>   ..$ RMSE.pois : num 0.215
+#>   ..$ AIC       : num -4554
+#>   ..$ BIC       : num -4542
+#>   ..$ AIC.bino  : num -1435
+#>   ..$ BIC.bino  : num -1423
+#>   ..$ AIC.pois  : num -1435
+#>   ..$ BIC.pois  : num -1423
+#>   ..$ N         : num 40276
+#>   ..$ Samples   : num 50
+#>   ..$ Richness  : num 2861
+#>   ..$ Detect    : num 2.48e-05
+#>   ..$ above.pred: num 0.165
+#>   ..$ below.pred: num 0.035
+#>  $ model_prediction:'data.frame':    2861 obs. of  14 variables:
+#>   ..$ otu       : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ otu_occ   : num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ otu_rel   : num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...
+#>   ..$ membership: chr [1:2861] "Not core" "Not core" "Not core" "Not core" ...
+#>   ..$ p         : num [1:2861] 3.48e-06 6.31e-05 2.48e-06 7.98e-03 2.54e-01 ...
+#>   ..$ freq      : num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ freq.pred : num [1:2861] 0.00951 0.16077 0.0068 1 1 ...
+#>   ..$ pred.lwr  : num [1:2861] 0.000953 0.083916 0.000514 0.928652 0.928652 ...
+#>   ..$ pred.upr  : num [1:2861] 0.088 0.286 0.0835 1 1 ...
+#>   ..$ bino.pred : num [1:2861] 0.1306 0.9211 0.0952 1 1 ...
+#>   ..$ bino.lwr  : num [1:2861] 0.0632 0.8131 0.0405 0.9287 0.9287 ...
+#>   ..$ bino.upr  : num [1:2861] 0.251 0.969 0.208 1 1 ...
+#>   ..$ y         : chr [1:2861] NA NA NA NA ...
+#>   ..$ fit_class : chr [1:2861] "As predicted" "Above prediction" "As predicted" "Below prediction" ...
+#>  - attr(*, "class")= chr [1:2] "fit_neutral_model" "list"
 ```
 
 #### Plot the neutral model and the core set
 
 ``` r
+
 plot_bcse_neutral_fit <- plot_neutral_model(bcse_core_multi_neutral_fit)
-#> Error: object 'bcse_core_multi_neutral_fit' not found
 
 print(plot_bcse_neutral_fit)
-#> Error: object 'plot_bcse_neutral_fit' not found
 ```
+
+![Figure 9: Neutral model fit illustrates the neutral model of
+abundance-occupancy distributions for the 'bcse' dataset. The \$R^2\$
+value represents a standard coefficient of determination, calculated as
+\$R^2 = 1 - \frac{SS\_{err}}{SS\_{total}}\$, providing a measure of
+goodness of fit. The immigration parameter (\$m\$) estimates the
+probability that an individual in a local sample originates from the
+metacommunity rather than from local dispersal. We also observe that the
+neutral model provides a poor fit; the \$R^2\$ is notably low, and the
+majority of taxa (including both core and non-core ASV/OTUs) fall above
+the model's prediction line. Furthermore, the estimated immigration
+parameter (\$m = 0.63\$) suggests that the local community is dominated
+by strong dispersal and mixing from the metacommunity.
+](images/fig9_plot_neutral_fit-1.png)
+
+Figure 9: Neutral model fit illustrates the neutral model of
+abundance-occupancy distributions for the ‘bcse’ dataset. The $`R^2`$
+value represents a standard coefficient of determination, calculated as
+$`R^2 = 1 - \frac{SS_{err}}{SS_{total}}`$, providing a measure of
+goodness of fit. The immigration parameter ($`m`$) estimates the
+probability that an individual in a local sample originates from the
+metacommunity rather than from local dispersal. We also observe that the
+neutral model provides a poor fit; the $`R^2`$ is notably low, and the
+majority of taxa (including both core and non-core ASV/OTUs) fall above
+the model’s prediction line. Furthermore, the estimated immigration
+parameter ($`m = 0.63`$) suggests that the local community is dominated
+by strong dispersal and mixing from the metacommunity.
 
 **Note:** Interpretations of the Migration Parameter, as a rule of
 thumb:
 
-- **Low** ($m \approx 0–0.05$): strong dispersal limitation; local
+- **Low** ($`m \approx 0–0.05`$): strong dispersal limitation; local
   history dominates community assembly.
-- **Moderate** ($m \approx 0.1–0.3$): partial connectivity among sites;
-  both dispersal and local structure influence community composition.
-- **High** ($m \geq 0.4$): high dispersal rates and strong mixing from
+- **Moderate** ($`m \approx 0.1–0.3`$): partial connectivity among
+  sites; both dispersal and local structure influence community
+  composition.
+- **High** ($`m \geq 0.4`$): high dispersal rates and strong mixing from
   the regional source pool.
 
 ## Supplemental Information
@@ -548,7 +834,8 @@ generated above using
 we obtain the following results:
 
 ``` r
-bcse_core_multi_iter1 <- identify_core(
+
+bcse_core_single_iter1 <- identify_core(
   physeq_obj = bcse_updated_rare,
   priority_var = "Crop",
   increase_value = 0.02,
@@ -557,6 +844,15 @@ bcse_core_multi_iter1 <- identify_core(
 )
 #> Seed used: 2135
 #> Error: object 'bcse_updated_rare' not found
+
+bcse_identified_core_iter1 <- plot_identified_core(bray_curtis_ranked = bcse_core_single_iter1$bray_curtis_ranked,
+  elbow = bcse_identified_core_iter1$elbow,
+  lastCall = bcse_identified_core_iter1$bc_increase,
+  increase_value = bcse_identified_core_iter1$increase_value
+)
+#> Error: object 'bcse_core_single_iter1' not found
+print(bcse_identified_core_iter1$plot_idenfied_core)
+#> Error: object 'bcse_identified_core_iter1' not found
 ```
 
 ### Further Customization of `identify_core()`
@@ -587,6 +883,9 @@ two metrics:
 - abundance_weight = 1: Ranking is based purely on mean relative
   abundance.
 
+- max_otus: Limits the number of taxa processed. Useful for large
+  datasets to improve computational efficiency.
+
 - Intermediate Values: A value such as 0.3 creates a hybrid score,
   weighting occupancy at 70% and abundance at 30%.
 
@@ -595,11 +894,10 @@ different core set than an occupancy-only approach.
 
 ## References
 
-Burns, Andrew R., Wesley Z. Stephens, Katie Stagaman, Sean Wong, John F.
-Rawls, Karen Guillemin, and Brendan J. M. Bohannan. 2015. “Contribution
-of Neutral Processes to the Assembly of Gut Microbial Communities in the
-Zebrafish over Host Development.” *The ISME Journal* 10: 655–64.
-<https://doi.org/10.1038/ismej.2015.142>.
+Burns, Andrew R., Wesley Z. Stephens, Katie Stagaman, et al. 2015.
+“Contribution of Neutral Processes to the Assembly of Gut Microbial
+Communities in the Zebrafish over Host Development.” *The ISME Journal*
+10: 655–64. <https://doi.org/10.1038/ismej.2015.142>.
 
 Cameron, Erin S., Paul J. Schmidt, Benoit J. M. Tremblay, Monica B.
 Emelko, and Kirsten M. Müller. 2021. “Enhancing Diversity Analysis by
@@ -628,9 +926,9 @@ Schloss, Patrick D. 2024a. “Rarefaction Is Currently the Best Approach
 to Control for Uneven Sequencing Effort in Amplicon Sequence Analyses.”
 *mSphere* 9: e00354–23. <https://doi.org/10.1128/msphere.00354-23>.
 
-———. 2024b. “Waste Not, Want Not: Revisiting the Analysis That Called
-into Question the Practice of Rarefaction.” *mSphere* 9: e00355–23.
-<https://doi.org/10.1128/msphere.00355-23>.
+Schloss, Patrick D. 2024b. “Waste Not, Want Not: Revisiting the Analysis
+That Called into Question the Practice of Rarefaction.” *mSphere* 9:
+e00355–23. <https://doi.org/10.1128/msphere.00355-23>.
 
 Shade, Ashley, and Nabeel Stopnisek. 2019. “Abundance-Occupancy
 Distributions to Prioritize Plant Core Microbiome Membership.” *Current
@@ -643,8 +941,7 @@ and Chance in Shaping Prokaryote Community Structure.” *Environmental
 Microbiology* 8: 732–40.
 <https://doi.org/10.1111/j.1462-2920.2005.00956.x>.
 
-Weiss, Sejin, ZhenZhen Xu, Shyamal Peddada, Amnon Amir, Kenneth
-Bittinger, Antonio Gonzalez, Catherine Lozupone, et al. 2017.
-“Normalization and Microbial Differential Abundance Strategies Depend
-Upon Data Characteristics.” *Microbiome* 5: 27.
+Weiss, Sejin, ZhenZhen Xu, Shyamal Peddada, et al. 2017. “Normalization
+and Microbial Differential Abundance Strategies Depend Upon Data
+Characteristics.” *Microbiome* 5: 27.
 <https://doi.org/10.1186/s40168-017-0237-y>.

@@ -12,12 +12,9 @@
 <url><loc>http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/bcse.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/bean.html</loc></url>
-<url><loc>http://www.germslab.org/BRCore/reference/detect_hpc_type.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/fit_neutral_model.html</loc></url>
-<url><loc>http://www.germslab.org/BRCore/reference/get_available_cores.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/identify_core.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/index.html</loc></url>
-<url><loc>http://www.germslab.org/BRCore/reference/is_hpc_environment.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/mimulus.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/multi_rarefy.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/pipe.html</loc></url>
@@ -27,9 +24,9 @@
 <url><loc>http://www.germslab.org/BRCore/reference/plot_neutral_model.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/plot_variance_propagation.html</loc></url>
-<url><loc>http://www.germslab.org/BRCore/reference/setup_parallel_backend.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/sncm.fit.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/switchgrass.html</loc></url>
+<url><loc>http://www.germslab.org/BRCore/reference/switchgrass_core.html</loc></url>
 <url><loc>http://www.germslab.org/BRCore/reference/update_otu_table.html</loc></url>
 </urlset>
 

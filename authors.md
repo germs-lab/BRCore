@@ -5,7 +5,7 @@
 - **[Bolívar Aponte Rolón](https://www.bolaponte.com/)**. Author,
   maintainer. [](https://orcid.org/0000-0002-2544-4551)
 
-- **Gian Maria Niccolò Benucci**. Author.
+- **[Gian Maria Niccolò Benucci](https://github.com/Gian77)**. Author.
   [](https://orcid.org/0000-0003-1589-947X)  
   Co-maintainer
 
@@ -27,17 +27,17 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/germs-lab/BRCore/blob/v2.0.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/germs-lab/BRCore/blob/v2.0.4/DESCRIPTION)
 
 Aponte Rolón B, Benucci G, Kristy B, Shade A, Stopnisek N, Howe A
 (2026). *BRCore: Unified Framework for Identification and Ecological
 Interpretation of Microbial Data from Bioenergy Research Centers*. R
-package version 2.0.1, <https://github.com/germs-lab/BRCore>.
+package version 2.0.4, <https://github.com/germs-lab/BRCore>.
 
     @Manual{,
       title = {BRCore: Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers},
       author = {Bolívar {Aponte Rolón} and Gian Maria Niccolò Benucci and Brandon Kristy and Ashley Shade and Nejc Stopnisek and Adina Howe},
       year = {2026},
-      note = {R package version 2.0.1},
+      note = {R package version 2.0.4},
       url = {https://github.com/germs-lab/BRCore},
     }

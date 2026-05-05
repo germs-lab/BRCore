@@ -1,10 +1,9 @@
-# Run multiple rarefaction for microbiome count tables
+# Run rarefaction for microbiome count tables
 
-This function performs multiple rarefaction on a `phyloseq` object by
-randomly sub-sampling OTUs/ASVs within samples without replacement. The
-process is repeated for a specified number of iterations, and the
-results are averaged. Samples with fewer OTUs/ASVs than the specified
-`depth_level` are discarded.
+This function performs rarefaction on a `phyloseq` object by randomly
+sub-sampling OTUs/ASVs within samples without replacement for a number
+of iterations specified by the user. Samples with fewer OTUs/ASVs than
+the specified `depth_level` are discarded.
 
 ## Usage
 
@@ -53,11 +52,16 @@ A data frame with taxa as rows and samples as columns. The values
 represent the average sequence counts calculated across all iterations.
 Samples with less than `depth_level` sequences are discarded.
 
+## See also
+
+[`update_otu_table()`](http://www.germslab.org/BRCore/reference/update_otu_table.md)
+for updating the OTU table in a `phyloseq` object and
+[`vegan::rrarefy()`](https://vegandevs.github.io/vegan/reference/rarefy.html)
+for the underlying rarefaction method used in this function.
+
 ## Examples
 
 ``` r
-# \donttest{
-library(phyloseq)
 library(BRCore)
 data("bcse", package = "BRCore")
 
@@ -65,12 +69,12 @@ data("bcse", package = "BRCore")
 otu_table_rare <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 100,
+  num_iter = 10,
   .as = "list",
   set_seed = 7642
 )
 #> 
-#> ── Multiple Rarefaction ────────────────────────────────────────────────────────
+#> ── Rarefaction iterations starting... ──────────────────────────────────────────
 #> 
 #> ── Input Validation ──
 #> 
@@ -78,7 +82,7 @@ otu_table_rare <- multi_rarefy(
 #> ℹ Seed: 7642
 #> ℹ Input (matrix/df dim): 47 samples x 2861 taxa
 #> ℹ Rarefaction depth: 1000
-#> ℹ Iterations: 100
+#> ℹ Iterations: 10
 #> ℹ taxa_are_rows: TRUE
 #> ℹ OTU matrix/df rownames head: bcse50, bcse69, bcse73, bcse191, bcse82, bcse102
 #> ℹ OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78
@@ -97,20 +101,20 @@ otu_table_rare <- multi_rarefy(
 #> 
 #> ── Data Sparsity 
 #> ℹ Returning list of data frames for each iteration.
-#> • Rarefied matrix (across 100 iterations):
-#>   • Min: 130551 zeros (97.09% sparsity) out of 134467 entries
-#>   • Max: 130690 zeros (97.19% sparsity) out of 134467 entries
-#>   • Avg: 130616.1 zeros (97.14% sparsity) out of 134467 entries
+#> • Rarefied matrix (across 10 iterations):
+#>   • Min: 130570 zeros (97.1% sparsity) out of 134467 entries
+#>   • Max: 130663 zeros (97.17% sparsity) out of 134467 entries
+#>   • Avg: 130615.7 zeros (97.14% sparsity) out of 134467 entries
 #> 
 #> ── Final Data Dimensions 
-#> ✔ Output: 100 iterations with 50 unique samples
+#> ✔ Output: 10 iterations with 50 unique samples
 #> • Samples per iteration:
 #>   • Min: 47
 #>   • Max: 47
 #> • Non-zero taxa per iteration:
-#>   • Min: 1029
-#>   • Max: 1123
-#>   • Avg: 1072.8
+#>   • Min: 1039
+#>   • Max: 1103
+#>   • Avg: 1073
 
 rowSums(otu_table_rare[[1]])
 #>  bcse50  bcse69  bcse73 bcse191  bcse82 bcse102 bcse111  bcse86  bcse97  bcse88 
@@ -123,5 +127,5 @@ rowSums(otu_table_rare[[1]])
 #>    1000    1000    1000    1000    1000    1000    1000    1000    1000    1000 
 #>  bcse95  bcse67  bcse61 bcse100  bcse87  bcse83  bcse70 
 #>    1000    1000    1000    1000    1000    1000    1000 
-# }
+
 ```

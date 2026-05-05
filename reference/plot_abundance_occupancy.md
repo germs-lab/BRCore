@@ -48,48 +48,21 @@ abundances typically found in microbiome data.
 
 ## See also
 
-[`plot_core_distribution`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)
+[`plot_core_distribution()`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)
 and
-[`identify_core`](http://www.germslab.org/BRCore/reference/identify_core.md)
+[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
 
 ## Examples
 
 ``` r
-# \donttest{
-library(phyloseq)
 library(BRCore)
-# Generate an object from `identify_core()` and then plot
 
-data("switchgrass", package = "BRCore")
+data("switchgrass_core", package = "BRCore")
 
-switchgrass_core <- identify_core(
-  physeq_obj = switchgrass,
-  priority_var = "sampling_date",
-  increase_value = 0.02,
-  abundance_weight = 0,
-  seed = 1234
-)
-#> Seed used: 1234
-#> ✔ Input phyloseq object is valid!
-#> ℹ No `rarefied_list` provided. `physeq_obj` is already rarefied; wrapping as a single iteration.
-#> ℹ No taxonomy found (or empty). Continuing without taxonomy.
-#> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:10:12.716019
-#> ■■■■■■                            15% | ETA:  6s
-#> ■■■■■■■■■                         27% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■                 52% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  3s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     93% | ETA:  1s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
-#> ✔ Elbow method identified 3 core OTUs
-#> ✔ % increase method identified 34 core OTUs
-#> ✔ Analysis complete!
-
-plot_abundance_occupancy(
+p <- plot_abundance_occupancy(
   core_result = switchgrass_core,
   core_set = "increase"
 )
+print(p)
 
-# }
 ```

@@ -1,15 +1,15 @@
 # Fit a Neutral Model to Microbial Community Data
 
 The function fits the neutral distribution model developed by Sloan et
-al. 2006, and implemented in R by Burns et al. 2015, to an OTU/ASV table
-and returns several goodness of fit statistics alongside a data.frame
-with predicted occurrence frequencies for each OTU/ASV based on their
-abundance in the metacommunity for plotting the abundance-occupancy
-distribution. In addition, this function identified core and not-core
-OTU/ASVs that are neutral (i.e. stochastically or randomly distributed)
-above (i.e. interpreted as deterministically or predictably selected)
-and below (i.e. interpreted as dispersally limited) the model
-predictions.
+al. (2006), and implemented in R by Burns et al. (2015), to an OTU/ASV
+table and returns several goodness of fit statistics alongside a
+data.frame with predicted occurrence frequencies for each OTU/ASV based
+on their abundance in the metacommunity for plotting the
+abundance-occupancy distribution. In addition, this function identified
+core and not-core OTU/ASVs that are neutral (i.e. stochastically or
+randomly distributed) above (i.e. interpreted as deterministically or
+predictably selected) and below (i.e. interpreted as dispersally
+limited) the model predictions.
 
 ## Usage
 
@@ -45,56 +45,30 @@ A list with:
 
 ## References
 
-Sloan WT, Lunn M, Woodcock S, Head IM, Nee S, Curtis TP. (2006)
-Quantifying the roles of immigration and chance in shaping prokaryote
-community structure. Environ Microbiol. 8(4):732-40. doi:
-https://doi.org/10.1111/j.1462-2920.2005.00956.x
+Sloan, W. T., Lunn, M., Woodcock, S., Head, I. M., Nee, S., & Curtis, T.
+P. (2006). Quantifying the roles of immigration and chance in shaping
+prokaryote community structure. Environmental Microbiology, 8(4),
+732–740. <doi:10.1111/j.1462-2920.2005.00956.x>
 
-Burns AR, Stephens WZ, Stagaman K, Wong S, Rawls JF, Guillemin K,
-Bohannan BJ. (2015) Contribution of neutral processes to the assembly of
-gut microbial communities in the zebrafish over host development. ISME
-J. 10(3):655-64. doi: https://doi.org/10.1038/ismej.2015.142
+Burns, A. R., Stephens, W. Z., Stagaman, K., Wong, S., Rawls, J. F.,
+Guillemin, K., & Bohannan, B. J. M. (2016). Contribution of neutral
+processes to the assembly of gut microbial communities in the zebrafish
+over host development. The ISME Journal, 10(3), 655–664.
+<doi:10.1038/ismej.2015.142>
 
 Shade A, Stopnisek N (2019) Abundance-occupancy distributions to
 prioritize plant core microbiome membership. Current Opinion in
-Microbiology, 49:50-58 doi: https://doi.org/10.1016/j.mib.2019.09.008
+Microbiology, 49:50-58 <doi:10.1016/j.mib.2019.09.008>
 
 ## See also
 
-[`plot_neutral_model`](http://www.germslab.org/BRCore/reference/plot_neutral_model.md)
+[`plot_neutral_model()`](http://www.germslab.org/BRCore/reference/plot_neutral_model.md)
 
 ## Examples
 
 ``` r
-# \donttest{
-library(phyloseq)
 library(BRCore)
-# Example using your switchgrass phyloseq object and grouping variable
-# 'sampling_date'
-data("switchgrass", package = "BRCore")
-
-switchgrass_core <- identify_core(
-  physeq_obj     = switchgrass,
-  priority_var   = "sampling_date",
-  increase_value = 0.02,
-  seed           = 092825
-)
-#> Seed used: 92825
-#> ✔ Input phyloseq object is valid!
-#> ℹ No `rarefied_list` provided. `physeq_obj` is already rarefied; wrapping as a single iteration.
-#> ℹ No taxonomy found (or empty). Continuing without taxonomy.
-#> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:09:33.611708
-#> ■■■■■                             15% | ETA:  6s
-#> ■■■■■■■■■                         27% | ETA:  7s
-#> ■■■■■■■■■■■■■■■■■                 52% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■■■            70% | ETA:  4s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       86% | ETA:  2s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
-#> ✔ Elbow method identified 3 core OTUs
-#> ✔ % increase method identified 34 core OTUs
-#> ✔ Analysis complete!
+data("switchgrass_core", package = "BRCore")
 
 switchgrass_core_fit <- fit_neutral_model(
   otu_table = switchgrass_core$otu_table,
@@ -162,7 +136,8 @@ switchgrass_core_fit$goodness_of_fit
 #> 1 -1180.701 -1171.582 -1181.176 -1172.057 1000      43      706  0.001
 #>   above.pred below.pred
 #> 1 0.07507082 0.02691218
-switchgrass_core_fit$model_prediction |> head()
+switchgrass_core_fit$model_prediction |>
+head()
 #>        otu    otu_occ      otu_rel membership            p       freq
 #> 1 OTU10713 0.20930233 0.0002325581   Not core 0.0002325581 0.20930233
 #> 2     OTU7 0.97674419 0.0467674419       Core 0.0467674419 0.97674419
@@ -184,5 +159,4 @@ switchgrass_core_fit$model_prediction |> head()
 #> 4 Above prediction
 #> 5     As predicted
 #> 6 Above prediction
-# }
 ```

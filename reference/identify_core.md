@@ -147,18 +147,25 @@ Requires phyloseq, dplyr, tidyr, tibble, rlang, and vegan.
 
 Shade A, Stopnisek N (2019) Abundance-occupancy distributions to
 prioritize plant core microbiome membership. Current Opinion in
-Microbiology, 49:50-58 doi:https://doi.org/10.1016/j.mib.2019.09.008
+Microbiology, 49:50-58 <doi:10.1016/j.mib.2019.09.008>
+
+## See also
+
+[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md),
+[`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md),
+and
+[`plot_core_distribution()`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)
 
 ## Examples
 
 ``` r
 # \donttest{
-library(phyloseq)
 library(BRCore)
-# Example using your switchgrass phyloseq object and grouping variable
-# 'sampling_date'
-data("switchgrass", package = "BRCore")
 
+data("switchgrass", package = "BRCore")
+data("bcse", package = "BRCore")
+
+# With rarefied data
 res <- identify_core(
   physeq_obj     = switchgrass,
   priority_var   = "sampling_date",
@@ -171,18 +178,18 @@ res <- identify_core(
 #> ℹ No taxonomy found (or empty). Continuing without taxonomy.
 #> ✔ Core prioritizing variable: sampling_date
 #> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:09:48.554335
-#> ■■■■■■                            15% | ETA:  6s
-#> ■■■■■■■■■■                        29% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■                55% | ETA:  4s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  3s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     93% | ETA:  1s
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-05-05 20:52:44.956608
+#> ■■■■■                             14% | ETA:  6s
+#> ■■■■■■                            16% | ETA:  6s
+#> ■■■■■■■■■■■■■                     40% | ETA:  6s
+#> ■■■■■■■■■■■■■■■■■■■               60% | ETA:  5s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         80% | ETA:  3s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    95% | ETA:  1s
 #> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
 #> ✔ Elbow method identified 3 core OTUs
 #> ✔ % increase method identified 34 core OTUs
 #> ✔ Analysis complete!
 
-# Inspect results
 str(res)
 #> List of 13
 #>  $ bray_curtis_ranked : tibble [706 × 12] (S3: tbl_df/tbl/data.frame)
@@ -226,6 +233,321 @@ str(res)
 #>   ..$ sampling_date: POSIXct[1:43], format: "2016-08-01 04:00:00" "2016-10-03 04:00:00" ...
 #>   ..$ sample_id    : chr [1:43] "G5R1_MAIN_01AUG2016_LD2" "G5R1_MAIN_03OCT2016_LD1" "G5R1_MAIN_12JUL2016_LD1" "G5R1_MAIN_12SEP2016_LD2" ...
 #>  $ taxonomy           : NULL
+#>  - attr(*, "class")= chr [1:2] "identify_core_result" "list"
+
+# With unrarefied data (requires multi_rarefy step)
+rarefied_list <- multi_rarefy(
+  physeq_obj = bcse,
+  depth_level = 1000,
+  num_iter = 3,
+  .as = "list",
+  set_seed = 7642
+)
+#> 
+#> ── Rarefaction iterations starting... ──────────────────────────────────────────
+#> 
+#> ── Input Validation ──
+#> 
+#> ✔ Input phyloseq object is valid!
+#> ℹ Seed: 7642
+#> ℹ Input (matrix/df dim): 47 samples x 2861 taxa
+#> ℹ Rarefaction depth: 1000
+#> ℹ Iterations: 3
+#> ℹ taxa_are_rows: TRUE
+#> ℹ OTU matrix/df rownames head: bcse50, bcse69, bcse73, bcse191, bcse82, bcse102
+#> ℹ OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78
+#> ℹ Row sums summary: Min=1193, Max=107643, Median=25209
+#> 
+#> ── Rarefaction Results ──
+#> 
+#> ── Sample Removal 
+#> ! 3 samples removed (depth < 1000)
+#> ! Samples removed: "bcse108, bcse105, bcse110"
+#> 
+#> ── Taxa Removal 
+#> ✔ No taxa removed.
+#> ! Taxa are not removed across iterations to maintain consistent dimensions. 
+#> Downstream analyses should handle zero-abundance taxa appropriately.
+#> 
+#> ── Data Sparsity 
+#> ℹ Returning list of data frames for each iteration.
+#> • Rarefied matrix (across 3 iterations):
+#>   • Min: 130570 zeros (97.1% sparsity) out of 134467 entries
+#>   • Max: 130663 zeros (97.17% sparsity) out of 134467 entries
+#>   • Avg: 130608 zeros (97.13% sparsity) out of 134467 entries
+#> 
+#> ── Final Data Dimensions 
+#> ✔ Output: 3 iterations with 50 unique samples
+#> • Samples per iteration:
+#>   • Min: 47
+#>   • Max: 47
+#> • Non-zero taxa per iteration:
+#>   • Min: 1046
+#>   • Max: 1098
+#>   • Avg: 1073
+
+
+res_rare <- identify_core(
+  physeq_obj = bcse,
+  rarefied_list = rarefied_list,
+  priority_var = "Crop",
+  increase_value = 0.02,
+  seed = 091825
+)
+#> Seed used: 91825
+#> ✔ Input phyloseq object is valid!
+#> ℹ Using provided `rarefied_list` (3 iterations).
+#> ✔ Core prioritizing variable: Crop
+#> ℹ Ranked by Rank only
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-05-05 20:53:01.540994
+#> ■                                  1% | ETA:  2m
+#> ■■                                 2% | ETA:  3m
+#> ■■                                 3% | ETA:  3m
+#> ■■                                 5% | ETA:  3m
+#> ■■■                                6% | ETA:  3m
+#> ■■■                                8% | ETA:  3m
+#> ■■■■                               9% | ETA:  3m
+#> ■■■■                              11% | ETA:  3m
+#> ■■■■■                             12% | ETA:  3m
+#> ■■■■■                             13% | ETA:  3m
+#> ■■■■■                             14% | ETA:  3m
+#> ■■■■■■                            15% | ETA:  3m
+#> ■■■■■■                            17% | ETA:  3m
+#> ■■■■■■                            18% | ETA:  3m
+#> ■■■■■■■                           18% | ETA:  3m
+#> ■■■■■■■                           19% | ETA:  3m
+#> ■■■■■■■                           20% | ETA:  3m
+#> ■■■■■■■                           21% | ETA:  3m
+#> ■■■■■■■■                          22% | ETA:  3m
+#> ■■■■■■■■                          23% | ETA:  3m
+#> ■■■■■■■■                          24% | ETA:  3m
+#> ■■■■■■■■                          25% | ETA:  3m
+#> ■■■■■■■■■                         26% | ETA:  3m
+#> ■■■■■■■■■                         26% | ETA:  3m
+#> ■■■■■■■■■                         27% | ETA:  3m
+#> ■■■■■■■■■                         28% | ETA:  3m
+#> ■■■■■■■■■■                        29% | ETA:  3m
+#> ■■■■■■■■■■                        29% | ETA:  3m
+#> ■■■■■■■■■■                        30% | ETA:  3m
+#> ■■■■■■■■■■                        31% | ETA:  3m
+#> ■■■■■■■■■■                        31% | ETA:  3m
+#> ■■■■■■■■■■■                       32% | ETA:  3m
+#> ■■■■■■■■■■■                       33% | ETA:  3m
+#> ■■■■■■■■■■■                       33% | ETA:  3m
+#> ■■■■■■■■■■■                       34% | ETA:  3m
+#> ■■■■■■■■■■■                       34% | ETA:  3m
+#> ■■■■■■■■■■■                       35% | ETA:  3m
+#> ■■■■■■■■■■■■                      35% | ETA:  3m
+#> ■■■■■■■■■■■■                      36% | ETA:  3m
+#> ■■■■■■■■■■■■                      37% | ETA:  3m
+#> ■■■■■■■■■■■■                      37% | ETA:  3m
+#> ■■■■■■■■■■■■                      38% | ETA:  3m
+#> ■■■■■■■■■■■■■                     38% | ETA:  3m
+#> ■■■■■■■■■■■■■                     39% | ETA:  3m
+#> ■■■■■■■■■■■■■                     40% | ETA:  3m
+#> ■■■■■■■■■■■■■                     40% | ETA:  3m
+#> ■■■■■■■■■■■■■                     41% | ETA:  3m
+#> ■■■■■■■■■■■■■■                    42% | ETA:  3m
+#> ■■■■■■■■■■■■■■                    42% | ETA:  3m
+#> ■■■■■■■■■■■■■■                    43% | ETA:  3m
+#> ■■■■■■■■■■■■■■                    44% | ETA:  3m
+#> ■■■■■■■■■■■■■■                    44% | ETA:  3m
+#> ■■■■■■■■■■■■■■                    45% | ETA:  3m
+#> ■■■■■■■■■■■■■■■                   45% | ETA:  3m
+#> ■■■■■■■■■■■■■■■                   46% | ETA:  3m
+#> ■■■■■■■■■■■■■■■                   47% | ETA:  3m
+#> ■■■■■■■■■■■■■■■                   47% | ETA:  3m
+#> ■■■■■■■■■■■■■■■                   48% | ETA:  3m
+#> ■■■■■■■■■■■■■■■                   48% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■                  49% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■                  49% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■                  50% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■                  51% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■                  51% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 52% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 52% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 53% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 53% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 54% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 54% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■                 55% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■                55% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■                56% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■                57% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■                57% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■                57% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■                58% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               58% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               59% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               59% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               60% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               60% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               61% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■               61% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■■              62% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■■              62% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■■              63% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■■              63% | ETA:  3m
+#> ■■■■■■■■■■■■■■■■■■■■              64% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■              64% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■              65% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             65% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             66% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             66% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             68% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■             68% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            69% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            69% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            70% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            70% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            70% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            71% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            71% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■            72% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           72% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           72% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           73% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           73% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           74% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           74% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           74% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■           75% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          75% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          76% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          77% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          77% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          78% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■          78% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         78% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         79% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         79% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         80% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         80% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         80% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         81% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         81% | ETA:  2m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■         82% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        82% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        82% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        83% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        83% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        83% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        84% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        84% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        85% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        85% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       85% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       86% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       86% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       86% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       87% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       87% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       87% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       88% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■       88% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      88% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      89% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      89% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      90% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      90% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      90% | ETA:  1m
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      91% | ETA: 49s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      91% | ETA: 47s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      91% | ETA: 46s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■      91% | ETA: 44s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     92% | ETA: 43s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     92% | ETA: 42s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     92% | ETA: 40s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     93% | ETA: 39s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     93% | ETA: 37s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     93% | ETA: 36s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     94% | ETA: 34s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     94% | ETA: 33s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     94% | ETA: 31s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     95% | ETA: 29s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■     95% | ETA: 28s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    95% | ETA: 27s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    95% | ETA: 25s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    96% | ETA: 24s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    96% | ETA: 22s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    96% | ETA: 20s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    97% | ETA: 19s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    97% | ETA: 17s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    97% | ETA: 16s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    97% | ETA: 14s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    98% | ETA: 13s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    98% | ETA: 11s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    98% | ETA: 10s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   99% | ETA:  8s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   99% | ETA:  6s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   99% | ETA:  5s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   99% | ETA:  3s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  2s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+#> ✔ Elbow method identified 7 core OTUs
+#> ✔ % increase method identified 30 core OTUs
+#> ✔ Analysis complete!
+
+str(res_rare)
+#> List of 13
+#>  $ bray_curtis_ranked : tibble [2,861 × 12] (S3: tbl_df/tbl/data.frame)
+#>   ..$ rank             : Factor w/ 2861 levels "1","10","100",..: 1 1112 2085 2196 2307 2418 2529 2640 2751 2 ...
+#>   ..$ rank_num         : num [1:2861] 1 2 3 4 5 6 7 8 9 10 ...
+#>   ..$ otu_added        : chr [1:2861] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>   ..$ MeanBC           : num [1:2861] 0.0744 0.0862 0.1019 0.1036 0.1264 ...
+#>   ..$ proportionBC     : num [1:2861] 0.12 0.139 0.164 0.167 0.203 ...
+#>   ..$ IncreaseBC       : num [1:2861] NA 1.16 1.18 1.02 1.22 ...
+#>   ..$ elbow_slope_diffs: num [1:2861] -0.000191 0.005744 0.009008 0.007127 0.010232 ...
+#>   ..$ delta_pct_max_BC : num [1:2861] NA 15.96 18.22 1.63 22 ...
+#>   ..$ is_BC_core       : logi [1:2861] TRUE TRUE TRUE TRUE TRUE TRUE ...
+#>   ..$ last_pctBC_cutoff: logi [1:2861] FALSE FALSE FALSE FALSE FALSE FALSE ...
+#>   ..$ is_elbow_core    : logi [1:2861] TRUE TRUE TRUE TRUE TRUE TRUE ...
+#>   ..$ last_elbow_cutoff: logi [1:2861] FALSE FALSE FALSE FALSE FALSE FALSE ...
+#>  $ otu_ranked         :'data.frame': 2861 obs. of  7 variables:
+#>   ..$ otu    : chr [1:2861] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>   ..$ otu_occ: num [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
+#>   ..$ otu_rel: num [1:2861] 0.21728 0.01799 0.03296 0.00278 0.05897 ...
+#>   ..$ sumF   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ sumG   : num [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ nS     : int [1:2861] 10 10 10 10 10 10 10 10 10 10 ...
+#>   ..$ rank   : num [1:2861] 2 2 2 2 2 2 2 2 2 2 ...
+#>  $ abundance_occupancy:'data.frame': 2861 obs. of  3 variables:
+#>   ..$ otu    : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ otu_occ: num [1:2861] 0.08 0.46 0.04 0.74 1 0.32 0.3 0.06 0.96 0.04 ...
+#>   ..$ otu_rel: num [1:2861] 2.47e-05 5.55e-04 4.90e-06 4.82e-03 2.17e-01 ...
+#>  $ priority_var       : chr "Crop"
+#>  $ abundance_weight   : num 0
+#>  $ elbow              : int 7
+#>  $ bc_increase        : int 30
+#>  $ increase_value     : num 0.02
+#>  $ elbow_core         : chr [1:7] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>  $ increase_core      : chr [1:30] "OTU_3" "OTU_12" "OTU_21" "OTU_68" ...
+#>  $ otu_table          : int [1:2861, 1:50] 0 1 0 0 27777 0 7 2 119 0 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   .. ..$ : chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...
+#>  $ metadata           :'data.frame': 50 obs. of  4 variables:
+#>   ..$ Niche    : chr [1:50] "Leaf" "Leaf" "Leaf" "Leaf" ...
+#>   ..$ Crop     : chr [1:50] "Corn" "Sorghum" "Switchgrass" "Miscanthus" ...
+#>   ..$ Plot     : chr [1:50] "R2" "R4" "R5" "R5" ...
+#>   ..$ sample_id: chr [1:50] "bcse50" "bcse69" "bcse73" "bcse191" ...
+#>  $ taxonomy           :'data.frame': 2861 obs. of  10 variables:
+#>   ..$ OTU_ID   : chr [1:2861] "OTU_427" "OTU_11" "OTU_253" "OTU_148" ...
+#>   ..$ Kingdom  : chr [1:2861] "Bacteria" "Bacteria" "Bacteria" "Bacteria" ...
+#>   ..$ Phylum   : chr [1:2861] "Myxococcota" "Actinobacteriota" "Proteobacteria" "Proteobacteria" ...
+#>   ..$ Class    : chr [1:2861] "Polyangia" "Actinobacteria" "Alphaproteobacteria" "Gammaproteobacteria" ...
+#>   ..$ Order    : chr [1:2861] "Polyangiales" "Streptomycetales" "Rhizobiales" "Enterobacterales" ...
+#>   ..$ Family   : chr [1:2861] "Polyangiaceae" "Streptomycetaceae" "Rhizobiaceae" "Enterobacteriaceae" ...
+#>   ..$ Genus    : chr [1:2861] "Aetherobacter" "Streptomyces" "Mesorhizobium" NA ...
+#>   ..$ Species  : chr [1:2861] "Uncultured_bacterium_3097" NA "Mesorhizobium_sophorae" NA ...
+#>   ..$ BestMatch: chr [1:2861] "Uncultured bacterium 3097" "Streptomyces" "Mesorhizobium sophorae" "Enterobacteriaceae" ...
+#>   ..$ Taxonomy : chr [1:2861] "OTU_427-Uncultured bacterium 3097" "OTU_11-Streptomyces" "OTU_253-Mesorhizobium sophorae" "OTU_148-Enterobacteriaceae" ...
 #>  - attr(*, "class")= chr [1:2] "identify_core_result" "list"
 # }
 ```

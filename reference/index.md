@@ -41,20 +41,9 @@
 - [`add_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
   : Calculate and append pre-rarefaction statistics to microbiome data
 - [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
-  : Run multiple rarefaction for microbiome count tables
+  : Run rarefaction for microbiome count tables
 - [`plot_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md)
   : Plot pre-rarefaction diagnostics
-
-## Parallel Computing Utilities
-
-- [`detect_hpc_type()`](http://www.germslab.org/BRCore/reference/detect_hpc_type.md)
-  : Detect HPC environment type
-- [`get_available_cores()`](http://www.germslab.org/BRCore/reference/get_available_cores.md)
-  : Get the number of available CPU cores based on environment
-- [`is_hpc_environment()`](http://www.germslab.org/BRCore/reference/is_hpc_environment.md)
-  : Check if running in an HPC environment
-- [`setup_parallel_backend()`](http://www.germslab.org/BRCore/reference/setup_parallel_backend.md)
-  : Set up an appropriate parallel backend
 
 ## OTU Table Utilities
 
@@ -72,3 +61,5 @@
   amplicon dataset from yellow monkeyflower (Mimulus guttatus)
 - [`switchgrass`](http://www.germslab.org/BRCore/reference/switchgrass.md)
   : 16S amplicon dataset from Switchgrass (Panicum virgatum)
+- [`switchgrass_core`](http://www.germslab.org/BRCore/reference/switchgrass_core.md)
+  : Identified core microbiome members for the switchgrass dataset

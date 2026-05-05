@@ -1,13 +1,13 @@
 # Variance propagation diagnostic for rarefaction
 
-This function evaluate the variance generated during multiple
-rarefaction by plotting comparing raw vs. rarefied alpha diversity
-metrics calculated at each iterations. It is possible to plot observed
-richness (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by
-setting the `q` parameter to "richness" or `q` = 0, "shannon" or `q` =
-1, or "shannon" or `q` = 2. The plot is faceted by method (raw vs
-rarefied) and colored by a specified grouping variable from the sample
-data.
+This function evaluate the variance between rarefaction iterations from
+[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+by visually comparing raw vs. rarefied alpha diversity metrics
+calculated at each iterations. It is possible to plot observed richness
+(q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting
+the `q` parameter to "richness" or `q` = 0, "shannon" or `q` = 1, or
+"shannon" or `q` = 2. The plot is faceted by method (raw vs rarefied)
+and colored by a specified grouping variable from the sample data.
 
 ## Usage
 
@@ -50,7 +50,7 @@ plot_variance_propagation(
   Logical. If `TRUE`, both `group_var` and `group_color` are coerced to
   `factor` before plotting, which is useful when those columns are
   numeric/continuous (e.g. dates, counts) but should be treated as
-  discrete groups. When `TRUE` a discrete colour scale
+  discrete groups. When `TRUE` a discrete color scale
   (`scale_color_viridis_d`) is used; otherwise the continuous scale
   (`scale_color_viridis_c`) is used. Default `FALSE`.
 
@@ -62,22 +62,23 @@ iterations.
 ## Examples
 
 ``` r
-# \donttest{
 library(phyloseq)
 library(BRCore)
-# Example using the bcse dataset, comparing hill q=1 between Poplar and Switchgrass plots
+# Example comparing hill q=1 between Poplar and Switchgrass plots
+data("bcse", package = "BRCore")
 bcse_filt <- bcse |>
 subset_samples(Crop %in% c("Poplar", "Switchgrass"))
+
 bcse_rarefied_otutable_filt <-
  multi_rarefy(
        physeq_obj = bcse_filt,
        depth_level = 1000,
-       num_iter = 100,
+       num_iter = 10,
        .as = "list",
        set_seed = 7643
    )
 #> 
-#> ── Multiple Rarefaction ────────────────────────────────────────────────────────
+#> ── Rarefaction iterations starting... ──────────────────────────────────────────
 #> 
 #> ── Input Validation ──
 #> 
@@ -85,7 +86,7 @@ bcse_rarefied_otutable_filt <-
 #> ℹ Seed: 7643
 #> ℹ Input (matrix/df dim): 10 samples x 2861 taxa
 #> ℹ Rarefaction depth: 1000
-#> ℹ Iterations: 100
+#> ℹ Iterations: 10
 #> ℹ taxa_are_rows: TRUE
 #> ℹ OTU matrix/df rownames head: bcse73, bcse102, bcse104, bcse77, bcse78, bcse75
 #> ℹ OTU matrix/df colnames head: OTU_427, OTU_11, OTU_253, OTU_148, OTU_3, OTU_78
@@ -103,20 +104,20 @@ bcse_rarefied_otutable_filt <-
 #> 
 #> ── Data Sparsity 
 #> ℹ Returning list of data frames for each iteration.
-#> • Rarefied matrix (across 100 iterations):
-#>   • Min: 27982 zeros (97.8% sparsity) out of 28610 entries
-#>   • Max: 28035 zeros (97.99% sparsity) out of 28610 entries
-#>   • Avg: 28009.7 zeros (97.9% sparsity) out of 28610 entries
+#> • Rarefied matrix (across 10 iterations):
+#>   • Min: 27998 zeros (97.86% sparsity) out of 28610 entries
+#>   • Max: 28029 zeros (97.97% sparsity) out of 28610 entries
+#>   • Avg: 28011.6 zeros (97.91% sparsity) out of 28610 entries
 #> 
 #> ── Final Data Dimensions 
-#> ✔ Output: 100 iterations with 10 unique samples
+#> ✔ Output: 10 iterations with 10 unique samples
 #> • Samples per iteration:
 #>   • Min: 10
 #>   • Max: 10
 #> • Non-zero taxa per iteration:
-#>   • Min: 173
-#>   • Max: 209
-#>   • Avg: 193.7
+#>   • Min: 188
+#>   • Max: 200
+#>   • Avg: 193.1
 
 plot_variance_propagation(
    physeq_obj   = bcse_filt,
@@ -129,8 +130,7 @@ plot_variance_propagation(
 #> 
 #> ── Rarefaction Variance Propagation Visualization ──────────────────────────────
 #> ℹ Hill number order selected, q= 1
-#> ℹ Number of rarefaction iterations, n_iter= 100
+#> ℹ Number of rarefaction iterations, n_iter= 10
 #> ℹ Comparison plot generated!
 
-# }
 ```

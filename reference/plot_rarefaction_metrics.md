@@ -21,10 +21,13 @@ plot_rarefaction_metrics(data)
 
 A `ggarrange` object with six plots.
 
+## See also
+
+[`add_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
+
 ## Examples
 
 ``` r
-# \donttest{
 library(phyloseq)
 library(BRCore)
 
@@ -39,7 +42,7 @@ plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [849ms]
+#> ✔ Generating rarefaction diagnostic plots [845ms]
 #> 
 
 
@@ -51,8 +54,7 @@ plot_rarefaction_metrics(sample_data_df)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [859ms]
+#> ✔ Generating rarefaction diagnostic plots [803ms]
 #> 
 
-# }
 ```

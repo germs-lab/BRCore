@@ -64,43 +64,16 @@ from the observed `proportionBC` range to avoid overlap.
 ## Examples
 
 ``` r
-# \donttest{
-library(phyloseq)
 library(BRCore)
-# Example with the package switchgrass dataset
-data("switchgrass", package = "BRCore")
+data("switchgrass_core", package = "BRCore")
 
-# Identify core taxa
-res <- identify_core(
-  physeq_obj = switchgrass,
-  priority_var = "sampling_date",
-  increase_value = 0.02,
-  seed = 48821
+p <- plot_identified_core(
+  bray_curtis_ranked = switchgrass_core$bray_curtis_ranked,
+  elbow = switchgrass_core$elbow,
+  lastCall = switchgrass_core$bc_increase,
+  increase_value = switchgrass_core$increase_value
 )
-#> Seed used: 48821
-#> ✔ Input phyloseq object is valid!
-#> ℹ No `rarefied_list` provided. `physeq_obj` is already rarefied; wrapping as a single iteration.
-#> ℹ No taxonomy found (or empty). Continuing without taxonomy.
-#> ✔ Core prioritizing variable: sampling_date
-#> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-27 03:10:38.791361
-#> ■■■■■■                            15% | ETA:  5s
-#> ■■■■■■■■■■■■                      37% | ETA:  5s
-#> ■■■■■■■■■■■■■■■■■■■■              63% | ETA:  3s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■        82% | ETA:  2s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■   99% | ETA:  0s
-#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
-#> ✔ Elbow method identified 3 core OTUs
-#> ✔ % increase method identified 34 core OTUs
-#> ✔ Analysis complete!
-
-# Plot using the returned curve and cut indices; label from increase_value
-plot_identified_core(
-  bray_curtis_ranked = res$bray_curtis_ranked,
-  elbow = res$elbow,
-  lastCall = res$bc_increase,
-  increase_value = res$increase_value
-)
+print(p)
 #> $df_for_plot
 #> # A tibble: 40 × 13
 #>    rank  rank_num otu_added  MeanBC proportionBC IncreaseBC elbow_slope_diffs
@@ -123,5 +96,4 @@ plot_identified_core(
 #> $plot_identified_core
 
 #> 
-# }
 ```

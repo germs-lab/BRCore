@@ -36,15 +36,18 @@ update_otu_table(physeq_obj, rarefied_otus, iteration = NULL)
 
 A `phyloseq` object.
 
+## See also
+
+[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+
 ## Examples
 
 ``` r
-# \donttest{
 library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# List output (.as = "list")
+# List output
 otu_list <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
@@ -54,7 +57,7 @@ otu_list <-
     set_seed = 123
   )
 #> 
-#> ── Multiple Rarefaction ────────────────────────────────────────────────────────
+#> ── Rarefaction iterations starting... ──────────────────────────────────────────
 #> 
 #> ── Input Validation ──
 #> 
@@ -103,7 +106,7 @@ rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 #> ℹ Building phyloseq object with 26 samples and 19216 taxa
 #> ✔ Update complete!
 
-# Array output (.as = "array")
+# Array output
 otu_array <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
@@ -113,7 +116,7 @@ otu_array <-
     set_seed = 123
   )
 #> 
-#> ── Multiple Rarefaction ────────────────────────────────────────────────────────
+#> ── Rarefaction iterations starting... ──────────────────────────────────────────
 #> 
 #> ── Input Validation ──
 #> 
@@ -161,5 +164,4 @@ rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
 #> ✔ All samples kept after rarefaction at depth of: 200
 #> ℹ Building phyloseq object with 26 samples and 19216 taxa
 #> ✔ Update complete!
-# }
 ```

@@ -9,10 +9,11 @@ robustness and reproducibility in microbiome data analysis.
 BRCore provides tools for:
 
 **Rarefaction analysis**: Calculate pre-rarefaction metrics and perform
-multiple rarefactions
+rarefactions
 
 - [`add_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
 - [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+- [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
 
 **Core microbiome identification**: Identify core microbial taxa using
 abundance-occupancy distributions
@@ -23,6 +24,7 @@ abundance-occupancy distributions
 
 - [`fit_neutral_model()`](http://www.germslab.org/BRCore/reference/fit_neutral_model.md)
 - [`plot_neutral_model()`](http://www.germslab.org/BRCore/reference/plot_neutral_model.md)
+- `scnm.fit()`
 
 **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
 curves, and core distributions
@@ -37,6 +39,7 @@ curves, and core distributions
 Install the latest *stable* version of BRCore from CRAN with:
 
 ``` r
+
 install.packages("BRCore")
 ```
 
@@ -45,6 +48,7 @@ Install the *development* version of BRCore from GitHub with:
 Install the *development* version of BRCore from GitHub with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("germs-lab/BRCore")
 ```
@@ -63,7 +67,7 @@ data("bcse", package = "BRCore")
 # Add rarefaction metrics
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
-# Perform multiple rarefaction
+# Perform rarefaction
 bcse_rarefied_list <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
@@ -72,7 +76,10 @@ bcse_rarefied_list <- multi_rarefy(
 )
 
 # Update phyloseq object with rarefied data
-bcse_rare_single <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied_list, iteration = 2) # Your preffered iteration can be used here
+bcse_rare_single <- update_otu_table(
+  physeq_obj = bcse, 
+  rarefied_otus = bcse_rarefied_list, 
+  iteration = 2) # Your preffered iteration can be used here
 
 # Identify core microbiome
 
@@ -114,6 +121,7 @@ plot_neutral_model(bcse_neutral)
 For detailed examples and use cases, see the package vignette:
 
 ``` r
+
 vignette("BRCore-vignette", package = "BRCore")
 ```
 
