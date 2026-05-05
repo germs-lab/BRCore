@@ -1,3 +1,6 @@
+# BRCore (development version)
+* Fixes to quote 'BRCore' in DESCRIPTION and typo fix of `sncm.fit` in _pkgdown.yaml
+
 # BRCore 2.0.4
 Date: 2026-04-30
 
