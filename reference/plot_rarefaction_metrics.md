@@ -23,7 +23,7 @@ A `ggarrange` object with six plots.
 
 ## See also
 
-[`add_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
+[`add_rarefaction_metrics()`](https://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
 
 ## Examples
 
@@ -42,7 +42,7 @@ plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [845ms]
+#> ✔ Generating rarefaction diagnostic plots [794ms]
 #> 
 
 
@@ -54,7 +54,7 @@ plot_rarefaction_metrics(sample_data_df)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [803ms]
+#> ✔ Generating rarefaction diagnostic plots [758ms]
 #> 
 
 ```

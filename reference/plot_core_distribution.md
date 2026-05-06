@@ -19,7 +19,7 @@ plot_core_distribution(
 - core_result:
 
   A list object returned by
-  [`identify_core`](http://www.germslab.org/BRCore/reference/identify_core.md),
+  [`identify_core`](https://www.germslab.org/BRCore/reference/identify_core.md),
   containing at minimum:
 
   - `otu_table`: A data frame with ASV/OTUs as rows and samples as
@@ -59,10 +59,10 @@ A ggplot2 object that can be further customized.
 
 ## See also
 
-[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md),
-[`plot_abundance_occupancy()`](http://www.germslab.org/BRCore/reference/plot_abundance_occupancy.md),
+[`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md),
+[`plot_abundance_occupancy()`](https://www.germslab.org/BRCore/reference/plot_abundance_occupancy.md),
 and
-[`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+[`plot_identified_core()`](https://www.germslab.org/BRCore/reference/plot_identified_core.md)
 
 ## Examples
 

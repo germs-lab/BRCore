@@ -1,5 +1,10 @@
 # Changelog
 
+## BRCore (development version)
+
+- Fixes to quote ‘BRCore’ in DESCRIPTION and typo fix of `sncm.fit` in
+  \_pkgdown.yaml
+
 ## BRCore 2.0.4
 
 CRAN release: 2026-05-05
@@ -39,19 +44,19 @@ Date: 2026-04-24
 ### Breaking Changes
 
 - [de1fa42](https://github.com/germs-lab/BRCore/commit/de1fa425d7466f7e652136b949884f795d878e0c)
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md):
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md):
   `.as_array` logical argument replaced with `.as` character argument
   (e.g. `"list"`, `"array"`). Single-iteration handling improved to
   support all `.as` formats and seeds.
 - [fbb3b90](https://github.com/germs-lab/BRCore/commit/fbb3b907b7010a3c64e6efb096b5d797b8f90fd9)
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md):
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md):
   output column renamed from `Index` to `rank`.
 - [fa7387e](https://github.com/germs-lab/BRCore/commit/fa7387e6e74e9cb4ac5dafe4f993288717a8ba54)
   `find_core()` removed; ground truth logic moved to `debugging` branch.
 - [28b8821](https://github.com/germs-lab/BRCore/commit/28b8821a49e438c0a0bd5d14dd878689b9b97bff)
   and
   [4f5a9c9](https://github.com/germs-lab/BRCore/commit/4f5a9c91ea4e5972d0937680a63704a3d2a0c9ab)
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md)
   major rewrite:
   [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html)
   replaced with
@@ -62,7 +67,7 @@ Date: 2026-04-24
   [`vegan::avgdist()`](https://vegandevs.github.io/vegan/reference/avgdist.html)
   handles zeros in a matrix of ones.
 - [9f3b3ae](https://github.com/germs-lab/BRCore/commit/9f3b3ae29b999b4691c4e0fffb9b9e358063e389)
-  [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+  [`plot_identified_core()`](https://www.germslab.org/BRCore/reference/plot_identified_core.md)
   now returns a named list with `$df` and `$plot` instead of a bare plot
   object.
 - [3a590aa](https://github.com/germs-lab/BRCore/commit/3a590aa0b3a1ebccf868ae1186804d64ccab7f21)
@@ -77,7 +82,7 @@ Date: 2026-04-24
   versions. We also added comprehensive messaging to inform user of
   species (`N` or `N.int`) used in model fitting.
 - [200100b](https://github.com/germs-lab/BRCore/commit/200100b8306371cb1ca7aacf130f97bf056f66fb)
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
   internal logic: Replaced `.single_rarefy()` with internal
   [`vegan::rrarefy()`](https://vegandevs.github.io/vegan/reference/rarefy.html)
   engine.
@@ -85,7 +90,7 @@ Date: 2026-04-24
   and
   [114468c](https://github.com/germs-lab/BRCore/commit/114468cf60b6276e5cd9a3829ae43874a8e087bf)
   Refactored
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
   to output 3D array or list. This handling increased speed of
   computation and eliminated the need for parallelization. CLI messages
   were improved to handle these new types and present summary statistics
@@ -97,34 +102,34 @@ Date: 2026-04-24
   Added `.brcore_theme()` internal helper (`brcore_theme.R`) to unify
   plot styling (borders, title sizes, viridis palettes) across all
   plotting functions.
-- [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+- [`plot_identified_core()`](https://www.germslab.org/BRCore/reference/plot_identified_core.md)
   gains an optional `dataset_name` parameter for plot titles.
 
 ### Bug Fixes
 
 - [3225bd4](https://github.com/germs-lab/BRCore/commit/3225bd4c28180ded6e36bc0e7fbdfa2a2496f7cd)
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md):
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md):
   fixed `proportionBC` normalisation to use
   [`max()`](https://rdrr.io/r/base/Extremes.html) instead of `last()`.
 - [b3824ab](https://github.com/germs-lab/BRCore/commit/b3824ab272ec16b65c0136e10e65e5925ff74474)
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md):
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md):
   fixed BC ranking and pair alignment using unique time points.
 - [7439ed3](https://github.com/germs-lab/BRCore/commit/7439ed31dc496d60165f7a250e957b6eabfc7f82)
-  [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md):
+  [`plot_identified_core()`](https://www.germslab.org/BRCore/reference/plot_identified_core.md):
   fixed deprecated `size` → `linewidth` in `panel.border`.
 - [5c2c57e](https://github.com/germs-lab/BRCore/commit/5c2c57eaa574b61bfa8045ef4614d64413680a68)
   and
   [bfd74da](https://github.com/germs-lab/BRCore/commit/bfd74da34cd63c1ef59c491679fda49299cd7701)
   Added
-  [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
+  [`plot_variance_propagation()`](https://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
   to plot results from
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md).
 - [79153ca](https://github.com/germs-lab/BRCore/commit/79153cabcdd93f44080566ea09d18f194afbae9d)
-  [`update_otu_table()`](http://www.germslab.org/BRCore/reference/update_otu_table.md)
+  [`update_otu_table()`](https://www.germslab.org/BRCore/reference/update_otu_table.md)
   has new parameter `iteration` to handle results from
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md).
 - [e4ac648](https://github.com/germs-lab/BRCore/commit/e4ac648420ceaa6bb3d5d946e8f7170029e6f615)
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md)
   now has a progress bar powered by
   [`cli::cli_progress_bar()`](https://cli.r-lib.org/reference/cli_progress_bar.html)
   in `.calculate_bc()`.
@@ -137,7 +142,7 @@ Date: 2026-04-24
 
 - Vignette and README updated to reflect the required multi-iteration
   workflow for
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md).
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md).
 
 - Test suite updated for `identify_core`, `multi_rarefy`,
   `plot_identified_core`, `plot_variance_propagation`,
@@ -145,13 +150,13 @@ Date: 2026-04-24
   regenerated (`test_vignette_data.rda` grew ~250 KB).
 
 - Vignette updated to include
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
   and
-  [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
+  [`plot_variance_propagation()`](https://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
   as part of the Data Exploration and Parameter Selection section. This
   new workflow allows users to determine the adequate sequence read
   depth for their data and input that into
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md).
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md).
 
 **See PR [\#97](https://github.com/germs-lab/BRCore/pull/97) and
 [\#95](https://github.com/germs-lab/BRCore/pull/95) for more details**
@@ -168,7 +173,7 @@ Date: 2026-02-25
 ### Bug Fixes
 
 - Fixed
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
   reproducibility across platforms using deterministic iteration seeds
   for parallel processing and adding floating-point tolerance in
   rarefaction.
@@ -177,7 +182,7 @@ Date: 2026-02-25
     [`2341154`](https://github.com/germs-lab/BRCore/commit/23411546814a8bdf9c1346f22e42f1820b77c371),
     [`a42d7a9`](https://github.com/germs-lab/BRCore/commit/a42d7a96e1931d99825fce1c66a4383d51e7b5c6)
 - Added floating point tolerance in
-  [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+  [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md)
   rarefaction validation
   - **Commits:**
     [`a687fa3`](https://github.com/germs-lab/BRCore/commit/a687fa38327dab62b9c7f666d25a59dc75722c05)
@@ -194,9 +199,9 @@ Date: 2026-02-25
     [`76fbec2`](https://github.com/germs-lab/BRCore/commit/76fbec2b6e3e4f72e98ae6fc5bd2e7908cfd1045)
 
 - Enhanced CLI output in
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md):
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md):
   improved input validation for
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
   parameters
 
   - **Commits::**

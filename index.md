@@ -11,28 +11,28 @@ BRCore provides tools for:
 **Rarefaction analysis**: Calculate pre-rarefaction metrics and perform
 rarefactions
 
-- [`add_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
-- [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
-- [`plot_variance_propagation()`](http://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
+- [`add_rarefaction_metrics()`](https://www.germslab.org/BRCore/reference/add_rarefaction_metrics.md)
+- [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
+- [`plot_variance_propagation()`](https://www.germslab.org/BRCore/reference/plot_variance_propagation.md)
 
 **Core microbiome identification**: Identify core microbial taxa using
 abundance-occupancy distributions
 
-- [`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+- [`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md)
 
 **Neutral model fitting**: Fit and visualize neutral community models
 
-- [`fit_neutral_model()`](http://www.germslab.org/BRCore/reference/fit_neutral_model.md)
-- [`plot_neutral_model()`](http://www.germslab.org/BRCore/reference/plot_neutral_model.md)
-- `scnm.fit()`
+- [`fit_neutral_model()`](https://www.germslab.org/BRCore/reference/fit_neutral_model.md)
+- [`plot_neutral_model()`](https://www.germslab.org/BRCore/reference/plot_neutral_model.md)
+- [`sncm.fit()`](https://www.germslab.org/BRCore/reference/sncm.fit.md)
 
 **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
 curves, and core distributions
 
-- [`plot_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md)
-- [`plot_abundance_occupancy()`](http://www.germslab.org/BRCore/reference/plot_abundance_occupancy.md)
-- [`plot_core_distribution()`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)
-- [`plot_identified_core()`](http://www.germslab.org/BRCore/reference/plot_identified_core.md)
+- [`plot_rarefaction_metrics()`](https://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md)
+- [`plot_abundance_occupancy()`](https://www.germslab.org/BRCore/reference/plot_abundance_occupancy.md)
+- [`plot_core_distribution()`](https://www.germslab.org/BRCore/reference/plot_core_distribution.md)
+- [`plot_identified_core()`](https://www.germslab.org/BRCore/reference/plot_identified_core.md)
 
 ## Installation
 

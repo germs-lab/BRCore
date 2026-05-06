@@ -15,7 +15,7 @@ plot_abundance_occupancy(core_result, core_set = "elbow")
 - core_result:
 
   A list object returned by
-  [`identify_core`](http://www.germslab.org/BRCore/reference/identify_core.md),
+  [`identify_core`](https://www.germslab.org/BRCore/reference/identify_core.md),
   containing at minimum:
 
   - `occupancy_abundance`: A data frame with columns `otu`, `otu_rel`
@@ -48,9 +48,9 @@ abundances typically found in microbiome data.
 
 ## See also
 
-[`plot_core_distribution()`](http://www.germslab.org/BRCore/reference/plot_core_distribution.md)
+[`plot_core_distribution()`](https://www.germslab.org/BRCore/reference/plot_core_distribution.md)
 and
-[`identify_core()`](http://www.germslab.org/BRCore/reference/identify_core.md)
+[`identify_core()`](https://www.germslab.org/BRCore/reference/identify_core.md)
 
 ## Examples
 

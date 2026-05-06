@@ -43,9 +43,9 @@ that sample are from OTUs that appear only once.
 
 ## See also
 
-[`plot_rarefaction_metrics()`](http://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md)
+[`plot_rarefaction_metrics()`](https://www.germslab.org/BRCore/reference/plot_rarefaction_metrics.md)
 for visualizing these metrics, and
-[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+[`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
 for performing rarefaction on a `phyloseq` object.
 
 ## Examples

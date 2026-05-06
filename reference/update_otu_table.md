@@ -2,7 +2,7 @@
 
 This function updates a `phyloseq` object by replacing its OTU/ASV table
 with a rarefied version produced by
-[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md).
+[`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md).
 The rarefied table can be a data frame, a list of data frames
 (`.as = "list"`), or a 3D array (`.as = "array"`). When providing a list
 or array, specify which iteration to use via the `iteration` parameter.
@@ -23,7 +23,7 @@ update_otu_table(physeq_obj, rarefied_otus, iteration = NULL)
 - rarefied_otus:
 
   A data frame, list of data frames, or 3D array output from
-  [`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+  [`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
   containing the rarefied OTU/ASV tables.
 
 - iteration:
@@ -38,7 +38,7 @@ A `phyloseq` object.
 
 ## See also
 
-[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+[`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
 
 ## Examples
 

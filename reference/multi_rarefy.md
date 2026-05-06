@@ -54,7 +54,7 @@ Samples with less than `depth_level` sequences are discarded.
 
 ## See also
 
-[`update_otu_table()`](http://www.germslab.org/BRCore/reference/update_otu_table.md)
+[`update_otu_table()`](https://www.germslab.org/BRCore/reference/update_otu_table.md)
 for updating the OTU table in a `phyloseq` object and
 [`vegan::rrarefy()`](https://vegandevs.github.io/vegan/reference/rarefy.html)
 for the underlying rarefaction method used in this function.

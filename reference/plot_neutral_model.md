@@ -16,7 +16,7 @@ plot_neutral_model(fit_result)
 - fit_result:
 
   A list-like object returned by
-  [fit_neutral_model()](http://www.germslab.org/BRCore/reference/fit_neutral_model.md).
+  [fit_neutral_model()](https://www.germslab.org/BRCore/reference/fit_neutral_model.md).
 
 ## Value
 
@@ -53,7 +53,7 @@ Points are split into four groups for display:
 
 ## See also
 
-[`fit_neutral_model`](http://www.germslab.org/BRCore/reference/fit_neutral_model.md)
+[`fit_neutral_model`](https://www.germslab.org/BRCore/reference/fit_neutral_model.md)
 
 ## Examples
 

@@ -2,7 +2,7 @@
 
 Visualize the cumulative normalized mean Bray-Curtis increase returned
 by
-[identify_core()](http://www.germslab.org/BRCore/reference/identify_core.md),
+[identify_core()](https://www.germslab.org/BRCore/reference/identify_core.md),
 over ranked OTU/ASVs and shows cutoff points for elbow percent increase
 methods.
 
@@ -57,9 +57,9 @@ from the observed `proportionBC` range to avoid overlap.
 
 ## See also
 
-[identify_core()](http://www.germslab.org/BRCore/reference/identify_core.md)
+[identify_core()](https://www.germslab.org/BRCore/reference/identify_core.md)
 
-[`identify_core`](http://www.germslab.org/BRCore/reference/identify_core.md)
+[`identify_core`](https://www.germslab.org/BRCore/reference/identify_core.md)
 
 ## Examples
 

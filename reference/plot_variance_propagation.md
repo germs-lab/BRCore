@@ -1,7 +1,7 @@
 # Variance propagation diagnostic for rarefaction
 
 This function evaluate the variance between rarefaction iterations from
-[`multi_rarefy()`](http://www.germslab.org/BRCore/reference/multi_rarefy.md)
+[`multi_rarefy()`](https://www.germslab.org/BRCore/reference/multi_rarefy.md)
 by visually comparing raw vs. rarefied alpha diversity metrics
 calculated at each iterations. It is possible to plot observed richness
 (q=0), Shannon diversity (q=1), or Simpson diversity (q=2) by setting

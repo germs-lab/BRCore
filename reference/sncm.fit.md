@@ -85,8 +85,8 @@ community structure. Environ Microbiol. 8(4):732-40.
 
 ## See also
 
-[`plot_neutral_model()`](http://www.germslab.org/BRCore/reference/plot_neutral_model.md),
-[`fit_neutral_model()`](http://www.germslab.org/BRCore/reference/fit_neutral_model.md)
+[`plot_neutral_model()`](https://www.germslab.org/BRCore/reference/plot_neutral_model.md),
+[`fit_neutral_model()`](https://www.germslab.org/BRCore/reference/fit_neutral_model.md)
 
 ## Examples
 
