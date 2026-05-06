@@ -120,7 +120,7 @@ test_that("2: Vignette workflow produces consistent results", {
     test_vignette_data$test_rarefaction_plot$labels
   )
 
-  # Step 4: Multiple rarefaction
+  # Step 4: Rarefaction
 
   bcse_rarefied_list <- multi_rarefy(
     physeq_obj = bcse,

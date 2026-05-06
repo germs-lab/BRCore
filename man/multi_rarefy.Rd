@@ -2,7 +2,7 @@
 % Please edit documentation in R/multi_rarefy.R
 \name{multi_rarefy}
 \alias{multi_rarefy}
-\title{Run multiple rarefaction for microbiome count tables}
+\title{Run rarefaction for microbiome count tables}
 \usage{
 multi_rarefy(
   physeq_obj,
@@ -36,14 +36,12 @@ represent the average sequence counts calculated across all iterations.
 Samples with less than \code{depth_level} sequences are discarded.
 }
 \description{
-This function performs multiple rarefaction on a \code{phyloseq} object by randomly
-sub-sampling OTUs/ASVs within samples without replacement. The process is
-repeated for a specified number of iterations, and the results are averaged.
-Samples with fewer OTUs/ASVs than the specified \code{depth_level} are discarded.
+This function performs rarefaction on a \code{phyloseq} object by randomly
+sub-sampling OTUs/ASVs within samples without replacement for a number of
+iterations specified by the user. Samples with fewer OTUs/ASVs than the
+specified \code{depth_level} are discarded.
 }
 \examples{
-\donttest{
-library(phyloseq)
 library(BRCore)
 data("bcse", package = "BRCore")
 
@@ -51,12 +49,17 @@ data("bcse", package = "BRCore")
 otu_table_rare <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
-  num_iter = 100,
+  num_iter = 10,
   .as = "list",
   set_seed = 7642
 )
 
 rowSums(otu_table_rare[[1]])
-}
 
+
+}
+\seealso{
+\code{\link[=update_otu_table]{update_otu_table()}} for updating the OTU table in a \code{phyloseq}
+object and \code{\link[vegan:rarefy]{vegan::rrarefy()}} for the underlying rarefaction method used in
+this function.
 }

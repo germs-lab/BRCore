@@ -28,12 +28,11 @@ be a data frame, a list of data frames (\code{.as = "list"}), or a 3D array
 to use via the \code{iteration} parameter.
 }
 \examples{
-\donttest{
 library(phyloseq)
 library(BRCore)
 data(GlobalPatterns, package = "phyloseq")
 
-# List output (.as = "list")
+# List output
 otu_list <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
@@ -46,7 +45,7 @@ otu_list <-
 # Extract iteration 2
 rarefied_gp <- update_otu_table(GlobalPatterns, otu_list, iteration = 2)
 
-# Array output (.as = "array")
+# Array output
 otu_array <-
   multi_rarefy(
     physeq_obj = GlobalPatterns,
@@ -58,6 +57,8 @@ otu_array <-
 
 # Extract iteration 1
 rarefied_gp2 <- update_otu_table(GlobalPatterns, otu_array, iteration = 1)
-}
 
+}
+\seealso{
+\code{\link[=multi_rarefy]{multi_rarefy()}}
 }

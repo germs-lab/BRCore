@@ -1,9 +1,31 @@
+# BRCore (development version)
+* Fixes to quote 'BRCore' in DESCRIPTION and typo fix of `sncm.fit` in _pkgdown.yaml
+
+# BRCore 2.0.4
+Date: 2026-04-30
+
+* Fixes to documentation: 
+    * DOI links updated to correct format
+    * New example for `scnm.fit()`
+    * New `@seealso` cross-refences in documentation
+    * Unwrapped examples from `\dontrun` and `\donttest`
+    * Gained new `swithchgrass_core` object, identified microbial core, for examples
+    * New APA 7th edition style for references
+
+# BRCore 2.0.2
+Date: 2026-04-28
+
+* Fixes to vignette and function documentation prior to CRAN submission.
+* Removed "multiple rarefaction" concept from documentation.
+* Removed `parallel_helpers.R` since we have moved away from parallel implementations.
+* Cleaned NAMESPACE and DESCRIPTION.
+
 # BRCore 2.0.1
 Date: 2026-04-25
 
 * Resubmission to CRAN to address auto-check issues on Debian and Windows.
 
-BRCore 2.0.0
+# BRCore 2.0.0
 Date: 2026-04-24
 
 ## Breaking Changes
