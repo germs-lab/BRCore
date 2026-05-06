@@ -25,34 +25,25 @@
 #' @seealso \link[=identify_core]{identify_core()}
 #'
 #' @examples
-#' \donttest{
-#' library(phyloseq)
 #' library(BRCore)
-#' # Example with the package switchgrass dataset
-#' data("switchgrass", package = "BRCore")
+#' data("switchgrass_core", package = "BRCore")
 #'
-#' # Identify core taxa
-#' res <- identify_core(
-#'   physeq_obj = switchgrass,
-#'   priority_var = "sampling_date",
-#'   increase_value = 0.02,
-#'   seed = 48821
+#' p <- plot_identified_core(
+#'   bray_curtis_ranked = switchgrass_core$bray_curtis_ranked,
+#'   elbow = switchgrass_core$elbow,
+#'   lastCall = switchgrass_core$bc_increase,
+#'   increase_value = switchgrass_core$increase_value
 #' )
-#'
-#' # Plot using the returned curve and cut indices; label from increase_value
-#' plot_identified_core(
-#'   bray_curtis_ranked = res$bray_curtis_ranked,
-#'   elbow = res$elbow,
-#'   lastCall = res$bc_increase,
-#'   increase_value = res$increase_value
-#' )
-#' }
+#' print(p)
 #'
 #' @seealso \code{\link{identify_core}}
 #'
 #' @importFrom grid unit
 #' @importFrom dplyr mutate filter
-#' @importFrom ggplot2 ggplot aes geom_point geom_vline annotate labs theme_classic theme element_text scale_x_continuous scale_y_continuous expansion
+#' @importFrom ggplot2 ggplot aes geom_point geom_vline annotate labs
+#' @importFrom ggplot2 theme_classic theme element_text scale_x_continuous
+#' @importFrom ggplot2 scale_y_continuous expansion
+#'
 #' @export
 plot_identified_core <- function(
   bray_curtis_ranked,
@@ -175,13 +166,6 @@ plot_identified_core <- function(
     ) +
     .brcore_theme() +
     scale_x_continuous(breaks = seq(0, max(new_data$rank_num), by = 5))
-
-  # To add some more fancy graphics later...
-  # axis.title = element_text(size = 11),
-  # axis.text = element_text(size = 9),
-  # panel.grid.minor = element_blank(),
-  # panel.grid.major.x = element_line(color = "gray90", size = 0.3),
-  # panel.grid.major.y = element_line(color = "gray90", size = 0.3))
 
   return(list(
     df_for_plot = new_data,

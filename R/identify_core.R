@@ -19,7 +19,8 @@
 #' @param priority_var The column name in the `sample_data` (e.g.
 #' sampling_date", "site") that is used for prioritizing the core microbiome.
 #' @param increase_value Increase value (numeric, scalar) used in the
-#' calculation (default 0.02) for "increase". The "elbow" is always calculated and returned as \code{elbow_core} (see below for details).
+#' calculation (default 0.02) for "increase". The "elbow" is always calculated
+#' and returned as \code{elbow_core} (see below for details).
 #' @param abundance_weight Numeric in `[0,1]`; how much to weight mean relative
 #' abundance in the ranking score. `0` (default) uses occupancy/composite only.
 #' `1` ranks purely by abundance. Values in between blend the two (e.g.,
@@ -87,29 +88,23 @@
 #' @references Shade A, Stopnisek N (2019) Abundance-occupancy
 #' distributions to prioritize plant core microbiome membership. Current
 #' Opinion in Microbiology, 49:50-58
-#' doi:https://doi.org/10.1016/j.mib.2019.09.008
+#' <doi:10.1016/j.mib.2019.09.008>
 #'
 #' @section Dependencies:
 #' Requires \pkg{phyloseq}, \pkg{dplyr}, \pkg{tidyr}, \pkg{tibble}, \pkg{rlang},
 #' and \pkg{vegan}.
 #'
-#' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data tax_table
-#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate n last select slice_head
-#' @importFrom tidyr pivot_longer
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom rlang ensym as_name .data
-#' @importFrom vegan decostand
-#' @importFrom cli cli_text cli_warn cli_abort cli_alert_success cli_alert_info
-#' @importFrom utils combn tail
+#' @seealso [multi_rarefy()], [plot_identified_core()], and
+#' [plot_core_distribution()]
 #'
 #' @examples
 #' \donttest{
-#' library(phyloseq)
 #' library(BRCore)
-#' # Example using your switchgrass phyloseq object and grouping variable
-#' # 'sampling_date'
-#' data("switchgrass", package = "BRCore")
 #'
+#' data("switchgrass", package = "BRCore")
+#' data("bcse", package = "BRCore")
+#'
+#' # With rarefied data
 #' res <- identify_core(
 #'   physeq_obj     = switchgrass,
 #'   priority_var   = "sampling_date",
@@ -117,10 +112,39 @@
 #'   seed           = 091825
 #' )
 #'
-#' # Inspect results
 #' str(res)
+#'
+#' # With unrarefied data (requires multi_rarefy step)
+#' rarefied_list <- multi_rarefy(
+#'   physeq_obj = bcse,
+#'   depth_level = 1000,
+#'   num_iter = 3,
+#'   .as = "list",
+#'   set_seed = 7642
+#' )
+#'
+#'
+#' res_rare <- identify_core(
+#'   physeq_obj = bcse,
+#'   rarefied_list = rarefied_list,
+#'   priority_var = "Crop",
+#'   increase_value = 0.02,
+#'   seed = 091825
+#' )
+#'
+#' str(res_rare)
 #' }
 #'
+#' @importFrom phyloseq sample_sums taxa_are_rows otu_table sample_data
+#' @importFrom phyloseq tax_table
+#' @importFrom dplyr left_join group_by summarise transmute arrange desc mutate
+#' @importFrom dplyr n last select slice_head
+#' @importFrom tidyr pivot_longer
+#' @importFrom tibble rownames_to_column column_to_rownames
+#' @importFrom rlang ensym as_name .data
+#' @importFrom vegan decostand
+#' @importFrom cli cli_text cli_warn cli_abort cli_alert_success cli_alert_info
+#' @importFrom utils combn tail
 #' @export
 identify_core <- function(
   physeq_obj,
@@ -144,7 +168,8 @@ identify_core <- function(
   .phyloseq_class_check(physeq_obj)
 
   # Define arguments ----
-  # Check if samples are rarefied (all have same depth, accounting for floating-point precision)
+  # Check if samples are rarefied (all have same depth, accounting for
+  # floating-point precision)
   ## Validate / generate rarefied_list ----
   min_sum <- min(sample_sums(physeq_obj))
   max_sum <- max(sample_sums(physeq_obj))

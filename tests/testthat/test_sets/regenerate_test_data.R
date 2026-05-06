@@ -27,7 +27,7 @@ test_bcse_metrics <- add_rarefaction_metrics(data = bcse)
 cat("Plotting rarefaction metrics...\n")
 test_rarefaction_plot <- plot_rarefaction_metrics(test_bcse_metrics)
 
-# Step 4: Multiple rarefaction
+# Step 4: Rarefaction
 # Use single thread for consistency with test expectations
 cat("Running multi_rarefy (this may take a while)...\n")
 test_bcse_rarefied_otutable <- multi_rarefy(

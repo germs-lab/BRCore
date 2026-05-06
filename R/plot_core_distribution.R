@@ -1,6 +1,6 @@
 #' Plot Core Taxa  Occupancy Across Metadata Groups
 #'
-#' Creates a bar plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
+#' Creates a plot showing core taxa (i.e. OTUs/ASVs) occupancy patterns across
 #' a grouping variable.
 #'
 #' @param core_result A list object returned by \code{\link{identify_core}},
@@ -27,28 +27,20 @@
 #'
 #' @return A ggplot2 object that can be further customized.
 #'
+#' @seealso [identify_core()], [plot_abundance_occupancy()], and
+#' [plot_identified_core()]
+#'
 #' @examples
-#' \donttest{
-#' library(phyloseq)
 #' library(BRCore)
-#' # Generate an object from identify_core and then plot
-#' data("switchgrass", package = "BRCore")
+#' data("switchgrass_core", package = "BRCore")
 #'
-#' switchgrass_core <- identify_core(
-#'   physeq_obj = switchgrass,
-#'   priority_var = "sampling_date",
-#'   increase_value = 0.02,
-#'   abundance_weight = 0,
-#'   seed = 1234
-#' )
-#'
-#' plot_core_distribution(
+#' p <- plot_core_distribution(
 #'   core_result = switchgrass_core,
 #'   core_set = "increase",
 #'   group_var = "sampling_date",
 #'   plot_type = "bar"
 #' )
-#' }
+#' print(p)
 #'
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr pivot_longer
@@ -57,7 +49,6 @@
 #' @importFrom ggplot2 theme_classic theme element_text element_line
 #' @importFrom ggplot2 element_blank labs geom_line geom_point facet_wrap
 #' @importFrom ggplot2 scale_y_continuous geom_tile
-#' @importFrom ggsci scale_fill_npg
 #' @importFrom vegan decostand
 #' @importFrom grid unit
 #'

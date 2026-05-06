@@ -7,8 +7,8 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![](https://www.r-pkg.org/badges/version-last-release/BRCore)](https://www.r-pkg.org/badges/version-last-release/BRCore)
-[![](https://cranlogs.r-pkg.org/badges/grand-total/BRCore)](https://cran.r-project.org/package=BRCore)
+[![](https://www.r-pkg.org/badges/version-last-release/BRCore)](https://cran.r-project.org/package=BRCore)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/BRCore)](https://www.r-pkg.org/pkg/BRCore)
 [![Codecov test
 coverage](https://codecov.io/gh/germs-lab/BRCore/graph/badge.svg)](https://app.codecov.io/gh/germs-lab/BRCore)
 [![R-CMD-check](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/germs-lab/BRCore/actions/workflows/R-CMD-check.yaml)
@@ -24,10 +24,11 @@ robustness and reproducibility in microbiome data analysis.
 BRCore provides tools for:
 
 **Rarefaction analysis**: Calculate pre-rarefaction metrics and perform
-multiple rarefactions
+rarefactions
 
 - `add_rarefaction_metrics()`
 - `multi_rarefy()`
+- `plot_variance_propagation()`
 
 **Core microbiome identification**: Identify core microbial taxa using
 abundance-occupancy distributions
@@ -38,6 +39,7 @@ abundance-occupancy distributions
 
 - `fit_neutral_model()`
 - `plot_neutral_model()`
+- `sncm.fit()`
 
 **Visualization**: Plot rarefaction diagnostics, abundance-occupancy
 curves, and core distributions
@@ -54,6 +56,8 @@ Install the latest *stable* version of BRCore from CRAN with:
 ``` r
 install.packages("BRCore")
 ```
+
+Install the *development* version of BRCore from GitHub with:
 
 Install the *development* version of BRCore from GitHub with:
 
@@ -76,7 +80,7 @@ data("bcse", package = "BRCore")
 # Add rarefaction metrics
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
-# Perform multiple rarefaction
+# Perform rarefaction
 bcse_rarefied_list <- multi_rarefy(
   physeq_obj = bcse,
   depth_level = 1000,
@@ -85,7 +89,10 @@ bcse_rarefied_list <- multi_rarefy(
 )
 
 # Update phyloseq object with rarefied data
-bcse_rare_single <- update_otu_table(physeq_obj = bcse, rarefied_otus = bcse_rarefied_list, iteration = 2) # Your preffered iteration can be used here
+bcse_rare_single <- update_otu_table(
+  physeq_obj = bcse, 
+  rarefied_otus = bcse_rarefied_list, 
+  iteration = 2) # Your preffered iteration can be used here
 
 # Identify core microbiome
 
@@ -133,11 +140,11 @@ vignette("BRCore-vignette", package = "BRCore")
 ## Contributing
 
 Contributions to BRCore are welcome! Please see the
-[CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to
-contribute.
+[CONTRIBUTING.md](https://github.com/germs-lab/BRCore/blob/main/.github/CONTRIBUTING.md)
+file for guidelines on how to contribute.
 
 ## Code of Conduct
 
 Please note that this project is released with a [Contributor Code of
-Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree
-to abide by its terms.
+Conduct](https://github.com/germs-lab/BRCore/blob/main/.github/CODE_OF_CONDUCT.md).
+By participating in this project you agree to abide by its terms.

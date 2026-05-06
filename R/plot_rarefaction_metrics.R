@@ -9,8 +9,9 @@
 #'
 #' @return A `ggarrange` object with six plots.
 #'
+#' @seealso [add_rarefaction_metrics()]
+#'
 #' @examples
-#' \donttest{
 #' library(phyloseq)
 #' library(BRCore)
 #'
@@ -26,7 +27,6 @@
 #' # pre-computed read_num, goods_cov, and outlier columns
 #' sample_data_df <- data.frame(sample_data(bcse_metrics))
 #' plot_rarefaction_metrics(sample_data_df)
-#' }
 #'
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_point geom_jitter
 #' @importFrom ggplot2 geom_boxplot geom_bar theme_bw theme labs
@@ -39,7 +39,6 @@
 #' @importFrom scales comma
 #' @importFrom cli cli_alert_info cli_progress_step cli_alert_success cli_abort
 #' @importFrom phyloseq sample_data
-
 #'
 #' @export
 #'

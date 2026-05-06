@@ -39,27 +39,33 @@ individuals in the sample. For example, a Good's coverage of
 that appear only once.
 }
 \examples{
-\donttest{
 library(phyloseq)
 library(BRCore)
-# From an object class "phyloseq" with added alpha metrics
 
 data("bcse", package = "BRCore")
+
+# Adding metrics to a "phyloseq" object
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
-sample_data(bcse_metrics)
+sample_data(bcse_metrics)|>
+head(10)
 
-# From a class "data.frame" count table object
 
+# Adding metrics to a "data.frame" count table object
 bcse_otutable <- as.data.frame(
-  as(otu_table(bcse), "matrix")
+  as.matrix(otu_table(bcse))
 )
-test_otutable_metrics <- add_rarefaction_metrics(
+
+bcse_otutable_metrics <- add_rarefaction_metrics(
   data = bcse_otutable
 )
-test_otutable_metrics[
-  utils::tail(seq_len(nrow(test_otutable_metrics)), 10),
-  utils::tail(seq_len(ncol(test_otutable_metrics)), 20)
+bcse_otutable_metrics[
+  head(seq_len(nrow(bcse_otutable_metrics)), 10),
+  tail(seq_len(ncol(bcse_otutable_metrics)), 20)
 ]
-}
 
+
+}
+\seealso{
+\code{\link[=plot_rarefaction_metrics]{plot_rarefaction_metrics()}} for visualizing these metrics, and
+\code{\link[=multi_rarefy]{multi_rarefy()}} for performing rarefaction on a \code{phyloseq} object.
 }
