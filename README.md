@@ -51,15 +51,21 @@ curves, and core distributions
 
 ## Installation
 
-Install the latest *stable* version of BRCore from CRAN with:
+### *Stable* version from CRAN with:
 
 ``` r
 install.packages("BRCore")
+
+# or if using with `renv`:
+renv::init(bioconductor = TRUE)
+renv::install("BRCore")
 ```
 
-Install the *development* version of BRCore from GitHub with:
+***NOTE:*** *If using `install.packages()` in an `renv` project, `renv`
+will intercept the call. Run `renv::init(bioconductor = TRUE)` first to
+ensure Bioconductor dependencies can be resolved and installed.*
 
-Install the *development* version of BRCore from GitHub with:
+### *Development* version from GitHub with:
 
 ``` r
 # install.packages("pak")
