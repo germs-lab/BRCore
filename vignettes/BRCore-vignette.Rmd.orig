@@ -56,7 +56,7 @@ p.caption {
 
 ## Load R libraries
 
-```{r load libraries, echo=TRUE}
+```{r load libraries, echo=FALSE}
 invisible(
   lapply(
     c("BRCore", "phyloseq", "tidyverse", "viridis"),
