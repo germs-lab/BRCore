@@ -1,4 +1,4 @@
-## ----chunk setup, include = FALSE-----------------------------------------------------------------------------------------------------------------------
+## ----chunk setup, include = FALSE-------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -35,7 +35,7 @@ options(cli.progress_show_after = Inf) # Disable progress bar for cleaner output
 ##     text-align: justify;
 ## }
 
-## ----load libraries, echo=TRUE--------------------------------------------------------------------------------------------------------------------------
+## ----load libraries, echo=FALSE---------------------------------------------------
 invisible(
   lapply(
     c("BRCore", "phyloseq", "tidyverse", "viridis"),
@@ -45,12 +45,11 @@ invisible(
 )
 
 
-## ----load bcse, echo=TRUE-------------------------------------------------------------------------------------------------------------------------------
-data("bcse", package = "BRCore")
+## ----load bcse, echo=TRUE---------------------------------------------------------
 str(bcse)
 
 
-## ----calculate metrics, echo=TRUE-----------------------------------------------------------------------------------------------------------------------
+## ----calculate metrics, echo=TRUE-------------------------------------------------
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 bcse_metrics
 
@@ -60,7 +59,7 @@ rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 print(rarefaction_plot)
 
 
-## ----rarefy bcse, echo=TRUE-----------------------------------------------------------------------------------------------------------------------------
+## ----rarefy bcse, echo=TRUE-------------------------------------------------------
 bcse_rarefied_list <-
   multi_rarefy(
     physeq_obj = bcse,
@@ -71,7 +70,7 @@ bcse_rarefied_list <-
   )
 
 
-## ----verify success rarefaction, echo=TRUE--------------------------------------------------------------------------------------------------------------
+## ----verify success rarefaction, echo=TRUE----------------------------------------
 class(bcse_rarefied_list)
 str(bcse_rarefied_list[[1]], list.len = 10) # Dimensions of iteration #1
 
@@ -87,7 +86,7 @@ rarefaction_variance_plot <- plot_variance_propagation(
 print(rarefaction_variance_plot)
 
 
-## ----update_otu_table, echo=TRUE------------------------------------------------------------------------------------------------------------------------
+## ----update_otu_table, echo=TRUE--------------------------------------------------
 bcse_rare_single <- update_otu_table(
   physeq_obj = bcse,
   rarefied_otus = bcse_rarefied_list,
@@ -95,7 +94,7 @@ bcse_rare_single <- update_otu_table(
 )
 
 
-## ----identify_core, echo=TRUE---------------------------------------------------------------------------------------------------------------------------
+## ----identify_core, echo=TRUE-----------------------------------------------------
 bcse_core_multi <- identify_core(
   physeq_obj = bcse,
   rarefied_list = bcse_rarefied_list,
@@ -114,7 +113,7 @@ bcse_core_multi <- identify_core(
 #   seed = 2134
 # )
 
-## ----check the identified core, echo=TRUE---------------------------------------------------------------------------------------------------------------
+## ----check the identified core, echo=TRUE-----------------------------------------
 str(bcse_core_multi)
 
 
@@ -131,7 +130,7 @@ bcse_identified_core <- plot_identified_core(
 print(bcse_identified_core$plot_identified_core)
 
 
-## ----plot abundance occupany and increase core set, echo=TRUE-------------------------------------------------------------------------------------------
+## ----plot abundance occupany and increase core set, echo=TRUE---------------------
 
 ## ----fig4_plot_increase, echo=TRUE, fig.cap="Figure 4: Abundance-occupancy distribution for the 'bcse' dataset. The core ASV/OTUs identified by the last 2% increase method are highlighted in red."----
 plot_abund_occ_increase <- plot_abundance_occupancy(
@@ -162,7 +161,7 @@ plot_core_dist_bar <- plot_core_distribution(
 print(plot_core_dist_bar)
 
 
-## ----plot_type line-------------------------------------------------------------------------------------------------------------------------------------
+## ----plot_type line---------------------------------------------------------------
 
 ## ----fig7_plot_type_line, echo=TRUE, fig.width=7, fig.height=10, fig.cap="Figure 7: Occupancy of core ASV/OTUs across the 'Crop' variable. Each point represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A line plot is better than a bar plot but still not ideal for this many variable levels."----
 plot_core_dist_line <- plot_core_distribution(
@@ -174,7 +173,7 @@ plot_core_dist_line <- plot_core_distribution(
 print(plot_core_dist_line)
 
 
-## ----reorder variable levels, echo=TRUE-----------------------------------------------------------------------------------------------------------------
+## ----reorder variable levels, echo=TRUE-------------------------------------------
 bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
   mutate(
     Crop = recode(
@@ -208,7 +207,7 @@ bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
   )
 
 
-## ----plot_type heatmap----------------------------------------------------------------------------------------------------------------------------------
+## ----plot_type heatmap------------------------------------------------------------
 
 ## ----fig8_plot_type_heatmap, echo=TRUE, fig.cap="Figure 8: Occupancy of core ASV/OTUs across the 'Crop' variable. Each cell represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A heatmap is more compact and shows well enough the average occupancy across samples in each variable level."----
 plot_core_dist_heatmap <- plot_core_distribution(
@@ -222,7 +221,7 @@ plot_core_dist_heatmap <- plot_core_distribution(
 print(plot_core_dist_heatmap)
 
 
-## ----fit neutral model, echo=TRUE-----------------------------------------------------------------------------------------------------------------------
+## ----fit neutral model, echo=TRUE-------------------------------------------------
 bcse_core_multi_neutral_fit <- fit_neutral_model(
   otu_table = bcse_core_multi$otu_table,
   core_set = bcse_core_multi$increase_core,
@@ -230,7 +229,7 @@ bcse_core_multi_neutral_fit <- fit_neutral_model(
 )
 
 
-## ----neutral fit result, echo=TRUE----------------------------------------------------------------------------------------------------------------------
+## ----neutral fit result, echo=TRUE------------------------------------------------
 str(bcse_core_multi_neutral_fit)
 
 
@@ -240,7 +239,7 @@ plot_bcse_neutral_fit <- plot_neutral_model(bcse_core_multi_neutral_fit)
 print(plot_bcse_neutral_fit)
 
 
-## ----supplemental_info, echo=TRUE-----------------------------------------------------------------------------------------------------------------------
+## ----supplemental_info, echo=TRUE-------------------------------------------------
 bcse_core_single_iter1 <- identify_core(
   physeq_obj = bcse_updated_rare,
   priority_var = "Crop",

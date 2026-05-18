@@ -70,7 +70,6 @@
 #' @importFrom minpack.lm nlsLM
 #' @importFrom Hmisc binconf
 #' @importFrom stats4 mle
-#' @importFrom stats pbeta
 #'
 #' @export
 sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
@@ -108,19 +107,39 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   d <- 1 / N
 
   ## Fit model parameter m (or Nm) using Non-linear least squares (NLS)
+  warned_nls_pbeta <- FALSE
   m.fit <- minpack.lm::nlsLM(
-    freq ~ stats::pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE),
+    freq ~ .internal_warn_sncm(
+      \() stats::pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE),
+      message = "NLS `stats::pbeta()` produced a warning during fitting",
+      warned = warned_nls_pbeta,
+      warn_setter = function() warned_nls_pbeta <<- TRUE
+    ),
     start = list(m = 0.1)
   )
   m.ci <- stats::confint(m.fit, "m", level = 0.95)
 
   ## Fit neutral model parameter m (or Nm) using Maximum likelihood estimation (MLE)
-  sncm.LL <- function(m, sigma) {
-    R <- freq -
-      stats::pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE)
-    R <- suppressWarnings(stats::dnorm(R, 0, sigma))
-    -base::sum(base::log(R))
-  }
+  sncm.LL <- local({
+    warned_pbeta <- FALSE
+    warned_dnorm <- FALSE
+    function(m, sigma) {
+      R <- freq -
+        .internal_warn_sncm(
+          \() stats::pbeta(d, N * m * p, N * m * (1 - p), lower.tail = FALSE),
+          message = "SNCM `stats::pbeta()` produced a warning during MLE",
+          warned = warned_pbeta,
+          warn_setter = function() warned_pbeta <<- TRUE
+        )
+      R <- .internal_warn_sncm(
+        \() stats::dnorm(R, 0, sigma),
+        message = "SNCM `stats::dnorm()` produced a warning during MLE",
+        warned = warned_dnorm,
+        warn_setter = function() warned_dnorm <<- TRUE
+      )
+      -base::sum(base::log(R))
+    }
+  })
   m.mle <- stats4::mle(
     sncm.LL,
     start = list(m = 0.1, sigma = 0.1),
@@ -132,12 +151,21 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   bic.fit <- stats::BIC(m.mle)
 
   ## Calculate goodness-of-fit (R-squared and Root Mean Squared Error)
-  freq.pred <- stats::pbeta(
-    d,
-    N * stats::coef(m.fit) * p,
-    N * stats::coef(m.fit) * (1 - p),
-    lower.tail = FALSE
+  warned_goodns_pbeta <- FALSE
+  freq.pred <- .internal_warn_sncm(
+    \() {
+      stats::pbeta(
+        d,
+        N * stats::coef(m.fit) * p,
+        N * stats::coef(m.fit) * (1 - p),
+        lower.tail = FALSE
+      )
+    },
+    message = "SNCM `stats::pbeta()` produced a warning during goodness-of-fit calculation",
+    warned = warned_goodns_pbeta,
+    warn_setter = function() warned_goodns_pbeta <<- TRUE
   )
+
   Rsqr <- 1 -
     (base::sum((freq - freq.pred)^2)) /
       (base::sum((freq - base::mean(freq))^2))
@@ -154,11 +182,19 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   )
 
   ## Calculate AIC for binomial model
-  bino.LL <- function(mu, sigma) {
-    R <- freq - stats::pbinom(d, N.int, p, lower.tail = FALSE)
-    R <- suppressWarnings(stats::dnorm(R, mu, sigma))
-    -base::sum(base::log(R))
-  }
+  bino.LL <- local({
+    warned_dnorm <- FALSE
+    function(mu, sigma) {
+      R <- freq - stats::pbinom(d, N.int, p, lower.tail = FALSE)
+      R <- .internal_warn_sncm(
+        \() stats::dnorm(R, mu, sigma),
+        message = "Binomial model `stats::dnorm()` produced a warning during MLE",
+        warned = warned_dnorm,
+        warn_setter = function() warned_dnorm <<- TRUE
+      )
+      -base::sum(base::log(R))
+    }
+  })
   bino.mle <- stats4::mle(
     bino.LL,
     start = list(mu = 0, sigma = 0.1),
@@ -186,11 +222,19 @@ sncm.fit <- function(spp, pool = NULL, stats = TRUE, taxon = NULL) {
   )
 
   ## Calculate AIC for Poisson model
-  pois.LL <- function(mu, sigma) {
-    R <- freq - stats::ppois(d, N * p, lower.tail = FALSE)
-    R <- suppressWarnings(stats::dnorm(R, mu, sigma))
-    -base::sum(base::log(R))
-  }
+  pois.LL <- local({
+    warned_dnorm <- FALSE
+    function(mu, sigma) {
+      R <- freq - stats::ppois(d, N * p, lower.tail = FALSE)
+      R <- .internal_warn_sncm(
+        \() stats::dnorm(R, mu, sigma),
+        message = "Poisson model `stats::dnorm()` produced a warning during MLE",
+        warned = warned_dnorm,
+        warn_setter = function() warned_dnorm <<- TRUE
+      )
+      -base::sum(base::log(R))
+    }
+  })
   pois.mle <- stats4::mle(
     pois.LL,
     start = list(mu = 0, sigma = 0.1),
