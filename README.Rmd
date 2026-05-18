@@ -73,9 +73,6 @@ pak::pak("germs-lab/BRCore")
 library(BRCore)
 library(phyloseq)
 
-# Load example data
-data("bcse", package = "BRCore")
-
 # Add rarefaction metrics
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 

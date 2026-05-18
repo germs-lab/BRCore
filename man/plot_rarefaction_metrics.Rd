@@ -22,8 +22,6 @@ Good's coverage, and outlier behavior based on a data frame or a
 library(phyloseq)
 library(BRCore)
 
-data("bcse", package = "BRCore")
-
 # Add rarefaction metrics to the phyloseq object
 bcse_metrics <- add_rarefaction_metrics(bcse)
 

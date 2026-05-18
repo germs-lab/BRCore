@@ -205,7 +205,7 @@ plot_neutral_model <- function(fit_result) {
       parse = TRUE,
       hjust = 1,
       vjust = -0.75,
-      size = 6,
+      size = 4.5,
       fill = "white",
       alpha = 0.9,
       lineheight = 1.05
