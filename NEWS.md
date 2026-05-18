@@ -3,6 +3,8 @@ Date: 2026-05-18
 
 ## Bug Fixes
 
+* Relaxed version requirements for `phyloseq` and `stats4` to improve compatibilit.
+
 * [5ba7a7c](https://github.com/germs-lab/BRCore/commit/5ba7a7c3067a2044c34aee812795dc427869eb4b) Added `biocViews` field to DESCRIPTION to allow installation of Bioconductor dependencies via `install.packages()`.
 * [40d79e4](https://github.com/germs-lab/BRCore/commit/40d79e448c632f590e4e52cbf16537496b29529f) Fixes to quote 'BRCore' in DESCRIPTION and typo fix of `sncm.fit` in _pkgdown.yaml
 
