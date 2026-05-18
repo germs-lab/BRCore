@@ -16,7 +16,7 @@ options(cli.progress_show_after = Inf) # Disable progress bar for cleaner output
 ##   padding: 10px;
 ##   margin: 15px 0;
 ## }
-## 
+##
 ## h1, .h1 {
 ##     margin-top: 84px;
 ##     margin-bottom: 42px;
@@ -25,7 +25,7 @@ options(cli.progress_show_after = Inf) # Disable progress bar for cleaner output
 ##     margin-top: 42px;
 ##     margin-bottom: 21px;
 ## }
-## 
+##
 ## p.caption {
 ##     font-size: 1em;
 ##     font-style: italic;
@@ -105,14 +105,13 @@ bcse_core_multi <- identify_core(
   seed = 2134
 )
 
-# With a single iteration 
+# With a single iteration
 # bcse_core_single <- identify_core(
 #   physeq_obj = bcse_rare_single,
 #   priority_var = "Crop",
 #   increase_value = 0.02,
 #   seed = 2134
 # )
-
 
 ## ----check the identified core, echo=TRUE-----------------------------------------
 str(bcse_core_multi)
@@ -132,7 +131,6 @@ print(bcse_identified_core$plot_identified_core)
 
 
 ## ----plot abundance occupany and increase core set, echo=TRUE---------------------
-
 
 ## ----fig4_plot_increase, echo=TRUE, fig.cap="Figure 4: Abundance-occupancy distribution for the 'bcse' dataset. The core ASV/OTUs identified by the last 2% increase method are highlighted in red."----
 plot_abund_occ_increase <- plot_abundance_occupancy(
@@ -164,8 +162,6 @@ print(plot_core_dist_bar)
 
 
 ## ----plot_type line---------------------------------------------------------------
-
-
 
 ## ----fig7_plot_type_line, echo=TRUE, fig.width=7, fig.height=10, fig.cap="Figure 7: Occupancy of core ASV/OTUs across the 'Crop' variable. Each point represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A line plot is better than a bar plot but still not ideal for this many variable levels."----
 plot_core_dist_line <- plot_core_distribution(
@@ -213,8 +209,6 @@ bcse_core_multi$metadata <- bcse_core_multi$metadata %>%
 
 ## ----plot_type heatmap------------------------------------------------------------
 
-
-
 ## ----fig8_plot_type_heatmap, echo=TRUE, fig.cap="Figure 8: Occupancy of core ASV/OTUs across the 'Crop' variable. Each cell represents the average occupancy of core ASV/OTUs in samples belonging to each level of the 'Crop' variable. A heatmap is more compact and shows well enough the average occupancy across samples in each variable level."----
 plot_core_dist_heatmap <- plot_core_distribution(
   core_result = bcse_core_multi,
@@ -254,10 +248,10 @@ bcse_core_single_iter1 <- identify_core(
   seed = 2135
 )
 
-bcse_identified_core_iter1 <- plot_identified_core(bray_curtis_ranked = bcse_core_single_iter1$bray_curtis_ranked,
+bcse_identified_core_iter1 <- plot_identified_core(
+  bray_curtis_ranked = bcse_core_single_iter1$bray_curtis_ranked,
   elbow = bcse_identified_core_iter1$elbow,
   lastCall = bcse_identified_core_iter1$bc_increase,
   increase_value = bcse_identified_core_iter1$increase_value
 )
 print(bcse_identified_core_iter1$plot_idenfied_core)
-
