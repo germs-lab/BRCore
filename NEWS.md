@@ -1,3 +1,8 @@
+# BRCore 2.0.6
+Date: 2026-05-19
+
+*  [cf3ef77](https://github.com/germs-lab/BRCore/commit/cf3ef779403d498fa9d57b09857e3d1816d3bbd9) & [a43bc71](https://github.com/germs-lab/BRCore/commit/a43bc71d779c5b1b11b1291056570c6e00124212) Typo and instructions fixes to README and DESCRIPTION files.
+
 # BRCore 2.0.5
 Date: 2026-05-18
 
