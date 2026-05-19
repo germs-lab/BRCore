@@ -1,4 +1,9 @@
-## v2.0.6
+## v2.0.7
+
+### Resubmission notes
+
+* Fixed invalid URLs in NEWS.md for v2.0.6 CRAN submission.
+
 ### R CMD check results 
 
 0 errors | 0 warnings | 3 notes
@@ -8,10 +13,6 @@
 * Relaxed version requirements for `phyloseq` and `stats4` to improve compatibility and avoid 
 CRAN error in `r-oldrel-macos-x86_64`.
 
-### Fixes
-
-* Relaxed version requirements for `phyloseq` and `stats4` to improve compatibility and avoid 
-CRAN error in `r-oldrel-macos-x86_64`.
 
 ### Notes
 
@@ -20,9 +21,6 @@ CRAN error in `r-oldrel-macos-x86_64`.
      the local check environment (`/usr/lib/aspell-0.60/en_US`). This is a
      local environment issue and does not affect the package.
 
-2. **Examples with CPU (user + system) or elapsed time > 5s**
-                   user system elapsed
-  update_otu_table 5.01  0.034   5.055
 2. **Examples with CPU (user + system) or elapsed time > 5s**
                    user system elapsed
   update_otu_table 5.01  0.034   5.055
