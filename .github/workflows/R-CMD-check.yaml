@@ -70,11 +70,12 @@ jobs:
           extra-packages: |
             any::rcmdcheck
             any::tidyverse
+            any::devtools
           needs: check
 
       - name: Check package
         uses: r-lib/actions/check-r-package@v2
         with:
-          error-on: "\"error\""
+          error-on: '"error"'
           upload-snapshots: true
-          build_args: "c(\"--no-manual\",\"--compact-vignettes=gs+qpdf\")"
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
