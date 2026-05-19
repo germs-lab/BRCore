@@ -1,9 +1,45 @@
 # Changelog
 
-## BRCore (development version)
+## BRCore 2.0.5
 
-- Fixes to quote ‘BRCore’ in DESCRIPTION and typo fix of `sncm.fit` in
+CRAN release: 2026-05-19
+
+Date: 2026-05-18
+
+### Bug Fixes
+
+- Relaxed version requirements for `phyloseq` and `stats4` to improve
+  compatibilit.
+
+- [5ba7a7c](https://github.com/germs-lab/BRCore/commit/5ba7a7c3067a2044c34aee812795dc427869eb4b)
+  Added `biocViews` field to DESCRIPTION to allow installation of
+  Bioconductor dependencies via
+  [`install.packages()`](https://rdrr.io/r/utils/install.packages.html).
+
+- [40d79e4](https://github.com/germs-lab/BRCore/commit/40d79e448c632f590e4e52cbf16537496b29529f)
+  Fixes to quote ‘BRCore’ in DESCRIPTION and typo fix of `sncm.fit` in
   \_pkgdown.yaml
+
+### Refactoring
+
+- [95a42db](https://github.com/germs-lab/BRCore/commit/95a42db482675450157ec2099a658e0ce538901c)[`sncm.fit()`](https://www.germslab.org/BRCore/reference/sncm.fit.md):
+  replaced [`suppressWarnings()`](https://rdrr.io/r/base/warning.html)
+  with targeted warning capture via new internal helper
+  [`.internal_warn_sncm()`](https://www.germslab.org/BRCore/reference/dot-internal_warn_sncm.md).
+- [46eff6f](https://github.com/germs-lab/BRCore/commit/46eff6fb691fd370e5b3723e285bb3882760d742)[`plot_neutral_model()`](https://www.germslab.org/BRCore/reference/plot_neutral_model.md):
+  refined plot axis styling and formatted y-axis as percent. Resized box
+  annotation.
+- [b275861](https://github.com/germs-lab/BRCore/commit/b275861e8434204d66dc4962d10499488d738513)
+  Removed redundant `data("bcse")` calls from examples and README
+  vignette.
+
+### Documentation
+
+- [46ef2ba](https://github.com/germs-lab/BRCore/commit/46ef2ba1ebb006736f9b86bfa7b06f3adca40f49)
+  Updated vignette output.
+- [b275861](https://github.com/germs-lab/BRCore/commit/b275861e8434204d66dc4962d10499488d738513)
+  Removed deprecated `num_iter` parameter from README examples.
+- Reordered DESCRIPTION fields.
 
 ## BRCore 2.0.4
 

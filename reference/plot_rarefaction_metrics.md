@@ -31,8 +31,6 @@ A `ggarrange` object with six plots.
 library(phyloseq)
 library(BRCore)
 
-data("bcse", package = "BRCore")
-
 # Add rarefaction metrics to the phyloseq object
 bcse_metrics <- add_rarefaction_metrics(bcse)
 
@@ -42,7 +40,7 @@ plot_rarefaction_metrics(bcse_metrics)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [794ms]
+#> ✔ Generating rarefaction diagnostic plots [790ms]
 #> 
 
 
@@ -54,7 +52,7 @@ plot_rarefaction_metrics(sample_data_df)
 #> ℹ Generating rarefaction diagnostic plots
 #> ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
-#> ✔ Generating rarefaction diagnostic plots [758ms]
+#> ✔ Generating rarefaction diagnostic plots [762ms]
 #> 
 
 ```

@@ -63,7 +63,7 @@ for the underlying rarefaction method used in this function.
 
 ``` r
 library(BRCore)
-data("bcse", package = "BRCore")
+
 
 # Example rarefaction (single iteration, single core to keep examples fast)
 otu_table_rare <- multi_rarefy(

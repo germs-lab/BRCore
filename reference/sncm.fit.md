@@ -110,11 +110,10 @@ colnames(spp_data) <- paste0("Species_", seq_len(n_species))
 
 fit_stats <- sncm.fit(spp_data, stats = TRUE)
 #> Waiting for profiling to be done...
-#> Warning: NaNs produced
-#> Warning: NaNs produced
-#> Warning: NaNs produced
-#> Warning: NaNs produced
-#> Warning: NaNs produced
+#> Warning: SNCM `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: SNCM `stats::pbeta()` produced a warning during MLE: NaNs produced
+#> Warning: Binomial model `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: Poisson model `stats::dnorm()` produced a warning during MLE: NaNs produced
 #> ℹ Neutral model fitting:
 #> • Average individuals per community (N): 1264.75
 #> • Binomial model using rounded N: 1265
@@ -123,11 +122,10 @@ fit_stats <- sncm.fit(spp_data, stats = TRUE)
 #>   0, sigma = 0.1
 predictions <- sncm.fit(spp_data, stats = FALSE)
 #> Waiting for profiling to be done...
-#> Warning: NaNs produced
-#> Warning: NaNs produced
-#> Warning: NaNs produced
-#> Warning: NaNs produced
-#> Warning: NaNs produced
+#> Warning: SNCM `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: SNCM `stats::pbeta()` produced a warning during MLE: NaNs produced
+#> Warning: Binomial model `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: Poisson model `stats::dnorm()` produced a warning during MLE: NaNs produced
 #> ℹ Neutral model fitting:
 #> • Average individuals per community (N): 1264.75
 #> • Binomial model using rounded N: 1265

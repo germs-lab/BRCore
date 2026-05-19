@@ -25,7 +25,6 @@ other three.
 
 ``` r
 
-data("bcse", package = "BRCore")
 str(bcse)
 #> Formal class 'phyloseq' [package "phyloseq"] with 5 slots
 #>   ..@ otu_table:Formal class 'otu_table' [package "phyloseq"] with 2 slots
@@ -62,7 +61,7 @@ str(bcse)
 #>   .. .. .. .. ..@ xp_list                    :List of 1
 #>   .. .. .. .. .. ..$ :<externalptr> 
 #>   .. .. .. .. ..@ .link_to_cached_object_list:List of 1
-#>   .. .. .. .. .. ..$ :<environment: 0x5ebe5ca4ea10> 
+#>   .. .. .. .. .. ..$ :<environment: 0x5ad933230678> 
 #>   .. .. ..@ ranges         :Formal class 'GroupedIRanges' [package "XVector"] with 7 slots
 #>   .. .. .. .. ..@ group          : int [1:2861] 1 1 1 1 1 1 1 1 1 1 ...
 #>   .. .. .. .. ..@ start          : int [1:2861] 106501 2501 63001 36751 501 19251 14251 37751 3751 8501 ...
@@ -119,7 +118,7 @@ rarefaction_plot <- plot_rarefaction_metrics(bcse_metrics)
 ✔ Rarefaction diagnostic plots generated successfully
 #> ℹ Generating rarefaction diagnostic plots
 
-✔ Generating rarefaction diagnostic plots [1.2s]
+✔ Generating rarefaction diagnostic plots [1s]
 print(rarefaction_plot)
 ```
 
@@ -178,7 +177,7 @@ bcse_rarefied_list <-
     set_seed = 7642
   )
 #> 
-#> ── Rarefaction iterations starting... ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#> ── Rarefaction iterations starting... ──────────────────────────────────────────────
 #> 
 #> ── Input Validation ──
 #> 
@@ -259,7 +258,7 @@ rarefaction_variance_plot <- plot_variance_propagation(
 )
 #> ✔ Input phyloseq object is valid!
 #> 
-#> ── Rarefaction Variance Propagation Visualization ────────────────────────────────────────────────────────────────────────────────────────────────────────
+#> ── Rarefaction Variance Propagation Visualization ──────────────────────────────────
 #> ℹ Hill number order selected, q= 0
 #> ℹ Number of rarefaction iterations, n_iter= 3
 #> ℹ Comparison plot generated!
@@ -375,7 +374,7 @@ bcse_core_multi <- identify_core(
 #> ℹ Using provided `rarefied_list` (3 iterations).
 #> ✔ Core prioritizing variable: Crop
 #> ℹ Ranked by Rank only
-#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-04-28 12:10:58.310505
+#> ℹ Ranking OTUs based on BC dissimilarity, starting at 2026-05-18 15:17:06.698128
 #> ✔ Elbow method identified 7 core OTUs
 #> ✔ % increase method identified 30 core OTUs
 #> ✔ Analysis complete!
@@ -717,11 +716,22 @@ bcse_core_multi_neutral_fit <- fit_neutral_model(
   abundance_occupancy = bcse_core_multi$abundance_occupancy
 )
 #> Waiting for profiling to be done...
+#> Warning: SNCM `stats::pbeta()` produced a warning during MLE: NaNs produced
+#> Warning: Binomial model `stats::dnorm()` produced a warning during MLE: NaNs
+#> produced
+#> Warning: Poisson model `stats::dnorm()` produced a warning during MLE: NaNs
+#> produced
 #> ℹ Neutral model fitting:
 #> • Average individuals per community (N): 40276.38
 #> • Binomial model using rounded N: 40276
 #> • Poisson model using N: 40276.38
-#> • Maximum likelihood estimation using N: 40276.38, and starting parameters: mu = 0, sigma = 0.1
+#> • Maximum likelihood estimation using N: 40276.38, and starting parameters: mu = 0,
+#>   sigma = 0.1
+#> Warning: SNCM `stats::pbeta()` produced a warning during MLE: NaNs produced
+#> Warning: Binomial model `stats::dnorm()` produced a warning during MLE: NaNs
+#> produced
+#> Warning: Poisson model `stats::dnorm()` produced a warning during MLE: NaNs
+#> produced
 #> ✔ Model fitting complete!
 ```
 

@@ -67,12 +67,18 @@ switchgrass_core_fit <- fit_neutral_model(
   abundance_occupancy = switchgrass_core$abundance_occupancy
 )
 #> Waiting for profiling to be done...
+#> Warning: SNCM `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: Binomial model `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: Poisson model `stats::dnorm()` produced a warning during MLE: NaNs produced
 #> ℹ Neutral model fitting:
 #> • Average individuals per community (N): 1000
 #> • Binomial model using rounded N: 1000
 #> • Poisson model using N: 1000
 #> • Maximum likelihood estimation using N: 1000, and starting parameters: mu = 0,
 #>   sigma = 0.1
+#> Warning: SNCM `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: Binomial model `stats::dnorm()` produced a warning during MLE: NaNs produced
+#> Warning: Poisson model `stats::dnorm()` produced a warning during MLE: NaNs produced
 #> ✔ Model fitting complete!
 
 p <- plot_neutral_model(switchgrass_core_fit)
