@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">BRCore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,24 +33,30 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.5/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/germs-lab/BRCore/blob/v2.0.7/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.0.7" id="brcore-207">BRCore 2.0.7<a class="anchor" aria-label="anchor" href="#brcore-207"></a></h2><p class="text-muted">CRAN release: 2026-05-20</p>
+<p>2026-05-19</p>
+<ul><li>
+<a href="https://github.com/germs-lab/BRCore/commit/a43bc71d779c5b1b11b1291056570c6e00124212" class="external-link">a43bc71</a> Typo and instructions fixes to README and DESCRIPTION files.</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.5" id="brcore-205">BRCore 2.0.5<a class="anchor" aria-label="anchor" href="#brcore-205"></a></h2><p class="text-muted">CRAN release: 2026-05-19</p>
-<p>Date: 2026-05-18</p>
+<p>2026-05-18</p>
 <div class="section level3">
 <h3 id="bug-fixes-2-0-5">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-0-5"></a></h3>
-<ul><li><p>Relaxed version requirements for <code>phyloseq</code> and <code>stats4</code> to improve compatibilit.</p></li>
+<ul><li><p>Relaxed version requirements for <code>phyloseq</code> and <code>stats4</code> to improve compatibility.</p></li>
 <li><p><a href="https://github.com/germs-lab/BRCore/commit/5ba7a7c3067a2044c34aee812795dc427869eb4b" class="external-link">5ba7a7c</a> Added <code>biocViews</code> field to DESCRIPTION to allow installation of Bioconductor dependencies via <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code>.</p></li>
 <li><p><a href="https://github.com/germs-lab/BRCore/commit/40d79e448c632f590e4e52cbf16537496b29529f" class="external-link">40d79e4</a> Fixes to quote ‘BRCore’ in DESCRIPTION and typo fix of <code>sncm.fit</code> in _pkgdown.yaml</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="refactoring-2-0-5">Refactoring<a class="anchor" aria-label="anchor" href="#refactoring-2-0-5"></a></h3>
 <ul><li>
-<a href="https://github.com/germs-lab/BRCore/commit/95a42db482675450157ec2099a658e0ce538901c" class="external-link">95a42db</a><code><a href="../reference/sncm.fit.html">sncm.fit()</a></code>: replaced <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings()</a></code> with targeted warning capture via new internal helper <code><a href="../reference/dot-internal_warn_sncm.html">.internal_warn_sncm()</a></code>.</li>
+<a href="https://github.com/germs-lab/BRCore/commit/95a42db482675450157ec2099a658e0ce538901c" class="external-link">95a42db</a> <code><a href="../reference/sncm.fit.html">sncm.fit()</a></code>: replaced <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings()</a></code> with targeted warning capture via new internal helper <code><a href="../reference/dot-internal_warn_sncm.html">.internal_warn_sncm()</a></code>.</li>
 <li>
-<a href="https://github.com/germs-lab/BRCore/commit/46eff6fb691fd370e5b3723e285bb3882760d742" class="external-link">46eff6f</a><code><a href="../reference/plot_neutral_model.html">plot_neutral_model()</a></code>: refined plot axis styling and formatted y-axis as percent. Resized box annotation.</li>
+<a href="https://github.com/germs-lab/BRCore/commit/46eff6fb691fd370e5b3723e285bb3882760d742" class="external-link">46eff6f</a> <code><a href="../reference/plot_neutral_model.html">plot_neutral_model()</a></code>: refined plot axis styling and formatted y-axis as percent. Resized box annotation.</li>
 <li>
 <a href="https://github.com/germs-lab/BRCore/commit/b275861e8434204d66dc4962d10499488d738513" class="external-link">b275861</a> Removed redundant <code>data("bcse")</code> calls from examples and README vignette.</li>
 </ul></div>
@@ -65,7 +71,7 @@
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.4" id="brcore-204">BRCore 2.0.4<a class="anchor" aria-label="anchor" href="#brcore-204"></a></h2><p class="text-muted">CRAN release: 2026-05-05</p>
-<p>Date: 2026-04-30</p>
+<p>2026-04-30</p>
 <ul><li>Fixes to documentation:
 <ul><li>DOI links updated to correct format</li>
 <li>New example for <code>scnm.fit()</code>
@@ -79,7 +85,7 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.2" id="brcore-202">BRCore 2.0.2<a class="anchor" aria-label="anchor" href="#brcore-202"></a></h2>
-<p>Date: 2026-04-28</p>
+<p>2026-04-28</p>
 <ul><li>Fixes to vignette and function documentation prior to CRAN submission.</li>
 <li>Removed “multiple rarefaction” concept from documentation.</li>
 <li>Removed <code>parallel_helpers.R</code> since we have moved away from parallel implementations.</li>
@@ -87,12 +93,12 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.1" id="brcore-201">BRCore 2.0.1<a class="anchor" aria-label="anchor" href="#brcore-201"></a></h2>
-<p>Date: 2026-04-25</p>
+<p>2026-04-25</p>
 <ul><li>Resubmission to CRAN to address auto-check issues on Debian and Windows.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.0.0" id="brcore-200">BRCore 2.0.0<a class="anchor" aria-label="anchor" href="#brcore-200"></a></h2>
-<p>Date: 2026-04-24</p>
+<p>2026-04-24</p>
 <div class="section level3">
 <h3 id="breaking-changes-2-0-0">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-2-0-0"></a></h3>
 <ul><li>
@@ -151,7 +157,7 @@
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.2" id="brcore-102">BRCore 1.0.2<a class="anchor" aria-label="anchor" href="#brcore-102"></a></h2>
-<p>Date: 2026-02-25</p>
+<p>2026-02-25</p>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-2"></a></h3>
 <ul><li>Fixed <code><a href="../reference/multi_rarefy.html">multi_rarefy()</a></code> reproducibility across platforms using deterministic iteration seeds for parallel processing and adding floating-point tolerance in rarefaction.

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">BRCore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,15 +90,27 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the latest <em>stable</em> version of BRCore from CRAN with:</p>
+<div class="section level3">
+<h3 id="stable-version-from-cran-with">
+<em>Stable</em> version from CRAN with:<a class="anchor" aria-label="anchor" href="#stable-version-from-cran-with"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BRCore"</span><span class="op">)</span></span></code></pre></div>
-<p>Install the <em>development</em> version of BRCore from GitHub with:</p>
-<p>Install the <em>development</em> version of BRCore from GitHub with:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BRCore"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># or if using with `renv`:</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu">init</span><span class="op">(</span>bioconductor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">renv</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="st">"BRCore"</span><span class="op">)</span></span></code></pre></div>
+<p><strong><em>NOTE:</em></strong> <em>If using <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code> in an <code>renv</code> project, <code>renv</code> will intercept the call. Run <code>renv::init(bioconductor = TRUE)</code> first to ensure Bioconductor dependencies can be resolved and installed.</em></p>
+</div>
+<div class="section level3">
+<h3 id="development-version-from-github-with">
+<em>Development</em> version from GitHub with:<a class="anchor" aria-label="anchor" href="#development-version-from-github-with"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"germs-lab/BRCore"</span><span class="op">)</span></span></code></pre></div>
 <p><strong><em>Note:</em></strong> <em><code>pak</code> handles dependencies automatically.</em></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>

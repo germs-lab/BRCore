@@ -1,15 +1,24 @@
 # Changelog
 
+## BRCore 2.0.7
+
+CRAN release: 2026-05-20
+
+2026-05-19
+
+- [a43bc71](https://github.com/germs-lab/BRCore/commit/a43bc71d779c5b1b11b1291056570c6e00124212)
+  Typo and instructions fixes to README and DESCRIPTION files.
+
 ## BRCore 2.0.5
 
 CRAN release: 2026-05-19
 
-Date: 2026-05-18
+2026-05-18
 
 ### Bug Fixes
 
 - Relaxed version requirements for `phyloseq` and `stats4` to improve
-  compatibilit.
+  compatibility.
 
 - [5ba7a7c](https://github.com/germs-lab/BRCore/commit/5ba7a7c3067a2044c34aee812795dc427869eb4b)
   Added `biocViews` field to DESCRIPTION to allow installation of
@@ -22,11 +31,13 @@ Date: 2026-05-18
 
 ### Refactoring
 
-- [95a42db](https://github.com/germs-lab/BRCore/commit/95a42db482675450157ec2099a658e0ce538901c)[`sncm.fit()`](https://www.germslab.org/BRCore/reference/sncm.fit.md):
+- [95a42db](https://github.com/germs-lab/BRCore/commit/95a42db482675450157ec2099a658e0ce538901c)
+  [`sncm.fit()`](https://www.germslab.org/BRCore/reference/sncm.fit.md):
   replaced [`suppressWarnings()`](https://rdrr.io/r/base/warning.html)
   with targeted warning capture via new internal helper
   [`.internal_warn_sncm()`](https://www.germslab.org/BRCore/reference/dot-internal_warn_sncm.md).
-- [46eff6f](https://github.com/germs-lab/BRCore/commit/46eff6fb691fd370e5b3723e285bb3882760d742)[`plot_neutral_model()`](https://www.germslab.org/BRCore/reference/plot_neutral_model.md):
+- [46eff6f](https://github.com/germs-lab/BRCore/commit/46eff6fb691fd370e5b3723e285bb3882760d742)
+  [`plot_neutral_model()`](https://www.germslab.org/BRCore/reference/plot_neutral_model.md):
   refined plot axis styling and formatted y-axis as percent. Resized box
   annotation.
 - [b275861](https://github.com/germs-lab/BRCore/commit/b275861e8434204d66dc4962d10499488d738513)
@@ -45,7 +56,7 @@ Date: 2026-05-18
 
 CRAN release: 2026-05-05
 
-Date: 2026-04-30
+2026-04-30
 
 - Fixes to documentation:
   - DOI links updated to correct format
@@ -58,7 +69,7 @@ Date: 2026-04-30
 
 ## BRCore 2.0.2
 
-Date: 2026-04-28
+2026-04-28
 
 - Fixes to vignette and function documentation prior to CRAN submission.
 - Removed “multiple rarefaction” concept from documentation.
@@ -68,14 +79,14 @@ Date: 2026-04-28
 
 ## BRCore 2.0.1
 
-Date: 2026-04-25
+2026-04-25
 
 - Resubmission to CRAN to address auto-check issues on Debian and
   Windows.
 
 ## BRCore 2.0.0
 
-Date: 2026-04-24
+2026-04-24
 
 ### Breaking Changes
 
@@ -204,7 +215,7 @@ Date: 2026-04-24
 
 ## BRCore 1.0.2
 
-Date: 2026-02-25
+2026-02-25
 
 ### Bug Fixes
 

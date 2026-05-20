@@ -27,17 +27,17 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/germs-lab/BRCore/blob/v2.0.5/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/germs-lab/BRCore/blob/v2.0.7/DESCRIPTION)
 
 Aponte Rolón B, Benucci G, Kristy B, Shade A, Stopnisek N, Howe A
-(2026). *BRCore: Unified Framework for Identification and Ecological
+(2026). *BRCore: A Unified Framework for Identification and Ecological
 Interpretation of Microbial Data from Bioenergy Research Centers*. R
-package version 2.0.5, <https://github.com/germs-lab/BRCore>.
+package version 2.0.7, <https://github.com/germs-lab/BRCore>.
 
     @Manual{,
-      title = {BRCore: Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers},
+      title = {BRCore: A Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers},
       author = {Bolívar {Aponte Rolón} and Gian Maria Niccolò Benucci and Brandon Kristy and Ashley Shade and Nejc Stopnisek and Adina Howe},
       year = {2026},
-      note = {R package version 2.0.5},
+      note = {R package version 2.0.7},
       url = {https://github.com/germs-lab/BRCore},
     }
