@@ -1,6 +1,6 @@
 Package: BRCore
-Title: Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers
-Version: 2.0.4.9000
+Title: A Unified Framework for Identification and Ecological Interpretation of Microbial Data from Bioenergy Research Centers
+Version: 2.0.7.9000
 Authors@R: c(
     person("Bolívar", "Aponte Rolón",
            email = "bolaponte@pm.me", 
@@ -40,16 +40,14 @@ Imports:
     Hmisc (>= 5.2.4),
     magrittr (>= 2.0.4),
     minpack.lm (>= 1.2.4),
-    phyloseq (>= 1.54.0),
+    phyloseq,
     rlang (>= 1.1.6),
     scales (>= 1.4.0),
-    stats4 (>= 4.5.2),
+    stats4,
     tibble (>= 3.3.0),
     tidyr (>= 1.3.1),
     vegan (>= 2.7.2)
 Suggests:
-    devtools (>= 2.4.5),
-    here (>= 1.0.1),
     knitr (>= 1.50),
     rmarkdown (>= 2.30),
     testthat (>= 3.2.3),
