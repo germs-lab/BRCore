@@ -101,9 +101,6 @@
 #' \donttest{
 #' library(BRCore)
 #'
-#' data("switchgrass", package = "BRCore")
-#' data("bcse", package = "BRCore")
-#'
 #' # With rarefied data
 #' res <- identify_core(
 #'   physeq_obj     = switchgrass,

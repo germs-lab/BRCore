@@ -69,12 +69,12 @@ plot_identified_core <- function(
   prop_range <- max_prop - min_prop
 
   # Dynamic y positions for labels
-  elbow_y <- min_prop + 0.15 * prop_range
+  elbow_y <- min_prop + 0.1 * prop_range
   lastCall_y <- min_prop + 0.35 * prop_range
 
   # Adjust x position for labels if too close to edges
   elbow_x_offset <- ifelse(
-    elbow < max_rank * 0.1,
+    elbow < max_rank * 1.2,
     elbow + max_rank * 0.02,
     elbow - max_rank * 0.02
   )
@@ -86,7 +86,7 @@ plot_identified_core <- function(
 
   # Base plot
   p <- ggplot(new_data, aes(x = rank_num, y = proportionBC)) +
-    geom_point(size = 1.5, alpha = 0.7) +
+    geom_point(size = 2, alpha = 0.7) +
     geom_vline(
       xintercept = elbow,
       linetype = "dashed",
@@ -162,9 +162,10 @@ plot_identified_core <- function(
         " OTUs)"
       ),
       x = "Ranked OTUs",
-      y = "% Bray-Curtis similarity"
+      y = "Bray-Curtis similarity"
     ) +
     .brcore_theme() +
+    scale_y_continuous(labels = scales::label_percent(accuracy = 1)) +
     scale_x_continuous(breaks = seq(0, max(new_data$rank_num), by = 5))
 
   return(list(

@@ -205,7 +205,7 @@ plot_neutral_model <- function(fit_result) {
       parse = TRUE,
       hjust = 1,
       vjust = -0.75,
-      size = 3,
+      size = 4.5,
       fill = "white",
       alpha = 0.9,
       lineheight = 1.05
@@ -214,7 +214,8 @@ plot_neutral_model <- function(fit_result) {
       title = "Neutral model",
       x = "Log10(mean abundance)",
       y = "Occupancy"
-    )
+    ) +
+    scale_y_continuous(labels = scales::label_percent(accuracy = 1))
   # change legend shape to avoid confusion with the scatter points.
   p <- p +
     guides(

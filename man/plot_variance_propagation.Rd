@@ -41,7 +41,6 @@ This function evaluate the variance between rarefaction iterations from \code{mu
 library(phyloseq)
 library(BRCore)
 # Example comparing hill q=1 between Poplar and Switchgrass plots
-data("bcse", package = "BRCore")
 bcse_filt <- bcse |>
 subset_samples(Crop \%in\% c("Poplar", "Switchgrass"))
 

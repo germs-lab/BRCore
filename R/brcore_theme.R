@@ -78,7 +78,7 @@
       # Axes ----
       axis.title = element_text(
         size = base_size,
-        face = "bold",
+        face = "plain",
         colour = "black"
       ),
       axis.text = element_text(

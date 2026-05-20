@@ -35,8 +35,6 @@
 #' library(phyloseq)
 #' library(BRCore)
 #'
-#' data("bcse", package = "BRCore")
-#'
 #' # Adding metrics to a "phyloseq" object
 #' bcse_metrics <- add_rarefaction_metrics(data = bcse)
 #' sample_data(bcse_metrics)|>

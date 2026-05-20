@@ -51,15 +51,21 @@ curves, and core distributions
 
 ## Installation
 
-Install the latest *stable* version of BRCore from CRAN with:
+### *Stable* version from CRAN with:
 
 ``` r
 install.packages("BRCore")
+
+# or if using with `renv`:
+renv::init(bioconductor = TRUE)
+renv::install("BRCore")
 ```
 
-Install the *development* version of BRCore from GitHub with:
+***NOTE:*** *If using `install.packages()` in an `renv` project, `renv`
+will intercept the call. Run `renv::init(bioconductor = TRUE)` first to
+ensure Bioconductor dependencies can be resolved and installed.*
 
-Install the *development* version of BRCore from GitHub with:
+### *Development* version from GitHub with:
 
 ``` r
 # install.packages("pak")
@@ -74,9 +80,6 @@ pak::pak("germs-lab/BRCore")
 library(BRCore)
 library(phyloseq)
 
-# Load example data
-data("bcse", package = "BRCore")
-
 # Add rarefaction metrics
 bcse_metrics <- add_rarefaction_metrics(data = bcse)
 
@@ -90,9 +93,10 @@ bcse_rarefied_list <- multi_rarefy(
 
 # Update phyloseq object with rarefied data
 bcse_rare_single <- update_otu_table(
-  physeq_obj = bcse, 
-  rarefied_otus = bcse_rarefied_list, 
-  iteration = 2) # Your preffered iteration can be used here
+  physeq_obj = bcse,
+  rarefied_otus = bcse_rarefied_list,
+  iteration = 2
+) # Your preffered iteration can be used here
 
 # Identify core microbiome
 
@@ -107,12 +111,11 @@ bcse_core <- identify_core(
 
 # With multiple iterations of rarefaction
 bcse_core_multi <- identify_core(
-  physeq_obj = bcse, 
-  rarefied_list = bcse_rarefied_list
+  physeq_obj = bcse,
+  rarefied_list = bcse_rarefied_list,
   priority_var = "Crop",
   increase_value = 0.02,
   depth_level = 1000,
-  num_iter = 10,
   seed = 2134
 )
 
